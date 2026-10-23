@@ -1,30 +1,46 @@
+# Tatree Noise Remover 2
 
-# Tatreenoise Remover
+Windows x64 is the first target for this new native C++17/JUCE development version. It keeps the selected Thai indie cream/cobalt UI, the colour lawyer character and playful Thai tone, with functional controls and audio-driven Motion FX. macOS follows after Windows validation.
 
-Tatreenoise Remover is a noise reduction audio plugin created by a Thai developer.
+**Status:** development in progress. Linux tests and native UI checks passed; a native Windows build is still pending. See [actual validation and blockers](VALIDATION.md). There is no claim of a completed official Windows release yet.
 
-It is designed for removing background noise from vocals, podcasts, and music recordings.
+## Features
 
-Plugin Type: Noise Reduction / Denoiser  
-Platform: VST3  
-Category: Utility Plugin  
+- Progressive noise reduction, voice-conscious low-level/breath control, de-esser and 75 Hz low-cut.
+- Colour lawyer reactions for noise, de-essing, input hot, breath, removed-signal listening and bypass; filter/control-touch feedback and a motion-off preference.
+- Stereo IN/OUT peak meters with peak hold; actual energy-based gain-reduction meter.
+- Exact percentage entry, drag/keyboard knobs, delta listen, latency-matched bypass, host automation and session recall.
+- No runtime network connection, account or model download. Mono/stereo, 44.1/48/96 kHz checks.
 
-Features
-- Reduce background noise
-- Clean vocal recordings
-- Easy to use interface
-- Lightweight CPU usage
+## Windows first
 
-Developer
-Independent audio plugin developer from Thailand.
+Install Visual Studio 2022 **Desktop development with C++**, Windows SDK, Git and CMake ≥3.22. In PowerShell:
 
-Download
-https://benjilennon.gumroad.com/l/rsecg
+```powershell
+./scripts/build-windows.ps1
+```
 
-audio plugin
-noise remover
-vst plugin
-denoiser
-music production
-thai audio plugin
-plugin developer thailand
+The script builds, tests, captures the native UI, verifies the pinned Windows pluginval download, validates the actual plugin, and packages only matching binaries that passed. [Windows instructions and testing checklist](docs/WINDOWS.md).
+
+GitHub Actions contains the same Windows pipeline; it has not been run by this session yet. Its macOS job is optional and runs only after Windows success.
+
+## Development checks
+
+```sh
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release --parallel 3
+ctest --test-dir build -C Release --output-on-failure
+```
+
+JUCE 8.0.8 is pinned by commit; a local copy can be selected with `-DJUCE_PATH=/path/to/JUCE`. Debian/Ubuntu development dependencies include ALSA, X11/extensions, Freetype and Fontconfig. WebKit and curl are disabled.
+
+- [Current UI/audio review page](TEST-ME.html) — recorded native UI and audio examples, not a browser audio plugin.
+- [Architecture](docs/ARCHITECTURE.md)
+- [Visual QA](design-qa.md)
+- [Third-party components/licences](THIRD_PARTY.md)
+
+## Original v1.02
+
+The original Windows VST3 distribution, promotional image and its terms remain unchanged in this repository. Original download: https://benjilennon.gumroad.com/l/rsecg . Developer: Yuay Sound Records, Thailand.
+
+Version 2 is a new implementation with new plugin IDs, not recovered v1 source or a patched v1 binary. Listening comparisons with the original and the user's recordings remain necessary.

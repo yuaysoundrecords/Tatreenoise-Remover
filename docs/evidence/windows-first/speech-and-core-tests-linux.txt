@@ -1,0 +1,40 @@
+PASS STFT unity reconstruction and exact 1024-sample latency
+PASS latency is available before host preparation
+PASS zero processing preserves signal through variable-size blocks
+PASS host latency is declared
+PASS bypass is latency-matched dry with processing active
+PASS host bypass also preserves declared latency
+Noise change: -8.34214 dB
+PASS stationary broadband noise is reduced by more than 3 dB
+PASS noise meter reports actual spectral attenuation
+PASS silence stays silent without NaN or denormal artifacts
+De-ess low/high: -1.0063e-06 / -3.25642 dB
+PASS de-esser attenuates sibilant band while preserving low-frequency voice
+PASS breath control preserves quiet voiced fundamentals at maximum amount
+PASS breath control still reduces quiet unvoiced broadband material
+PASS host session restores controls and motion preference
+PASS input-hot latch catches peaks independently of output processing
+PASS UI can consume peak latch without losing persistent signal detection
+PASS noise attenuation triggers lawyer motion
+PASS de-esser takes priority over noise motion
+PASS input-hot has highest active priority
+PASS short input peaks stay visible for 800 ms
+PASS motion settles back to idle
+PASS reduced motion disables transforms while retaining status
+PASS input-hot warning is retained even in bypass
+PASS bypass suppresses processing animation when input is safe
+PASS actual breath attenuation triggers its own motion state
+PASS delta listen has a distinct listening state
+PASS input-hot warning overrides delta listen
+PASS filter feedback does not fabricate noise-detector activity
+PASS control-touch motion respects reduced-motion preference
+PASS 44.1/48/96 kHz and one-sample blocks stay finite
+PASS 44.1/48/96 kHz and one-sample blocks stay finite
+PASS 44.1/48/96 kHz and one-sample blocks stay finite
+PASS real-speech fixture opens
+PASS real-speech fixture decodes
+Real speech amount 25: input SNR 9.99566 dB, output SNR 10.4822 dB, voice correlation gain 0.959337
+Real speech amount 45: input SNR 9.99566 dB, output SNR 10.8408 dB, voice correlation gain 0.880754
+PASS default noise amount improves noisy real-speech SNR and retains voice level
+Real speech amount 65: input SNR 9.99566 dB, output SNR 10.1983 dB, voice correlation gain 0.788873
+All audio and motion checks passed.

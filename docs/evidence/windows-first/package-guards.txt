@@ -1,0 +1,4 @@
+PASS package refuses missing validation metadata
+Package: /workspace/Tatreenoise-Remover/build-package-tests/fixture with spaces-3201527ccaee4464bfc77e2ea8ee948a/package/Tatree-2-Windows-x64-20261023-090130.zip
+PASS absolute build path with spaces, complete archive and checksum
+PASS package refuses stale binary hashes

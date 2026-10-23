@@ -1,0 +1,56 @@
+name: Windows x64 build and validation
+on:
+  workflow_dispatch:
+    inputs:
+      build_macos:
+        description: 'Also build macOS after Windows validation passes'
+        type: boolean
+        default: false
+  push:
+    paths: ['Source/**', 'assets/**', 'tests/**', 'scripts/**', 'CMakeLists.txt', '.github/workflows/build.yml']
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-2022
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check packaging guards
+        shell: pwsh
+        run: ./tests/PackageWindows.Tests.ps1
+      - name: Build, test, validate and package Windows x64
+        shell: pwsh
+        run: ./scripts/build-windows.ps1 -BuildDirectory build-windows-msvc
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Windows-validation-evidence
+          path: build-windows-msvc/validation/
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Tatree-2-Windows-x64-tested
+          path: build-windows-msvc/package/*.zip
+          if-no-files-found: error
+  macos:
+    if: github.event_name == 'workflow_dispatch' && inputs.build_macos
+    needs: windows
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure universal build
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release '-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64'
+      - name: Build
+        run: cmake --build build --config Release --parallel 3
+      - name: Audio and motion tests
+        run: ctest --test-dir build -C Release --output-on-failure
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Tatree-2-macOS-test-build
+          path: |
+            build/Tatree_artefacts/Release/VST3/
+            build/Tatree_artefacts/Release/AU/
+            build/Tatree_artefacts/Release/Standalone/
+          if-no-files-found: error

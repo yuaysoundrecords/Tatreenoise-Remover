@@ -1,0 +1,131 @@
+#include "PluginProcessor.h"
+#include "MotionState.h"
+#include <iostream>
+#include <juce_audio_formats/juce_audio_formats.h>
+#include <random>
+#include <stdexcept>
+#include <vector>
+
+static void check(bool ok,const char* message){if(!ok)throw std::runtime_error(message);std::cout<<"PASS "<<message<<'\n';}
+static void set(TatreeProcessor& p,const char* id,float v){auto* param=p.params.getParameter(id);param->setValueNotifyingHost(param->convertTo0to1(v));}
+static std::vector<float> run(TatreeProcessor& p,const std::vector<float>& in,int block=127,bool hostBypass=false){
+    std::vector<float> out(in.size());juce::MidiBuffer midi;
+    for(size_t i=0;i<in.size();i+=size_t(block)){
+        const int n=int(std::min(size_t(block),in.size()-i));juce::AudioBuffer<float>b(2,n);
+        for(int c=0;c<2;++c)for(int j=0;j<n;++j)b.setSample(c,j,in[i+size_t(j)]);
+        if(hostBypass)p.processBlockBypassed(b,midi);else p.processBlock(b,midi);
+        for(int j=0;j<n;++j){out[i+size_t(j)]=b.getSample(0,j);if(!std::isfinite(out[i+size_t(j)]))throw std::runtime_error("nonfinite output");}
+    }return out;
+}
+static double rms(const std::vector<float>& v,int begin){double sum=0;for(size_t i=size_t(begin);i<v.size();++i)sum+=v[i]*v[i];return std::sqrt(sum/double(v.size()-size_t(begin)));}
+int main(int argc, char** argv){
+ juce::ScopedJuceInitialiser_GUI gui;
+ try {
+    std::mt19937 rng(42);std::normal_distribution<float> normal(0,.03f);
+    std::vector<float> noise(48000*3);for(auto& x:noise)x=normal(rng);
+    {
+        SpectralDenoiser d;float error=0;
+        for(size_t i=0;i<noise.size();++i){float y=d.process(noise[i],0);if(i>=1024)error=std::max(error,std::abs(y-noise[i-1024]));}
+        check(error<1e-5f,"STFT unity reconstruction and exact 1024-sample latency");
+    }
+    {
+        TatreeProcessor p;check(p.getLatencySamples()==1024,"latency is available before host preparation");set(p,"noise",0);set(p,"breath",0);set(p,"ess",0);set(p,"filter",0);p.prepareToPlay(48000,512);
+        auto out=run(p,noise);float error=0;for(size_t i=1024;i<out.size();++i)error=std::max(error,std::abs(out[i]-noise[i-1024]));
+        check(error<1e-5f,"zero processing preserves signal through variable-size blocks");
+        check(p.getLatencySamples()==1024,"host latency is declared");
+        set(p,"noise",100);set(p,"breath",75);set(p,"ess",100);set(p,"bypass",1);p.prepareToPlay(48000,512);
+        out=run(p,noise);error=0;for(size_t i=1024;i<out.size();++i)error=std::max(error,std::abs(out[i]-noise[i-1024]));
+        check(error<1e-7f,"bypass is latency-matched dry with processing active");
+        set(p,"bypass",0);p.prepareToPlay(48000,512);out=run(p,noise,31,true);error=0;
+        for(size_t i=4096;i<out.size();++i)error=std::max(error,std::abs(out[i]-noise[i-1024]));
+        check(error<1e-7f,"host bypass also preserves declared latency");
+    }
+    {
+        TatreeProcessor p;set(p,"noise",100);set(p,"breath",0);set(p,"ess",0);set(p,"filter",0);p.prepareToPlay(48000,512);
+        auto out=run(p,noise);const double db=20*std::log10(rms(out,48000)/rms(noise,48000));std::cout<<"Noise change: "<<db<<" dB\n";
+        check(db<-3,"stationary broadband noise is reduced by more than 3 dB");
+        check(p.meters.noiseDb.load()>.5f,"noise meter reports actual spectral attenuation");
+        p.prepareToPlay(48000,512);std::vector<float> zero(10000);out=run(p,zero);
+        check(rms(out,2048)==0,"silence stays silent without NaN or denormal artifacts");
+    }
+    {
+        auto tone=[](double hz){std::vector<float>x(96000);for(size_t i=0;i<x.size();++i)x[i]=.15f*float(std::sin(juce::MathConstants<double>::twoPi*hz*double(i)/48000));return x;};
+        double lowChange=0,highChange=0;
+        for(double hz:{400.0,8500.0}){
+            TatreeProcessor p;set(p,"noise",0);set(p,"breath",0);set(p,"ess",100);set(p,"filter",0);p.prepareToPlay(48000,512);
+            auto x=tone(hz);auto out=run(p,x);double db=20*std::log10(rms(out,48000)/rms(x,48000));
+            if(hz<1000)lowChange=db;else highChange=db;
+        }
+        std::cout<<"De-ess low/high: "<<lowChange<<" / "<<highChange<<" dB\n";
+        check(std::abs(lowChange)<.4 && highChange<-3,"de-esser attenuates sibilant band while preserving low-frequency voice");
+    }
+    {
+        std::vector<float> quietVoice(96000), quietNoise(96000);
+        for(size_t i=0;i<quietVoice.size();++i){
+            quietVoice[i]=.004f*float(std::sin(juce::MathConstants<double>::twoPi*400*double(i)/48000));
+            quietNoise[i]=normal(rng)*.1f;
+        }
+        TatreeProcessor p;set(p,"noise",0);set(p,"ess",0);set(p,"breath",100);set(p,"filter",0);p.prepareToPlay(48000,128);
+        auto voiceOut=run(p,quietVoice);double voiceDb=20*std::log10(rms(voiceOut,48000)/rms(quietVoice,48000));
+        check(std::abs(voiceDb)<.2,"breath control preserves quiet voiced fundamentals at maximum amount");
+        p.prepareToPlay(48000,128);auto breathOut=run(p,quietNoise);
+        double breathDb=20*std::log10(rms(breathOut,48000)/rms(quietNoise,48000));
+        check(breathDb<-3,"breath control still reduces quiet unvoiced broadband material");
+    }
+    {
+        TatreeProcessor p;set(p,"noise",72);set(p,"motion",0);set(p,"filter",0);juce::MemoryBlock state;p.getStateInformation(state);
+        TatreeProcessor restored;restored.setStateInformation(state.getData(),int(state.getSize()));
+        check(restored.params.getRawParameterValue("noise")->load()==72 && restored.params.getRawParameterValue("motion")->load()==0,"host session restores controls and motion preference");
+        p.prepareToPlay(44100,128);std::vector<float> hot(2500,1.01f);run(p,hot);
+        check(p.meters.hot.exchange(false),"input-hot latch catches peaks independently of output processing");
+        check(!p.meters.hot.exchange(false),"UI can consume peak latch without losing persistent signal detection");
+    }
+    {
+        MotionState m;for(int i=0;i<30;++i)m.update(8,0,false,false,1.f/30);
+        check(m.state==LawyerState::noise,"noise attenuation triggers lawyer motion");
+        for(int i=0;i<10;++i)m.update(8,6,false,false,1.f/30);
+        check(m.state==LawyerState::deEss,"de-esser takes priority over noise motion");
+        m.update(8,6,true,false,1.f/30);check(m.state==LawyerState::hot,"input-hot has highest active priority");
+        for(int i=0;i<15;++i)m.update(8,6,false,false,1.f/30);
+        check(m.state==LawyerState::hot,"short input peaks stay visible for 800 ms");
+        for(int i=0;i<60;++i)m.update(0,0,false,false,1.f/30);
+        check(m.state==LawyerState::idle,"motion settles back to idle");
+        m.reduced=true;m.update(12,8,true,false,.03f);check(m.rotation()==0 && m.lift()==0,"reduced motion disables transforms while retaining status");
+        m.update(12,8,true,true,.03f);check(m.state==LawyerState::hot,"input-hot warning is retained even in bypass");
+        MotionState bypassed;bypassed.update(12,8,false,true,.03f);check(bypassed.state==LawyerState::bypass,"bypass suppresses processing animation when input is safe");
+    }
+    {
+        MotionState m;for(int i=0;i<30;++i)m.update(0,0,false,false,1.f/30,8);
+        check(m.state==LawyerState::breath,"actual breath attenuation triggers its own motion state");
+        m.update(8,8,false,false,1.f/30,8,true);check(m.state==LawyerState::listen,"delta listen has a distinct listening state");
+        m.update(8,8,true,false,1.f/30,8,true);check(m.state==LawyerState::hot,"input-hot warning overrides delta listen");
+        MotionState filter;filter.touch(LawyerControl::filter);filter.update(0,0,false,false,.03f);
+        check(filter.state==LawyerState::idle && filter.touchHold>0,"filter feedback does not fabricate noise-detector activity");
+        filter.reduced=true;check(filter.rotation()==0 && filter.lift()==0,"control-touch motion respects reduced-motion preference");
+    }
+    for(double sr:{44100.0,48000.0,96000.0}){
+        TatreeProcessor p;p.prepareToPlay(sr,64);std::vector<float> input(8192);input[12]=1;input[23]=std::numeric_limits<float>::quiet_NaN();
+        auto out=run(p,input,1);check(std::isfinite(rms(out,0)),"44.1/48/96 kHz and one-sample blocks stay finite");
+    }
+    if(argc==3 && juce::String(argv[1])=="--speech-check"){
+        juce::AudioFormatManager formats;formats.registerBasicFormats();
+        auto file=juce::File::getCurrentWorkingDirectory().getChildFile(argv[2]);
+        std::unique_ptr<juce::AudioFormatReader> reader(formats.createReaderFor(file));
+        check(bool(reader),"real-speech fixture opens");
+        const int n=int(reader->lengthInSamples);juce::AudioBuffer<float> speech(1,n);
+        check(reader->read(&speech,0,n,0,true,false),"real-speech fixture decodes");
+        std::vector<float> clean(size_t(n),0), noisy(size_t(n+1024),0);
+        double energy=0;for(int i=0;i<n;++i){clean[size_t(i)]=speech.getSample(0,i);energy+=clean[size_t(i)]*clean[size_t(i)];}
+        const float sigma=float(std::sqrt(energy/n/10));std::normal_distribution<float> noiseDist(0,sigma);std::mt19937 speechRng(76);
+        for(int i=0;i<n;++i)noisy[size_t(i)]=clean[size_t(i)]+noiseDist(speechRng);
+        for(float amount : {25.0f,45.0f,65.0f}){
+            TatreeProcessor p;set(p,"noise",amount);set(p,"ess",0);set(p,"breath",0);set(p,"filter",0);p.prepareToPlay(reader->sampleRate,512);
+            auto processed=run(p,noisy,512);double before=0,after=0,dot=0;
+            for(int i=0;i<n;++i){before+=std::pow(noisy[size_t(i)]-clean[size_t(i)],2);after+=std::pow(processed[size_t(i+1024)]-clean[size_t(i)],2);dot+=processed[size_t(i+1024)]*clean[size_t(i)];}
+            std::cout<<"Real speech amount "<<amount<<": input SNR "<<10*std::log10(energy/before)<<" dB, output SNR "<<10*std::log10(energy/after)<<" dB, voice correlation gain "<<dot/energy<<"\n";
+            if(amount==45)check(after<before*std::pow(10.0,-.3/10) && dot/energy>.85,"default noise amount improves noisy real-speech SNR and retains voice level");
+        }
+    }
+    std::cout<<"All audio and motion checks passed.\n";return 0;
+ }catch(const std::exception& e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+}

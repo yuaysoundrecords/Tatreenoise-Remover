@@ -1,0 +1,24 @@
+[0/2] Re-checking globbed directories...
+[1/2] Re-running CMake...
+-- Checking for module 'gl'
+--   Package 'gl', required by 'virtual:world', not found
+-- Checking for modules 'webkit2gtk-4.0;gtk+-x11-3.0'
+--   Package 'webkit2gtk-4.0', required by 'virtual:world', not found
+--   Package 'gtk+-x11-3.0', required by 'virtual:world', not found
+-- Configuring juceaide
+-- Building juceaide
+-- Exporting juceaide
+-- Testing juceaide
+-- Finished setting up juceaide
+-- Configuring done (0.8s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/Tatreenoise-Remover/build
+[0/4] Re-checking globbed directories...
+[1/18] Generating juce_binarydata_TatreeAssets/JuceLibraryCode/BinaryData1.cpp, juce_binarydata_TatreeAssets/JuceLibraryCode/BinaryData2.cpp, juce_binarydata_TatreeAssets/JuceLibraryCode/BinaryData3.cpp, juce_binarydata_TatreeAssets/JuceLibraryCode/BinaryData4.cpp, juce_binarydata_TatreeAssets/JuceLibraryCode/BinaryData5.cpp, juce_binarydata_TatreeAssets/JuceLibraryCode/BinaryData6.cpp, juce_binarydata_TatreeAssets/JuceLibraryCode/BinaryData.h
+[2/9] Linking CXX executable TatreeTests_artefacts/Release/TatreeTests
+[3/9] Linking CXX shared module "Tatree_artefacts/Release/VST3/Tatree Noise Remover 2.vst3/Contents/x86_64-linux/Tatree Noise Remover 2.so"
+removing moduleinfo.json
+creating /workspace/Tatreenoise-Remover/build/Tatree_artefacts/Release/VST3/Tatree Noise Remover 2.vst3/Contents/Resources/moduleinfo.json
+[4/9] Linking CXX executable "Tatree_artefacts/Release/Standalone/Tatree Noise Remover 2"
+[5/9] Linking CXX executable TatreeRender_artefacts/Release/TatreeRender
+[6/9] Linking CXX executable TatreeOffline_artefacts/Release/TatreeOffline
