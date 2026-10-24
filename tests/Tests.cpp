@@ -5,6 +5,7 @@
 #include <random>
 #include <stdexcept>
 #include <vector>
+#include <memory>
 
 static void check(bool ok,const char* message){if(!ok)throw std::runtime_error(message);std::cout<<"PASS "<<message<<'\n';}
 static void set(TatreeProcessor& p,const char* id,float v){auto* param=p.params.getParameter(id);param->setValueNotifyingHost(param->convertTo0to1(v));}
@@ -19,6 +20,9 @@ static std::vector<float> run(TatreeProcessor& p,const std::vector<float>& in,in
 }
 static double rms(const std::vector<float>& v,int begin){double sum=0;for(size_t i=size_t(begin);i<v.size();++i)sum+=v[i]*v[i];return std::sqrt(sum/double(v.size()-size_t(begin)));}
 int main(int argc, char** argv){
+ // Keep processor fixtures off main's stack. MSVC can reserve distinct slots
+ // for all scoped fixtures, exceeding the Windows default 1 MiB stack before
+ // the first assertion. Plugin instances themselves are heap-created by JUCE.
  juce::ScopedJuceInitialiser_GUI gui;
  try {
     std::mt19937 rng(42);std::normal_distribution<float> normal(0,.03f);
@@ -29,7 +33,7 @@ int main(int argc, char** argv){
         check(error<1e-5f,"STFT unity reconstruction and exact 1024-sample latency");
     }
     {
-        TatreeProcessor p;check(p.getLatencySamples()==1024,"latency is available before host preparation");set(p,"noise",0);set(p,"breath",0);set(p,"ess",0);set(p,"filter",0);p.prepareToPlay(48000,512);
+        auto processorStorage=std::make_unique<TatreeProcessor>();auto& p=*processorStorage;check(p.getLatencySamples()==1024,"latency is available before host preparation");set(p,"noise",0);set(p,"breath",0);set(p,"ess",0);set(p,"filter",0);p.prepareToPlay(48000,512);
         auto out=run(p,noise);float error=0;for(size_t i=1024;i<out.size();++i)error=std::max(error,std::abs(out[i]-noise[i-1024]));
         check(error<1e-5f,"zero processing preserves signal through variable-size blocks");
         check(p.getLatencySamples()==1024,"host latency is declared");
@@ -41,7 +45,7 @@ int main(int argc, char** argv){
         check(error<1e-7f,"host bypass also preserves declared latency");
     }
     {
-        TatreeProcessor p;set(p,"noise",100);set(p,"breath",0);set(p,"ess",0);set(p,"filter",0);p.prepareToPlay(48000,512);
+        auto processorStorage=std::make_unique<TatreeProcessor>();auto& p=*processorStorage;set(p,"noise",100);set(p,"breath",0);set(p,"ess",0);set(p,"filter",0);p.prepareToPlay(48000,512);
         auto out=run(p,noise);const double db=20*std::log10(rms(out,48000)/rms(noise,48000));std::cout<<"Noise change: "<<db<<" dB\n";
         check(db<-3,"stationary broadband noise is reduced by more than 3 dB");
         check(p.meters.noiseDb.load()>.5f,"noise meter reports actual spectral attenuation");
@@ -52,7 +56,7 @@ int main(int argc, char** argv){
         auto tone=[](double hz){std::vector<float>x(96000);for(size_t i=0;i<x.size();++i)x[i]=.15f*float(std::sin(juce::MathConstants<double>::twoPi*hz*double(i)/48000));return x;};
         double lowChange=0,highChange=0;
         for(double hz:{400.0,8500.0}){
-            TatreeProcessor p;set(p,"noise",0);set(p,"breath",0);set(p,"ess",100);set(p,"filter",0);p.prepareToPlay(48000,512);
+            auto processorStorage=std::make_unique<TatreeProcessor>();auto& p=*processorStorage;set(p,"noise",0);set(p,"breath",0);set(p,"ess",100);set(p,"filter",0);p.prepareToPlay(48000,512);
             auto x=tone(hz);auto out=run(p,x);double db=20*std::log10(rms(out,48000)/rms(x,48000));
             if(hz<1000)lowChange=db;else highChange=db;
         }
@@ -65,7 +69,7 @@ int main(int argc, char** argv){
             quietVoice[i]=.004f*float(std::sin(juce::MathConstants<double>::twoPi*400*double(i)/48000));
             quietNoise[i]=normal(rng)*.1f;
         }
-        TatreeProcessor p;set(p,"noise",0);set(p,"ess",0);set(p,"breath",100);set(p,"filter",0);p.prepareToPlay(48000,128);
+        auto processorStorage=std::make_unique<TatreeProcessor>();auto& p=*processorStorage;set(p,"noise",0);set(p,"ess",0);set(p,"breath",100);set(p,"filter",0);p.prepareToPlay(48000,128);
         auto voiceOut=run(p,quietVoice);double voiceDb=20*std::log10(rms(voiceOut,48000)/rms(quietVoice,48000));
         check(std::abs(voiceDb)<.2,"breath control preserves quiet voiced fundamentals at maximum amount");
         p.prepareToPlay(48000,128);auto breathOut=run(p,quietNoise);
@@ -73,7 +77,7 @@ int main(int argc, char** argv){
         check(breathDb<-3,"breath control still reduces quiet unvoiced broadband material");
     }
     {
-        TatreeProcessor p;set(p,"noise",0);set(p,"ess",0);set(p,"breath",100);set(p,"filter",0);p.prepareToPlay(48000,127);
+        auto processorStorage=std::make_unique<TatreeProcessor>();auto& p=*processorStorage;set(p,"noise",0);set(p,"ess",0);set(p,"breath",100);set(p,"filter",0);p.prepareToPlay(48000,127);
         std::vector<float> consonant(48000,0);
         for(int i=12000;i<13920;++i)consonant[size_t(i)]=normal(rng)*.15f; // 40 ms unvoiced consonant-like burst.
         auto out=run(p,consonant);double inEnergy=0,outEnergy=0;
@@ -88,7 +92,7 @@ int main(int argc, char** argv){
         check(10*std::log10(outEnergy/inEnergy)>-.75,"de-breath recovers for the voiced word following a breath");
     }
     for(double sr:{16000.0,44100.0,48000.0,96000.0}) {
-        TatreeProcessor p;set(p,"noise",0);set(p,"ess",100);set(p,"breath",0);set(p,"filter",0);p.prepareToPlay(sr,127);
+        auto processorStorage=std::make_unique<TatreeProcessor>();auto& p=*processorStorage;set(p,"noise",0);set(p,"ess",100);set(p,"breath",0);set(p,"filter",0);p.prepareToPlay(sr,127);
         std::vector<float> sibilant(size_t(sr*2),0);
         for(size_t i=0;i<sibilant.size();++i)sibilant[i]=.01f*float(std::sin(juce::MathConstants<double>::twoPi*6000*double(i)/sr));
         auto out=run(p,sibilant);const double change=20*std::log10(rms(out,int(sr))/rms(sibilant,int(sr)));
@@ -96,7 +100,7 @@ int main(int argc, char** argv){
         check(change<-2,"de-esser detects quiet sibilance at 16/44.1/48/96 kHz");
     }
     {
-        TatreeProcessor p;set(p,"noise",0);set(p,"ess",100);set(p,"breath",0);set(p,"filter",0);p.prepareToPlay(48000,127);
+        auto processorStorage=std::make_unique<TatreeProcessor>();auto& p=*processorStorage;set(p,"noise",0);set(p,"ess",100);set(p,"breath",0);set(p,"filter",0);p.prepareToPlay(48000,127);
         std::vector<float> mixed(96000,0);
         for(size_t i=0;i<mixed.size();++i)mixed[i]=.1f*float(std::sin(juce::MathConstants<double>::twoPi*400*double(i)/48000))+.08f*float(std::sin(juce::MathConstants<double>::twoPi*8500*double(i)/48000));
         auto out=run(p,mixed);const auto bandAmplitude=[&](double hz){double re=0,im=0;for(int i=48000;i<96000;++i){double phase=juce::MathConstants<double>::twoPi*hz*(i-1024)/48000;re+=out[size_t(i)]*std::cos(phase);im+=out[size_t(i)]*std::sin(phase);}return 2*std::sqrt(re*re+im*im)/48000;};
@@ -105,8 +109,8 @@ int main(int argc, char** argv){
         check(std::abs(voiceDb)<.2 && essDb<-2,"split-band de-esser reduces sibilance without ducking simultaneous vowel body");
     }
     {
-        TatreeProcessor p;set(p,"noise",72);set(p,"motion",0);set(p,"filter",0);juce::MemoryBlock state;p.getStateInformation(state);
-        TatreeProcessor restored;restored.setStateInformation(state.getData(),int(state.getSize()));
+        auto processorStorage=std::make_unique<TatreeProcessor>();auto& p=*processorStorage;set(p,"noise",72);set(p,"motion",0);set(p,"filter",0);juce::MemoryBlock state;p.getStateInformation(state);
+        auto restoredStorage=std::make_unique<TatreeProcessor>();auto& restored=*restoredStorage;restored.setStateInformation(state.getData(),int(state.getSize()));
         check(restored.params.getRawParameterValue("noise")->load()==72 && restored.params.getRawParameterValue("motion")->load()==0,"host session restores controls and motion preference");
         p.prepareToPlay(44100,128);std::vector<float> hot(2500,1.01f);run(p,hot);
         check(p.meters.hot.exchange(false),"input-hot latch catches peaks independently of output processing");
@@ -136,7 +140,7 @@ int main(int argc, char** argv){
         filter.reduced=true;check(filter.rotation()==0 && filter.lift()==0,"control-touch motion respects reduced-motion preference");
     }
     {
-        TatreeProcessor p;set(p,"noise",0);set(p,"breath",0);set(p,"ess",0);set(p,"filter",0);
+        auto processorStorage=std::make_unique<TatreeProcessor>();auto& p=*processorStorage;set(p,"noise",0);set(p,"breath",0);set(p,"ess",0);set(p,"filter",0);
         set(p,"inputGain",6);set(p,"outputGain",-3);p.prepareToPlay(48000,512);
         auto out=run(p,noise);const double change=20*std::log10(rms(out,48000)/rms(noise,48000));
         check(std::abs(change-3)<.02,"input and output trim apply in dB independently of denoising");
@@ -145,13 +149,13 @@ int main(int argc, char** argv){
         check(error<1e-7f,"bypass skips input trim, auto gain and output trim with exact latency");
         set(p,"bypass",0);set(p,"listen",1);set(p,"autoGain",0);p.prepareToPlay(48000,512);
         auto removed=run(p,noise);check(rms(removed,48000)<1e-5,"delta listen excludes input and output gain from removed-signal reference");
-        juce::MemoryBlock state;p.getStateInformation(state);TatreeProcessor restored;restored.setStateInformation(state.getData(),int(state.getSize()));
+        juce::MemoryBlock state;p.getStateInformation(state);auto restoredStorage=std::make_unique<TatreeProcessor>();auto& restored=*restoredStorage;restored.setStateInformation(state.getData(),int(state.getSize()));
         check(restored.params.getRawParameterValue("inputGain")->load()==6 && restored.params.getRawParameterValue("outputGain")->load()==24 && restored.params.getRawParameterValue("autoGain")->load()==0,"gain controls and auto preference survive session recall");
         set(p,"listen",0);set(p,"bypass",0);set(p,"autoGain",0);set(p,"inputGain",0);set(p,"outputGain",24);p.prepareToPlay(48000,512);
         run(p,std::vector<float>(4096,.2f));check(p.meters.hot.exchange(false),"output overload warns even when raw input is safe");
     }
     {
-        TatreeProcessor p;set(p,"noise",0);set(p,"breath",0);set(p,"ess",0);set(p,"filter",0);set(p,"autoGain",1);set(p,"inputGain",6);p.prepareToPlay(48000,512);
+        auto processorStorage=std::make_unique<TatreeProcessor>();auto& p=*processorStorage;set(p,"noise",0);set(p,"breath",0);set(p,"ess",0);set(p,"filter",0);set(p,"autoGain",1);set(p,"inputGain",6);p.prepareToPlay(48000,512);
         juce::MidiBuffer midi;double energy=0;float stereoError=0;int count=0;
         for(int block=0;block<1200;++block) {
             juce::AudioBuffer<float> b(2,512);
@@ -199,7 +203,7 @@ int main(int argc, char** argv){
         check(high-low<.8 && low>-19 && high<-17,"vocal auto gain stages settled phrase levels around -18 dBFS without fast compression");
     }
     for(double sr:{44100.0,48000.0,96000.0}){
-        TatreeProcessor p;p.prepareToPlay(sr,64);std::vector<float> input(8192);input[12]=1;input[23]=std::numeric_limits<float>::quiet_NaN();
+        auto processorStorage=std::make_unique<TatreeProcessor>();auto& p=*processorStorage;p.prepareToPlay(sr,64);std::vector<float> input(8192);input[12]=1;input[23]=std::numeric_limits<float>::quiet_NaN();
         auto out=run(p,input,1);check(std::isfinite(rms(out,0)),"44.1/48/96 kHz and one-sample blocks stay finite");
     }
     if(argc==3 && juce::String(argv[1])=="--speech-check"){
@@ -214,14 +218,14 @@ int main(int argc, char** argv){
         const float sigma=float(std::sqrt(energy/n/10));std::normal_distribution<float> noiseDist(0,sigma);std::mt19937 speechRng(76);
         for(int i=0;i<n;++i)noisy[size_t(i)]=clean[size_t(i)]+noiseDist(speechRng);
         for(float amount : {25.0f,45.0f,65.0f}){
-            TatreeProcessor p;set(p,"noise",amount);set(p,"ess",0);set(p,"breath",0);set(p,"filter",0);p.prepareToPlay(reader->sampleRate,512);
+            auto processorStorage=std::make_unique<TatreeProcessor>();auto& p=*processorStorage;set(p,"noise",amount);set(p,"ess",0);set(p,"breath",0);set(p,"filter",0);p.prepareToPlay(reader->sampleRate,512);
             auto processed=run(p,noisy,512);double before=0,after=0,dot=0;
             for(int i=0;i<n;++i){before+=std::pow(noisy[size_t(i)]-clean[size_t(i)],2);after+=std::pow(processed[size_t(i+1024)]-clean[size_t(i)],2);dot+=processed[size_t(i+1024)]*clean[size_t(i)];}
             std::cout<<"Real speech amount "<<amount<<": input SNR "<<10*std::log10(energy/before)<<" dB, output SNR "<<10*std::log10(energy/after)<<" dB, voice correlation gain "<<dot/energy<<"\n";
             if(amount==45)check(after<before*std::pow(10.0,-.3/10) && dot/energy>.85,"default noise amount improves noisy real-speech SNR and retains voice level");
         }
         {
-            TatreeProcessor p;set(p,"noise",45);set(p,"ess",0);set(p,"breath",0);set(p,"filter",0);p.prepareToPlay(reader->sampleRate,512);
+            auto processorStorage=std::make_unique<TatreeProcessor>();auto& p=*processorStorage;set(p,"noise",45);set(p,"ess",0);set(p,"breath",0);set(p,"filter",0);p.prepareToPlay(reader->sampleRate,512);
             auto input=clean;input.resize(size_t(n+1024),0);auto y=run(p,input,127);double dot=0,error=0;
             for(int i=0;i<n;++i){dot+=y[size_t(i+1024)]*clean[size_t(i)];error+=std::pow(y[size_t(i+1024)]-clean[size_t(i)],2);}
             const double gain=dot/energy, errorSnr=10*std::log10(energy/error);
@@ -241,7 +245,7 @@ int main(int argc, char** argv){
             }
             const float scale=float(std::sqrt(energy/(10*noiseEnergy)));
             for(int i=0;i<total;++i)fixture[size_t(i)]=disturbance[size_t(i)]*scale+(i>=pre?clean[size_t(i-pre)]:0);
-            TatreeProcessor p;set(p,"noise",45);set(p,"ess",0);set(p,"breath",0);set(p,"filter",0);p.prepareToPlay(reader->sampleRate,512);
+            auto processorStorage=std::make_unique<TatreeProcessor>();auto& p=*processorStorage;set(p,"noise",45);set(p,"ess",0);set(p,"breath",0);set(p,"filter",0);p.prepareToPlay(reader->sampleRate,512);
             auto y=run(p,fixture,127);double error=0,dot=0;
             for(int i=0;i<n;++i){float out=y[size_t(pre+i+1024)];error+=std::pow(out-clean[size_t(i)],2);dot+=out*clean[size_t(i)];}
             const double snr=10*std::log10(energy/error),gain=dot/energy;
@@ -249,7 +253,7 @@ int main(int argc, char** argv){
             check(snr>10.25 && gain>.90,"default denoiser improves white/pink/hum/modulated speech fixtures while retaining voice");
         }
         {
-            TatreeProcessor p;set(p,"noise",0);set(p,"ess",0);set(p,"breath",0);set(p,"filter",0);set(p,"autoGain",1);p.prepareToPlay(reader->sampleRate,512);
+            auto processorStorage=std::make_unique<TatreeProcessor>();auto& p=*processorStorage;set(p,"noise",0);set(p,"ess",0);set(p,"breath",0);set(p,"filter",0);set(p,"autoGain",1);p.prepareToPlay(reader->sampleRate,512);
             juce::MidiBuffer midi;float previous=0,maxRise=0,maxFall=0,peak=0;
             for(int offset=0;offset<n;offset+=512) {
                 const int count=std::min(512,n-offset);juce::AudioBuffer<float> b(2,count);
