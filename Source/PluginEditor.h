@@ -1,6 +1,7 @@
 #pragma once
 #include "PluginProcessor.h"
 #include "MotionState.h"
+#include "SpeechFeedback.h"
 #include <juce_gui_extra/juce_gui_extra.h>
 
 class TatreeLook final : public juce::LookAndFeel_V4 {
@@ -22,6 +23,7 @@ public:
     void paint(juce::Graphics&) override;
     void resized() override;
     LawyerState currentMotionState() const { return motion.state; }
+    SpeechCue currentSpeechCue() const { return speech.cue; }
 private:
     void timerCallback() override;
     void drawSpeechBanner(juce::Graphics&);
@@ -35,7 +37,7 @@ private:
     juce::Image paper, lawyer, lawyerDeess, lawyerHot;
     std::array<juce::Slider,3> knobs;
     std::array<juce::Label,3> values;
-    std::array<float,6> previousControls {{45,25,30,1,0,0}};
+    std::array<float,9> previousControls {};
     std::array<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>,3> knobAttachments;
     juce::TextButton filter {"FILTER"}, listen {"LISTEN"}, bypass {"BYPASS"}, motionButton {"MOTION FX"}, autoButton {"AUTO GAIN"};
     std::array<juce::Slider,2> gainSliders;
@@ -43,6 +45,8 @@ private:
     std::array<std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>,5> buttonAttachments;
     juce::TooltipWindow tooltips {this,650};
     MotionState motion;
+    SpeechFeedback speech;
+    float speechFontSize=38;
     juce::String bannerText;
     juce::GlyphArrangement bannerGlyphs;
     juce::Rectangle<float> bannerFrame;

@@ -5,7 +5,7 @@
 class RenderApp final : public juce::JUCEApplication, private juce::Timer {
 public:
     const juce::String getApplicationName() override { return "Tatree render"; }
-    const juce::String getApplicationVersion() override { return "2.0.2"; }
+    const juce::String getApplicationVersion() override { return "2.0.3"; }
     void initialise(const juce::String& args) override {
         auto arguments=juce::StringArray::fromTokens(args,true);arguments.removeEmptyStrings();
         recordFrames=arguments.contains("--frames");arguments.removeString("--frames");
@@ -70,13 +70,50 @@ private:
         set("listen",scenario==7?1:0);set("filter",scenario==0 || scenario==8?1:0);
         processor->prepareToPlay(48000,1600);
     }
+    void quoteAction() {
+        if(quoteIndex<3) {
+            const char* names[]{"inputGain","De-esser","Noise reduction"};
+            for(int i=0;i<editor->getNumChildComponents();++i)
+                if(auto* knob=dynamic_cast<juce::Slider*>(editor->getChildComponent(i)))
+                    if(knob->getName()==names[quoteIndex]) {knob->setValue(knob->getValue()+1,juce::sendNotificationSync);return;}
+        } else if(quoteIndex<5) {
+            for(int i=0;i<editor->getNumChildComponents();++i)
+                if(auto* button=dynamic_cast<juce::TextButton*>(editor->getChildComponent(i)))
+                    if(button->getButtonText()=="AUTO GAIN") {button->triggerClick();return;}
+        } else return;
+        fail("Quote control not found");
+    }
+    void quoteTick() {
+        ++ticks;
+        if(quoteIndex==5) {
+            if(ticks<100)return;
+            if(editor->currentSpeechCue()!=SpeechCue::idle){fail("Quote did not expire after control release");return;}
+            std::cout<<"Control quotes expire without fabricating DSP activity\n";stopTimer();quit();return;
+        }
+        if(ticks<10)return;
+        const SpeechCue expected[]{SpeechCue::peak,SpeechCue::deEss,SpeechCue::noise,SpeechCue::autoGain,SpeechCue::autoGain};
+        const char* names[]{"quote-peak","quote-de-esser","quote-noise","quote-auto-on","quote-auto-off"};
+        if(editor->currentSpeechCue()!=expected[quoteIndex]){fail("User control did not show its assigned quote");return;}
+        if(quoteIndex>=3 && (processor->params.getRawParameterValue("autoGain")->load()>.5f)!=(quoteIndex==3)){fail("Auto Gain quote must work on both ON and OFF clicks");return;}
+        if(editor->currentMotionState()!=LawyerState::idle){fail("Control quote fabricated DSP activity");return;}
+        if(!capture(names[quoteIndex]))return;
+        if(quoteIndex==0) {
+            for(auto size:{juce::Point<int>{864,688},juce::Point<int>{1620,1290}}) {
+                editor->setSize(size.x,size.y);if(!capture("quote-peak-"+juce::String(size.x)))return;
+            }
+            editor->setSize(1080,860);
+        }
+        std::cout<<"User interaction captured "<<names[quoteIndex]<<"\n";
+        ++quoteIndex;ticks=0;quoteAction();
+    }
     void timerCallback() override {
+        if(quoteTesting){quoteTick();return;}
         if(stopped) {
             if(++ticks<55)return;
             if(editor->currentMotionState()!=LawyerState::idle) { fail("Motion stayed active after audio stopped");return; }
             if(!capture("stopped"))return;
             std::cout<<"Stopped transport decays meters and returns motion to idle\n";
-            stopTimer();quit();return;
+            quoteTesting=true;quoteIndex=0;ticks=0;quoteAction();return;
         }
         juce::AudioBuffer<float> b(2,1600);juce::MidiBuffer midi;
         for(int i=0;i<1600;++i) {
@@ -119,6 +156,7 @@ private:
     juce::Random random {42};
     int ticks=0,scenario=0,frameIndex=0;
     double phase=0;
-    bool stopped=false,recordFrames=false;
+    bool stopped=false,recordFrames=false,quoteTesting=false;
+    int quoteIndex=0;
 };
 START_JUCE_APPLICATION(RenderApp)

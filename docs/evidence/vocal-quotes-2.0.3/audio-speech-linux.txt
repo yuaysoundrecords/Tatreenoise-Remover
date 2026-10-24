@@ -1,0 +1,94 @@
+PASS STFT unity reconstruction and exact 1024-sample latency
+PASS latency is available before host preparation
+PASS zero processing preserves signal through variable-size blocks
+PASS host latency is declared
+PASS bypass is latency-matched dry with processing active
+PASS host bypass also preserves declared latency
+Noise change: -14.9112 dB
+PASS stationary broadband noise is reduced by more than 3 dB
+PASS noise meter reports actual spectral attenuation
+PASS silence stays silent without NaN or denormal artifacts
+De-ess low/high: -7.41321e-06 / -6.72608 dB
+PASS de-esser attenuates sibilant band while preserving low-frequency voice
+PASS breath control preserves quiet voiced fundamentals at maximum amount
+PASS breath control still reduces quiet unvoiced broadband material
+Short unvoiced burst: -5.75203e-07 dB
+PASS maximum de-breath preserves short unvoiced consonant-like bursts
+PASS de-breath recovers for the voiced word following a breath
+Quiet 6 kHz de-ess at 16000: -4.83645 dB
+PASS de-esser detects quiet sibilance at 16/44.1/48/96 kHz
+Quiet 6 kHz de-ess at 44100: -3.01726 dB
+PASS de-esser detects quiet sibilance at 16/44.1/48/96 kHz
+Quiet 6 kHz de-ess at 48000: -2.98667 dB
+PASS de-esser detects quiet sibilance at 16/44.1/48/96 kHz
+Quiet 6 kHz de-ess at 96000: -2.87181 dB
+PASS de-esser detects quiet sibilance at 16/44.1/48/96 kHz
+Simultaneous voice/sibilance: -0.0187995 / -2.76522 dB
+PASS split-band de-esser reduces sibilance without ducking simultaneous vowel body
+PASS host session restores controls and motion preference
+PASS input-hot latch catches peaks independently of output processing
+PASS UI can consume peak latch without losing persistent signal detection
+PASS noise attenuation triggers lawyer motion
+PASS de-esser takes priority over noise motion
+PASS input-hot has highest active priority
+PASS short input peaks stay visible for 800 ms
+PASS motion settles back to idle
+PASS reduced motion disables transforms while retaining status
+PASS input-hot warning is retained even in bypass
+PASS bypass suppresses processing animation when input is safe
+PASS actual breath attenuation triggers its own motion state
+PASS delta listen has a distinct listening state
+PASS input-hot warning overrides delta listen
+PASS filter feedback does not fabricate noise-detector activity
+PASS control-touch motion respects reduced-motion preference
+PASS input and output trim apply in dB independently of denoising
+PASS bypass skips input trim, auto gain and output trim with exact latency
+PASS delta listen excludes input and output gain from removed-signal reference
+PASS gain controls and auto preference survive session recall
+PASS output overload warns even when raw input is safe
+PASS pre-chain auto gain compensates input trim and reaches stereo RMS target
+PASS stereo-linked auto gain preserves left-right balance
+PASS auto gain converges to target for steady quiet voice within boost bound
+PASS auto gain silence gate avoids noise runaway
+PASS auto gain attenuates loud input with bounded correction
+PASS disabling auto gain returns smoothly to unity
+PASS auto gain converges to target for steady quiet voice within boost bound
+PASS auto gain silence gate avoids noise runaway
+PASS auto gain attenuates loud input with bounded correction
+PASS disabling auto gain returns smoothly to unity
+PASS auto gain converges to target for steady quiet voice within boost bound
+PASS auto gain silence gate avoids noise runaway
+PASS auto gain attenuates loud input with bounded correction
+PASS disabling auto gain returns smoothly to unity
+PASS vocal auto gain obeys smooth gain-rise/fall bounds through phrase level changes
+PASS vocal auto gain holds low breaths instead of learning them as a quiet phrase
+PASS vocal auto gain obeys smooth gain-rise/fall bounds through phrase level changes
+PASS vocal auto gain holds low breaths instead of learning them as a quiet phrase
+PASS vocal auto gain obeys smooth gain-rise/fall bounds through phrase level changes
+PASS vocal auto gain holds low breaths instead of learning them as a quiet phrase
+Vocal staging phrase 0: -18.1773 dBFS RMS
+Vocal staging phrase 1: -17.8583 dBFS RMS
+Vocal staging phrase 2: -18.1878 dBFS RMS
+PASS vocal auto gain stages settled phrase levels around -18 dBFS without fast compression
+PASS 44.1/48/96 kHz and one-sample blocks stay finite
+PASS 44.1/48/96 kHz and one-sample blocks stay finite
+PASS 44.1/48/96 kHz and one-sample blocks stay finite
+PASS real-speech fixture opens
+PASS real-speech fixture decodes
+Real speech amount 25: input SNR 9.99566 dB, output SNR 12.0735 dB, voice correlation gain 0.96678
+Real speech amount 45: input SNR 9.99566 dB, output SNR 13.2582 dB, voice correlation gain 0.945044
+PASS default noise amount improves noisy real-speech SNR and retains voice level
+Real speech amount 65: input SNR 9.99566 dB, output SNR 13.8934 dB, voice correlation gain 0.927261
+Clean speech gain 0.96047, error SNR 23.0203 dB
+PASS default denoiser preserves clean recorded speech instead of learning it as noise
+Speech/noise case 0: SNR 13.3085 dB, voice gain 0.9452
+PASS default denoiser improves white/pink/hum/modulated speech fixtures while retaining voice
+Speech/noise case 1: SNR 13.0985 dB, voice gain 0.949777
+PASS default denoiser improves white/pink/hum/modulated speech fixtures while retaining voice
+Speech/noise case 2: SNR 18.9548 dB, voice gain 0.958581
+PASS default denoiser improves white/pink/hum/modulated speech fixtures while retaining voice
+Speech/noise case 3: SNR 10.7422 dB, voice gain 0.95533
+PASS default denoiser improves white/pink/hum/modulated speech fixtures while retaining voice
+Recorded vocal auto gain: maximum rise/fall 3.00026 / 12.0001 dB/s, output peak 0.861814
+PASS recorded vocal auto gain remains smooth with headroom on the reference fixture
+All audio and motion checks passed.

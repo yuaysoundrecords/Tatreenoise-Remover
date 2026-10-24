@@ -14,6 +14,10 @@ Windows x64 is the first target for this new native C++17/JUCE development versi
 
 [Download Windows 2.0.1 test package](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40055383919/artifacts/12545221698) (GitHub sign-in may be required).
 
+## Vocal staging and interaction quotes (2.0.3)
+
+Four new two-line lawyer captions appear when their controls move; Auto Gain speaks on both ON/OFF clicks. Text stays about 3 seconds after the last change, independently of real audio detection. Smooth vocal Auto Gain uses windowed RMS, bounded gain rides and breath/silence HOLD. Input and Output trims remain independent. [Controls, exact captions and gain behaviour](docs/WINDOWS.md).
+
 ## Quality and banner update (2.0.2)
 
 Bold Thai/Latin banners fit their actual glyph outlines with balanced padding. Revised minimum-statistics denoising, sample-rate-correct split-band de-essing and duration-gated de-breath protection. [Measured comparisons, sources and remaining limits](docs/DSP-QUALITY.md).

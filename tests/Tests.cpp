@@ -173,6 +173,31 @@ int main(int argc, char** argv){
         for(int i=0;i<int(sr);++i)correction=ag.process(0,0,false);
         check(std::abs(correction-1)<1e-5f,"disabling auto gain returns smoothly to unity");
     }
+    for(double sr:{44100.0,48000.0,96000.0}) {
+        InputAutoGain ag;ag.reset(sr);float previous=0,maxRise=0,maxFall=0;
+        for(int i=0;i<int(sr*8);++i) {
+            const float level=i<int(sr*3)?.05f:i<int(sr*5)?.3f:.05f;
+            ag.process(level*level,level*1.414214f,true);
+            const float current=ag.decibels(),step=(current-previous)*float(sr);
+            maxRise=std::max(maxRise,step);maxFall=std::max(maxFall,-step);previous=current;
+        }
+        check(maxRise<3.2f && maxFall<12.3f,"vocal auto gain obeys smooth gain-rise/fall bounds through phrase level changes");
+        const float held=ag.decibels();
+        for(int i=0;i<int(sr);++i)ag.process(.000001f,.0014f,true);
+        check(ag.isHolding() && std::abs(ag.decibels()-held)<.2f,"vocal auto gain holds low breaths instead of learning them as a quiet phrase");
+    }
+    {
+        InputAutoGain ag;ag.reset(48000);double energy[3]{};int counts[3]{};
+        const float levels[]{.04f,.15f,.05f};
+        for(int i=0;i<48000*24;++i) {
+            const int section=i/(48000*8);const float level=levels[section];
+            const float gain=ag.process(level*level,level*1.414214f,true);
+            if(i%(48000*8)>=48000*6){energy[section]+=double(level*gain)*(level*gain);++counts[section];}
+        }
+        double low=100,high=-100;
+        for(int i=0;i<3;++i){const double db=10*std::log10(energy[i]/counts[i]);std::cout<<"Vocal staging phrase "<<i<<": "<<db<<" dBFS RMS\n";low=std::min(low,db);high=std::max(high,db);}
+        check(high-low<.8 && low>-19 && high<-17,"vocal auto gain stages settled phrase levels around -18 dBFS without fast compression");
+    }
     for(double sr:{44100.0,48000.0,96000.0}){
         TatreeProcessor p;p.prepareToPlay(sr,64);std::vector<float> input(8192);input[12]=1;input[23]=std::numeric_limits<float>::quiet_NaN();
         auto out=run(p,input,1);check(std::isfinite(rms(out,0)),"44.1/48/96 kHz and one-sample blocks stay finite");
@@ -222,6 +247,19 @@ int main(int argc, char** argv){
             const double snr=10*std::log10(energy/error),gain=dot/energy;
             std::cout<<"Speech/noise case "<<kind<<": SNR "<<snr<<" dB, voice gain "<<gain<<"\n";
             check(snr>10.25 && gain>.90,"default denoiser improves white/pink/hum/modulated speech fixtures while retaining voice");
+        }
+        {
+            TatreeProcessor p;set(p,"noise",0);set(p,"ess",0);set(p,"breath",0);set(p,"filter",0);set(p,"autoGain",1);p.prepareToPlay(reader->sampleRate,512);
+            juce::MidiBuffer midi;float previous=0,maxRise=0,maxFall=0,peak=0;
+            for(int offset=0;offset<n;offset+=512) {
+                const int count=std::min(512,n-offset);juce::AudioBuffer<float> b(2,count);
+                for(int c=0;c<2;++c)for(int k=0;k<count;++k)b.setSample(c,k,clean[size_t(offset+k)]);
+                p.processBlock(b,midi);const float gain=p.meters.autoGainDb.load();
+                const float slew=(gain-previous)*float(reader->sampleRate)/count;previous=gain;
+                maxRise=std::max(maxRise,slew);maxFall=std::max(maxFall,-slew);peak=std::max(peak,b.getMagnitude(0,count));
+            }
+            std::cout<<"Recorded vocal auto gain: maximum rise/fall "<<maxRise<<" / "<<maxFall<<" dB/s, output peak "<<peak<<"\n";
+            check(maxRise<3.2f && maxFall<12.3f && peak<.98f,"recorded vocal auto gain remains smooth with headroom on the reference fixture");
         }
     }
     std::cout<<"All audio and motion checks passed.\n";return 0;

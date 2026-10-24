@@ -41,7 +41,7 @@ void TatreeProcessor::prepareToPlay(double sr, int) {
         highpass[c].reset(); // Allocate filter state here, not on the first audio callback.
         meters.input[c].store(0); meters.output[c].store(0);
     }
-    meters.autoGainDb.store(0);
+    meters.autoGainDb.store(0);meters.autoGainHolding.store(true);
     for (auto entry : {std::pair{&inputGain,"inputGain"}, {&outputGain,"outputGain"}}) {
         entry.first->reset(sr,.025); entry.first->setCurrentAndTargetValue(juce::Decibels::decibelsToGain(params.getRawParameterValue(entry.second)->load()));
     }
@@ -135,7 +135,7 @@ void TatreeProcessor::process(juce::AudioBuffer<float>& b, bool hostBypass) {
         meters.output[c].store(std::max(outputPeak[c],meters.output[c].load()*decay));
         if(c<channels) noiseDb=std::max(noiseDb,denoisers[c].reductionDb);
     }
-    meters.autoGainDb.store(autoGain.decibels());
+    meters.autoGainDb.store(autoGain.decibels());meters.autoGainHolding.store(autoGain.isHolding());
     meters.noiseDb.store(noiseDb); meters.deEssDb.store(maxEss); meters.breathDb.store(maxBreath);
     const bool isBypassed = hostBypass || params.getRawParameterValue("bypass")->load() > .5f;
     meters.bypassed.store(isBypassed);

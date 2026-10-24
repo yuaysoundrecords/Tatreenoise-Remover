@@ -31,6 +31,7 @@ public:
     struct Metering {
         std::array<std::atomic<float>,2> input {{0,0}}, output {{0,0}};
         std::atomic<float> autoGainDb {0};
+        std::atomic<bool> autoGainHolding {true};
         std::atomic<float> noiseDb {0}, deEssDb {0}, breathDb {0}, reductionDb {0};
         std::atomic<bool> bypassed {false};
         std::atomic<unsigned long long> blocks {0};

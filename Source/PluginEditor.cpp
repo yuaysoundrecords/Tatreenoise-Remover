@@ -89,13 +89,16 @@ TatreeEditor::TatreeEditor(TatreeProcessor& p):AudioProcessorEditor(p),processor
         slider.setTooltip(i==0?"Input trim before Auto Gain and all processing. Double-click to reset to 0 dB.":"Output trim after processing and Listen. Bypass remains original dry. Double-click to reset.");
         gainAttachments[i]=std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(p.params,gainIds[i],slider);
     }
-    autoButton.setTooltip("Pre-chain stereo-linked RMS levelling: target -18 dBFS, -24 to +12 dB correction, silence gate and peak-aware boost. Not a limiter.");
+    autoButton.setTooltip("Smooth vocal gain staging before cleanup. -18 dBFS RMS target, stereo linked, breath/silence hold and bounded gain rides. Not a limiter.");
     filter.setTooltip("75 Hz low-cut: remove rumble before noise reduction.");
     listen.setTooltip("Listen to the removed signal (input minus cleaned output).");
     bypass.setTooltip("Latency-matched dry signal. Smooth 15 ms transition.");
     motionButton.setTooltip("Turn off motion effects. Status text and audio remain active.");
     setResizable(true,true);setResizeLimits(864,688,1620,1290);
     if(auto* c=getConstrainer())c->setFixedAspectRatio(1080.0/860.0);
+    const char* observed[]{"noise","breath","ess","filter","listen","bypass","inputGain","outputGain","autoGain"};
+    for(int i=0;i<9;++i)previousControls[i]=p.params.getRawParameterValue(observed[i])->load();
+    autoButton.onClick=[this]{speech.trigger(SpeechCue::autoGain);};
     setSize(1080,860);startTimerHz(30);
 }
 TatreeEditor::~TatreeEditor(){stopTimer();setLookAndFeel(nullptr);}
@@ -121,10 +124,18 @@ void TatreeEditor::timerCallback(){
     noAudioSeconds = block != lastBlock ? 0 : noAudioSeconds + 1.0f/30;
     lastBlock = block;
     meterFade = noAudioSeconds > .2f ? meterFade * .8465f : 1.0f;
-    const char* ids[]{"noise","breath","ess","filter","listen","bypass"};
+    speech.update(1.0f/30);
+    const char* ids[]{"noise","breath","ess","filter","listen","bypass","inputGain","outputGain","autoGain"};
     const LawyerControl controls[]{LawyerControl::noise,LawyerControl::breath,LawyerControl::deEss,LawyerControl::filter,LawyerControl::listen,LawyerControl::bypass};
-    for(int i=0;i<6;++i){const float value=processor.params.getRawParameterValue(ids[i])->load();
-        if(std::abs(value-previousControls[i])>.01f){motion.touch(controls[i]);previousControls[i]=value;}}
+    for(int i=0;i<9;++i){const float value=processor.params.getRawParameterValue(ids[i])->load();
+        if(std::abs(value-previousControls[i])>.01f){
+            if(i<6)motion.touch(controls[i]);
+            if(i==0)speech.trigger(SpeechCue::noise);
+            if(i==2)speech.trigger(SpeechCue::deEss);
+            if(i==6 || i==7)speech.trigger(SpeechCue::peak);
+            if(i==8)speech.trigger(SpeechCue::autoGain);
+            previousControls[i]=value;
+        }}
     for(int i=0;i<3;++i)if(!values[i].isBeingEdited())values[i].setText(juce::String(knobs[i].getValue(),1)+"%",juce::dontSendNotification);
     const float activity[]{processor.meters.noiseDb.load()/12,processor.meters.breathDb.load()/8,processor.meters.deEssDb.load()/8};
     for(int i=0;i<3;++i)knobs[i].getProperties().set("activity",double(std::clamp(activity[i]*meterFade,0.0f,1.0f)));
@@ -168,20 +179,48 @@ void TatreeEditor::meter(juce::Graphics& g,juce::Rectangle<float> r,juce::String
     caption(g,reduction ? juce::String(processor.meters.reductionDb.load()*meterFade,1)+" dB" : juce::String(juce::Decibels::gainToDecibels(std::max(heldPeaks[output?1:0][0],heldPeaks[output?1:0][1]),-60.0f),1)+" dBFS",{r.getX(),r.getY()+111,r.getWidth(),18},14,look.cream,true);
 }
 void TatreeEditor::drawSpeechBanner(juce::Graphics& g) {
-    const auto state=motion.state;
-    const char* speech=state==LawyerState::hot?"อย่าทำ Meter แตก":state==LawyerState::deEss?"อย่ากระเเทก Sibilance":state==LawyerState::noise?"จงระวัง Single Noise!":"เงียบไว้น้อง!";
-    const auto text=juce::String::fromUTF8(speech);
+    // Semantic line breaks preserve the exact wording without splitting Thai
+    // combining marks. One shared size fits all four quotes in the free space.
+    static const char* quotes[]{"เงียบไว้น้อง!",
+        "คุณมีสิทธิที่จะไม่พูด\nเพราะคำพูดของคุณอาจทำให้ Peak ได้!",
+        "กระบวนการยุติธรรม\nSibilance นำเสมอ... ลดหน่อย!",
+        "ศาลมีคำสั่ง! ให้ตัดเสียงรบกวน\nออกจากกระบวนการพิจารณา!",
+        "ศาลมีคำสั่ง! ให้ปรับระดับเสียง\nของจำเลยให้เท่าเทียมกัน!"};
+    const auto text=juce::String::fromUTF8(quotes[int(speech.cue)]);
     if(text!=bannerText) {
-        bannerText=text;bannerGlyphs.clear();
-        bannerGlyphs.addLineOfText(look.body(62.0f).boldened(),text,0,0);
-        // Outline bounds include the actual Thai combining marks and Latin ink,
-        // avoiding the font's asymmetric baseline/leading and side bearings.
-        juce::Path outline;bannerGlyphs.createPath(outline);
-        const auto ink=outline.getBounds();
-        constexpr float horizontalPadding=23, verticalPadding=12;
-        const auto width=ink.getWidth()+2*horizontalPadding, height=ink.getHeight()+2*verticalPadding;
-        bannerFrame={1040-width,191-height*.5f,width,height};
-        bannerGlyphs.moveRangeOfGlyphs(0,-1,bannerFrame.getX()+horizontalPadding-ink.getX(),bannerFrame.getY()+verticalPadding-ink.getY());
+        bannerText=text;
+        constexpr float maxInkWidth=514,maxInkHeight=76,gap=8,padX=23,padY=12;
+        // Fit the longest of the four phrases once, keeping a consistent size.
+        speechFontSize=42;
+        for(;speechFontSize>24;speechFontSize-=.5f) {
+            bool fits=true;
+            for(int q=1;q<5;++q) {
+                auto lines=juce::StringArray::fromLines(juce::String::fromUTF8(quotes[q]));float h=0;
+                for(auto& line:lines) {
+                    juce::GlyphArrangement glyphs;glyphs.addLineOfText(look.body(speechFontSize).boldened(),line,0,0);
+                    juce::Path outline;glyphs.createPath(outline);auto bounds=outline.getBounds();
+                    fits &= bounds.getWidth()<=maxInkWidth;h+=bounds.getHeight();
+                }
+                fits &= h+gap*(lines.size()-1)<=maxInkHeight;
+            }
+            if(fits)break;
+        }
+        bannerGlyphs.clear();float y=0,width=0;
+        const auto lines=juce::StringArray::fromLines(text);
+        std::array<juce::GlyphArrangement,2> rows;
+        std::array<juce::Rectangle<float>,2> ink;
+        for(int i=0;i<lines.size();++i) {
+            rows[size_t(i)].addLineOfText(look.body(speech.cue==SpeechCue::idle?62:speechFontSize).boldened(),lines[i],0,0);
+            juce::Path outline;rows[size_t(i)].createPath(outline);ink[size_t(i)]=outline.getBounds();
+            width=std::max(width,ink[size_t(i)].getWidth());
+        }
+        for(int i=0;i<lines.size();++i) {
+            const auto r=ink[size_t(i)];rows[size_t(i)].moveRangeOfGlyphs(0,-1,(width-r.getWidth())*.5f-r.getX(),y-r.getY());
+            bannerGlyphs.addGlyphArrangement(rows[size_t(i)]);y+=r.getHeight()+gap;
+        }
+        const float height=y-gap;
+        bannerFrame={1040-width-2*padX,191-height*.5f-padY,width+2*padX,height+2*padY};
+        bannerGlyphs.moveRangeOfGlyphs(0,-1,bannerFrame.getX()+padX,bannerFrame.getY()+padY);
     }
     juce::Graphics::ScopedSaveState save(g);
     g.addTransform(juce::AffineTransform::rotation(-.075f,bannerFrame.getCentreX(),bannerFrame.getCentreY()));
@@ -223,7 +262,7 @@ void TatreeEditor::paint(juce::Graphics& g){
         caption(g,text,{925,256,112,48},23,accent,false);
         g.setColour(accent);g.drawLine(928,310,1034,310,2);
     }
-    caption(g,state==LawyerState::hot?"อย่าทำ Meter แตก":state==LawyerState::deEss?"อย่ากระเเทก Sibilance":state==LawyerState::noise?"จงระวัง Single Noise!":state==LawyerState::breath?"เบาลมหายใจหน่อยน้อง!":state==LawyerState::listen?"กำลังฟังเฉพาะเสียงที่เอาออก":state==LawyerState::bypass?"พักก่อน • ฟังเสียงต้นฉบับ":"อย่าดัง Noise ต่ำ เดี๋ยวโดนจับ",{650,471,392,22},16,look.blue,true);
+    caption(g,state==LawyerState::hot?"ลดระดับ Input / Output ลงหน่อยน้อง!":state==LawyerState::deEss?"กำลังลดเสียงเสียดแทรก":state==LawyerState::noise?"กำลังลดเสียงรบกวน":state==LawyerState::breath?"เบาลมหายใจหน่อยน้อง!":state==LawyerState::listen?"กำลังฟังเฉพาะเสียงที่เอาออก":state==LawyerState::bypass?"พักก่อน • ฟังเสียงต้นฉบับ":"อย่าดัง Noise ต่ำ เดี๋ยวโดนจับ",{650,471,392,22},16,look.blue,true);
     g.setColour(look.ink);g.fillRoundedRectangle(22,498,1036,143,5);
     meter(g,{39,507,320,125},"IN",false,false);
     meter(g,{383,507,310,125},"GAIN REDUCTION",false,true);
@@ -231,7 +270,7 @@ void TatreeEditor::paint(juce::Graphics& g){
     g.setColour(look.cream.withAlpha(.35f));g.drawLine(373,514,373,628,1);g.drawLine(704,514,704,628,1);
     caption(g,"INPUT GAIN",{43,653,286,35},25,look.blue);
     caption(g,"OUTPUT GAIN",{738,653,286,35},25,look.blue);
-    caption(g,autoButton.getToggleState()?juce::String(processor.meters.autoGainDb.load(),1)+" dB / TARGET -18 dBFS":"OFF / PRE-CHAIN",{399,714,276,24},15,look.blue,true);
+    caption(g,autoButton.getToggleState()?(processor.meters.autoGainHolding.load()?juce::String("HOLD / "):juce::String())+juce::String(processor.meters.autoGainDb.load(),1)+" dB / TARGET -18 dBFS":"OFF / PRE-CHAIN",{399,714,276,24},15,look.blue,true);
     g.setColour(look.blue.withAlpha(.3f));g.drawLine(359,657,359,736,1);g.drawLine(710,657,710,736,1);
     caption(g,filter.getToggleState()?"75 Hz / ON":"75 Hz / OFF",{44,818,163,19},13,look.blue,true);
     caption(g,listen.getToggleState()?"REMOVED SIGNAL":"REMOVED SIGNAL / OFF",{363,818,214,19},12,look.blue,true);
