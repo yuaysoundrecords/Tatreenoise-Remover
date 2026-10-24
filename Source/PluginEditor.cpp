@@ -76,16 +76,27 @@ TatreeEditor::TatreeEditor(TatreeProcessor& p):AudioProcessorEditor(p),processor
         knobAttachments[i]=std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(p.params,ids[i],k);
         refresh();
     }
-    std::array<juce::TextButton*,4> buttons{&filter,&listen,&bypass,&motionButton};const char* bids[]{"filter","listen","bypass","motion"};
-    for(int i=0;i<4;++i){auto& b=*buttons[i];b.setClickingTogglesState(true);addAndMakeVisible(b);
+    std::array<juce::TextButton*,5> buttons{&filter,&listen,&bypass,&motionButton,&autoButton};const char* bids[]{"filter","listen","bypass","motion","autoGain"};
+    for(int i=0;i<5;++i){auto& b=*buttons[i];b.setClickingTogglesState(true);addAndMakeVisible(b);
         buttonAttachments[i]=std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(p.params,bids[i],b);}
+    const char* gainIds[]{"inputGain","outputGain"};
+    for(int i=0;i<2;++i) {
+        auto& slider=gainSliders[i];addAndMakeVisible(slider);slider.setName(gainIds[i]);
+        slider.setSliderStyle(juce::Slider::LinearHorizontal);slider.setTextBoxStyle(juce::Slider::TextBoxRight,false,82,28);
+        slider.setTextValueSuffix(" dB");slider.setDoubleClickReturnValue(true,0);slider.setNumDecimalPlacesToDisplay(1);
+        slider.setColour(juce::Slider::thumbColourId,look.blue);slider.setColour(juce::Slider::trackColourId,look.blue);
+        slider.setColour(juce::Slider::textBoxTextColourId,look.ink);slider.setColour(juce::Slider::textBoxOutlineColourId,look.blue.withAlpha(.4f));
+        slider.setTooltip(i==0?"Input trim before Auto Gain and all processing. Double-click to reset to 0 dB.":"Output trim after processing and Listen. Bypass remains original dry. Double-click to reset.");
+        gainAttachments[i]=std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(p.params,gainIds[i],slider);
+    }
+    autoButton.setTooltip("Pre-chain stereo-linked RMS levelling: target -18 dBFS, -24 to +12 dB correction, silence gate and peak-aware boost. Not a limiter.");
     filter.setTooltip("75 Hz low-cut: remove rumble before noise reduction.");
     listen.setTooltip("Listen to the removed signal (input minus cleaned output).");
     bypass.setTooltip("Latency-matched dry signal. Smooth 15 ms transition.");
     motionButton.setTooltip("Turn off motion effects. Status text and audio remain active.");
-    setResizable(true,true);setResizeLimits(864,608,1620,1140);
-    if(auto* c=getConstrainer())c->setFixedAspectRatio(1080.0/760.0);
-    setSize(1080,760);startTimerHz(30);
+    setResizable(true,true);setResizeLimits(864,688,1620,1290);
+    if(auto* c=getConstrainer())c->setFixedAspectRatio(1080.0/860.0);
+    setSize(1080,860);startTimerHz(30);
 }
 TatreeEditor::~TatreeEditor(){stopTimer();setLookAndFeel(nullptr);}
 void TatreeEditor::resized(){
@@ -97,10 +108,13 @@ void TatreeEditor::resized(){
     values[1].setBounds(juce::Rectangle<int>(330,450,120,36)*scale);
     values[2].setBounds(juce::Rectangle<int>(500,450,120,36)*scale);
     for(int i=0;i<3;++i)values[i].setFont(look.headline((i==0?39.0f:31.0f)*scale));
-    filter.setBounds(juce::Rectangle<int>(43,663,164,52)*scale);
-    listen.setBounds(juce::Rectangle<int>(386,663,170,52)*scale);
-    bypass.setBounds(juce::Rectangle<int>(635,663,170,52)*scale);
-    motionButton.setBounds(juce::Rectangle<int>(900,687,128,26)*scale);
+    filter.setBounds(juce::Rectangle<int>(43,763,164,52)*scale);
+    listen.setBounds(juce::Rectangle<int>(386,763,170,52)*scale);
+    bypass.setBounds(juce::Rectangle<int>(635,763,170,52)*scale);
+    gainSliders[0].setBounds(juce::Rectangle<int>(43,691,286,37)*scale);
+    gainSliders[1].setBounds(juce::Rectangle<int>(738,691,286,37)*scale);
+    autoButton.setBounds(juce::Rectangle<int>(427,667,220,42)*scale);
+    motionButton.setBounds(juce::Rectangle<int>(900,787,128,26)*scale);
 }
 void TatreeEditor::timerCallback(){
     const auto block = processor.meters.blocks.load(std::memory_order_relaxed);
@@ -155,8 +169,8 @@ void TatreeEditor::meter(juce::Graphics& g,juce::Rectangle<float> r,juce::String
 }
 void TatreeEditor::paint(juce::Graphics& g){
     g.addTransform(juce::AffineTransform::scale(float(getWidth())/1080));
-    g.setColour(look.cream);g.fillRect(0,0,1080,760);
-    g.drawImage(paper,{0,0,1080,760});
+    g.setColour(look.cream);g.fillRect(0,0,1080,860);
+    g.drawImage(paper,{0,0,1080,860});
     g.setColour(look.blue);g.setFont(look.headline(145));g.drawText("TATREE NOISE REMOVER",juce::Rectangle<int>{32,3,875,122},juce::Justification::centredLeft,false);
     caption(g,"AUDIO",{920,43,125,22},21,look.blue);
     caption(g,"DENOISER",{920,65,125,22},21,look.blue);
@@ -180,7 +194,9 @@ void TatreeEditor::paint(juce::Graphics& g){
     {
         juce::Graphics::ScopedSaveState save(g);g.addTransform(juce::AffineTransform::rotation(-.075f,828,183));
         g.setColour(look.blue);g.fillRect(653,150,388,71);
-        caption(g,"เงียบไว้น้อง!",{665,149,363,71},58,look.cream,true);
+        const auto state=motion.state;
+        const char* speech=state==LawyerState::hot?"อย่าทำ Meter แตก":state==LawyerState::deEss?"อย่ากระเเทก Sibilance":state==LawyerState::noise?"จงระวัง Single Noise!":"เงียบไว้น้อง!";
+        caption(g,speech,{665,149,363,71},state==LawyerState::idle?58.0f:34.0f,look.cream,true);
     }
     auto state=motion.state;
     juce::String text=state==LawyerState::hot?"INPUT HOT!":state==LawyerState::deEss?"DE-ESSING":state==LawyerState::noise?"NOISE ACTIVE":state==LawyerState::breath?"BREATH CTRL":state==LawyerState::listen?"DELTA LISTEN":state==LawyerState::bypass?"BYPASSED":motion.touchHold>0 && motion.recentControl==LawyerControl::filter?(filter.getToggleState()?"LOW CUT 75Hz":"LOW CUT OFF"):"READY!";
@@ -192,15 +208,19 @@ void TatreeEditor::paint(juce::Graphics& g){
         caption(g,text,{925,256,112,48},23,accent,false);
         g.setColour(accent);g.drawLine(928,310,1034,310,2);
     }
-    caption(g,state==LawyerState::hot?"ลด Input ลงหน่อยน้อง!":state==LawyerState::deEss?"เสียงซ่า… ขอค้าน!":state==LawyerState::noise?"เสียงรบกวน ออกจากศาล!":state==LawyerState::breath?"เบาลมหายใจหน่อยน้อง!":state==LawyerState::listen?"กำลังฟังเฉพาะเสียงที่เอาออก":state==LawyerState::bypass?"พักก่อน • ฟังเสียงต้นฉบับ":"อย่าดัง Noise ต่ำ เดี๋ยวโดนจับ",{650,471,392,22},16,look.blue,true);
+    caption(g,state==LawyerState::hot?"อย่าทำ Meter แตก":state==LawyerState::deEss?"อย่ากระเเทก Sibilance":state==LawyerState::noise?"จงระวัง Single Noise!":state==LawyerState::breath?"เบาลมหายใจหน่อยน้อง!":state==LawyerState::listen?"กำลังฟังเฉพาะเสียงที่เอาออก":state==LawyerState::bypass?"พักก่อน • ฟังเสียงต้นฉบับ":"อย่าดัง Noise ต่ำ เดี๋ยวโดนจับ",{650,471,392,22},16,look.blue,true);
     g.setColour(look.ink);g.fillRoundedRectangle(22,498,1036,143,5);
     meter(g,{39,507,320,125},"IN",false,false);
     meter(g,{383,507,310,125},"GAIN REDUCTION",false,true);
     meter(g,{716,507,320,125},"OUT",true,false);
     g.setColour(look.cream.withAlpha(.35f));g.drawLine(373,514,373,628,1);g.drawLine(704,514,704,628,1);
-    caption(g,filter.getToggleState()?"75 Hz / ON":"75 Hz / OFF",{44,718,163,19},13,look.blue,true);
-    caption(g,listen.getToggleState()?"REMOVED SIGNAL":"REMOVED SIGNAL / OFF",{363,718,214,19},12,look.blue,true);
-    caption(g,bypass.getToggleState()?"DRY / ON":"DRY / OFF",{636,718,170,19},13,look.blue,true);
-    caption(g,"YUAY SOUND RECORDS",{872,658,180,25},19,look.blue);
-    g.setColour(look.blue.withAlpha(.3f));g.drawLine(269,665,269,736,1);g.drawLine(605,665,605,736,1);g.drawLine(850,665,850,736,1);
+    caption(g,"INPUT GAIN",{43,653,286,35},25,look.blue);
+    caption(g,"OUTPUT GAIN",{738,653,286,35},25,look.blue);
+    caption(g,autoButton.getToggleState()?juce::String(processor.meters.autoGainDb.load(),1)+" dB / TARGET -18 dBFS":"OFF / PRE-CHAIN",{399,714,276,24},15,look.blue,true);
+    g.setColour(look.blue.withAlpha(.3f));g.drawLine(359,657,359,736,1);g.drawLine(710,657,710,736,1);
+    caption(g,filter.getToggleState()?"75 Hz / ON":"75 Hz / OFF",{44,818,163,19},13,look.blue,true);
+    caption(g,listen.getToggleState()?"REMOVED SIGNAL":"REMOVED SIGNAL / OFF",{363,818,214,19},12,look.blue,true);
+    caption(g,bypass.getToggleState()?"DRY / ON":"DRY / OFF",{636,818,170,19},13,look.blue,true);
+    caption(g,"YUAY SOUND RECORDS",{872,758,180,25},19,look.blue);
+    g.setColour(look.blue.withAlpha(.3f));g.drawLine(269,765,269,836,1);g.drawLine(605,765,605,836,1);g.drawLine(850,765,850,836,1);
 }

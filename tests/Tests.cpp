@@ -103,6 +103,44 @@ int main(int argc, char** argv){
         check(filter.state==LawyerState::idle && filter.touchHold>0,"filter feedback does not fabricate noise-detector activity");
         filter.reduced=true;check(filter.rotation()==0 && filter.lift()==0,"control-touch motion respects reduced-motion preference");
     }
+    {
+        TatreeProcessor p;set(p,"noise",0);set(p,"breath",0);set(p,"ess",0);set(p,"filter",0);
+        set(p,"inputGain",6);set(p,"outputGain",-3);p.prepareToPlay(48000,512);
+        auto out=run(p,noise);const double change=20*std::log10(rms(out,48000)/rms(noise,48000));
+        check(std::abs(change-3)<.02,"input and output trim apply in dB independently of denoising");
+        set(p,"autoGain",1);set(p,"bypass",1);set(p,"outputGain",24);p.prepareToPlay(48000,512);
+        out=run(p,noise);float error=0;for(size_t i=1024;i<out.size();++i)error=std::max(error,std::abs(out[i]-noise[i-1024]));
+        check(error<1e-7f,"bypass skips input trim, auto gain and output trim with exact latency");
+        set(p,"bypass",0);set(p,"listen",1);set(p,"autoGain",0);p.prepareToPlay(48000,512);
+        auto removed=run(p,noise);check(rms(removed,48000)<1e-5,"delta listen excludes input and output gain from removed-signal reference");
+        juce::MemoryBlock state;p.getStateInformation(state);TatreeProcessor restored;restored.setStateInformation(state.getData(),int(state.getSize()));
+        check(restored.params.getRawParameterValue("inputGain")->load()==6 && restored.params.getRawParameterValue("outputGain")->load()==24 && restored.params.getRawParameterValue("autoGain")->load()==0,"gain controls and auto preference survive session recall");
+        set(p,"listen",0);set(p,"bypass",0);set(p,"autoGain",0);set(p,"inputGain",0);set(p,"outputGain",24);p.prepareToPlay(48000,512);
+        run(p,std::vector<float>(4096,.2f));check(p.meters.hot.exchange(false),"output overload warns even when raw input is safe");
+    }
+    {
+        TatreeProcessor p;set(p,"noise",0);set(p,"breath",0);set(p,"ess",0);set(p,"filter",0);set(p,"autoGain",1);set(p,"inputGain",6);p.prepareToPlay(48000,512);
+        juce::MidiBuffer midi;double energy=0;float stereoError=0;int count=0;
+        for(int block=0;block<1200;++block) {
+            juce::AudioBuffer<float> b(2,512);
+            for(int i=0;i<512;++i){float x=.07f*std::sin(float((block*512+i)*juce::MathConstants<double>::twoPi*400/48000));b.setSample(0,i,x);b.setSample(1,i,x*.5f);}
+            p.processBlock(b,midi);
+            if(block>1000)for(int i=0;i<512;++i){float l=b.getSample(0,i),r=b.getSample(1,i);energy+=(l*l+r*r)*.5;stereoError=std::max(stereoError,std::abs(r-l*.5f));++count;}
+        }
+        check(std::abs(10*std::log10(energy/count)+18)<.4,"pre-chain auto gain compensates input trim and reaches stereo RMS target");
+        check(stereoError<1e-6f,"stereo-linked auto gain preserves left-right balance");
+    }
+    for(double sr:{44100.0,48000.0,96000.0}) {
+        InputAutoGain ag;ag.reset(sr);float correction=1;
+        for(int i=0;i<int(sr*12);++i)correction=ag.process(.05f*.05f,.0707107f,true);
+        check(std::abs(20*std::log10(.05f*correction)+18)<.25,"auto gain converges to target for steady quiet voice within boost bound");
+        const float held=ag.decibels();for(int i=0;i<int(sr*4);++i)ag.process(0,0,true);
+        check(ag.decibels()<=12 && std::isfinite(ag.decibels()) && ag.decibels()<held+1,"auto gain silence gate avoids noise runaway");
+        ag.reset(sr);for(int i=0;i<int(sr*3);++i)correction=ag.process(.64f,1.13f,true);
+        check(.8f*correction<.14f && ag.decibels()>=-24,"auto gain attenuates loud input with bounded correction");
+        for(int i=0;i<int(sr);++i)correction=ag.process(0,0,false);
+        check(std::abs(correction-1)<1e-5f,"disabling auto gain returns smoothly to unity");
+    }
     for(double sr:{44100.0,48000.0,96000.0}){
         TatreeProcessor p;p.prepareToPlay(sr,64);std::vector<float> input(8192);input[12]=1;input[23]=std::numeric_limits<float>::quiet_NaN();
         auto out=run(p,input,1);check(std::isfinite(rms(out,0)),"44.1/48/96 kHz and one-sample blocks stay finite");

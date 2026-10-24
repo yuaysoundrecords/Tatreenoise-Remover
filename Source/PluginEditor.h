@@ -36,8 +36,10 @@ private:
     std::array<juce::Label,3> values;
     std::array<float,6> previousControls {{45,25,30,1,0,0}};
     std::array<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>,3> knobAttachments;
-    juce::TextButton filter {"FILTER"}, listen {"LISTEN"}, bypass {"BYPASS"}, motionButton {"MOTION FX"};
-    std::array<std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>,4> buttonAttachments;
+    juce::TextButton filter {"FILTER"}, listen {"LISTEN"}, bypass {"BYPASS"}, motionButton {"MOTION FX"}, autoButton {"AUTO GAIN"};
+    std::array<juce::Slider,2> gainSliders;
+    std::array<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>,2> gainAttachments;
+    std::array<std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>,5> buttonAttachments;
     juce::TooltipWindow tooltips {this,650};
     MotionState motion;
     unsigned long long lastBlock = 0;

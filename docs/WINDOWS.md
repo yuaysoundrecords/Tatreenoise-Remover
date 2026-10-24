@@ -13,6 +13,23 @@ Windows เป็นเป้าหมายหลักของรุ่นน
 - พิมพ์เปอร์เซ็นต์ที่แม่นยำได้ด้วย double-click ที่ตัวเลข หมุน/ลาก/ใช้คีย์บอร์ดกับ knob ได้
 - Mono/stereo, parameter smoothing, latency-compensated bypass, delta listen, automation และ session recall
 
+## Gain และข้อความทนาย — รุ่น 2.0.1
+
+ลำดับเสียง: Input Gain → Auto Gain → Filter → Noise Reduction → De-esser → Breath → Output Gain
+
+- Input/Output ปรับได้ −24 ถึง +24 dB พิมพ์ค่าที่ช่อง dB ได้ และ double-click ที่ slider เพื่อคืน 0 dB
+- Auto Gain อยู่ต้น chain เปิดด้วยปุ่ม AUTO GAIN เป้าหมาย −18 dBFS RMS แบบ stereo-linked ชดเชยได้ −24 ถึง +12 dB พร้อม gate ที่ −50 dBFS เพื่อไม่ไล่เร่งช่วงเงียบ และจำกัด boost ตาม peak headroom −3 dBFS
+- Auto Gain ปิดไว้โดยปริยาย เปิดเมื่อต้องการ level เสียงเข้า; ลด gain เร็วกว่าการเพิ่ม gain และแสดง dB ชดเชยจริงใต้ปุ่ม
+- IN แสดงระดับหลัง Input Gain/Auto Gain ส่วน OUT แสดงระดับหลัง Output Gain
+- LISTEN ฟังผลต่างของเสียงหลัง Input Gain/Auto Gain กับเสียงที่ cleanup แล้ว ก่อนผ่าน Output Gain จึงไม่เข้าใจผิดว่า gain trim เป็น noise ที่ถูกตัด
+- BYPASS ข้าม gain และ processing ทั้งหมด กลับไปเสียงต้นฉบับที่ชดเชย latency แล้ว
+- เสียงดิบเข้า, เสียงหลัง gain เข้า หรือเสียงออกใกล้เกิน .98 linear จะเตือน: **อย่าทำ Meter แตก**
+- De-esser ทำงานถึงเกณฑ์ motion: **อย่ากระเเทก Sibilance**
+- Noise reducer ทำงานถึงเกณฑ์ motion: **จงระวัง Single Noise!**
+- ข้อความแสดงบนป้ายทนาย ไม่มีเสียงพูดแทรกในสัญญาณเสียง; hot warning มีลำดับสูงสุด
+
+Auto Gain เป็นตัวปรับระดับ ไม่ใช่ limiter และกู้เสียงที่ clip มาจากอุปกรณ์ต้นทางไม่ได้ หาก OUT เตือน ให้ลด Output Gain/ระดับต้นทาง
+
 ## สิ่งที่ปรับในระบบเสียงรอบนี้
 
 Noise control ใช้ progressive taper ให้ช่วงใช้งานปกติรักษาเสียงพูดมากขึ้น และยังได้ช่วงลด noise เต็มที่เมื่อหมุนสูงสุด ส่วน Breath ใช้ high-band/unvoiced confidence ร่วมกับระดับเสียงและ envelope ที่นุ่มขึ้น เพื่อลดโอกาสตัดเสียงพูดเบา ๆ

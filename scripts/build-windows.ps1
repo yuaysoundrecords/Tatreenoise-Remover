@@ -33,7 +33,7 @@ Invoke-TestExecutable $Tests @('--speech-check',(Join-Path $Root 'tests/fixtures
 $Render = Join-Path $Build 'TatreeRender_artefacts/Release/TatreeRender.exe'
 $Captures = Join-Path $Evidence 'ui'
 Invoke-TestExecutable $Render @($Captures) 'native-ui-tests'
-foreach ($Name in @('idle','noise','de-esser','input-hot','bypass','reduced-motion','breath','listen','filter-on','filter-off','stopped')) {
+foreach ($Name in @('idle','noise','de-esser','input-hot','bypass','reduced-motion','breath','listen','filter-on','filter-off','auto-gain','output-hot','stopped')) {
     if (-not (Test-Path (Join-Path $Captures ($Name + '.png')))) { throw "Missing UI capture: $Name" }
 }
 

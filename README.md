@@ -12,6 +12,10 @@ Windows x64 is the first target for this new native C++17/JUCE development versi
 - Exact percentage entry, drag/keyboard knobs, delta listen, latency-matched bypass, host automation and session recall.
 - No runtime network connection, account or model download. Mono/stereo, 44.1/48/96 kHz checks.
 
+## Gain update (2.0.1)
+
+Input and Output trims (±24 dB), optional pre-chain stereo-linked Auto Gain (-18 dBFS RMS target), and new lawyer warning captions. Auto Gain defaults off; Bypass preserves original dry audio. See [gain behaviour and controls](docs/WINDOWS.md).
+
 ## Windows first
 
 Install Visual Studio 2022 **Desktop development with C++**, Windows SDK, Git and CMake ≥3.22. In PowerShell:

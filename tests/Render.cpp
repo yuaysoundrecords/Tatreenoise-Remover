@@ -5,9 +5,12 @@
 class RenderApp final : public juce::JUCEApplication, private juce::Timer {
 public:
     const juce::String getApplicationName() override { return "Tatree render"; }
-    const juce::String getApplicationVersion() override { return "2.0"; }
+    const juce::String getApplicationVersion() override { return "2.0.1"; }
     void initialise(const juce::String& args) override {
-        folder=juce::File(args.unquoted());folder.createDirectory();
+        auto arguments=juce::StringArray::fromTokens(args,true);arguments.removeEmptyStrings();
+        recordFrames=arguments.contains("--frames");arguments.removeString("--frames");
+        if(arguments.size()!=1){std::cerr<<"Usage: TatreeRender output-directory [--frames]\n";setApplicationReturnValue(1);quit();return;}
+        folder=juce::File(arguments[0].unquoted());folder.createDirectory();
         folder.getChildFile("frames").createDirectory();
         processor=std::make_unique<TatreeProcessor>();
         editor.reset(static_cast<TatreeEditor*>(processor->createEditor()));
@@ -29,14 +32,16 @@ private:
     bool controlsWork() {
         for(int c=0;c<editor->getNumChildComponents();++c) {
             auto* child=editor->getChildComponent(c);
-            if(auto* knob=dynamic_cast<juce::Slider*>(child))knob->setValue(61,juce::sendNotificationSync);
+            if(auto* knob=dynamic_cast<juce::Slider*>(child))knob->setValue(knob->getName()=="inputGain"?3:knob->getName()=="outputGain"?-3:61,juce::sendNotificationSync);
             if(auto* button=dynamic_cast<juce::TextButton*>(child)) {
-                const char* id=button->getButtonText()=="FILTER"?"filter":button->getButtonText()=="LISTEN"?"listen":button->getButtonText()=="BYPASS"?"bypass":"motion";
+                const char* id=button->getButtonText()=="FILTER"?"filter":button->getButtonText()=="LISTEN"?"listen":button->getButtonText()=="BYPASS"?"bypass":button->getButtonText()=="AUTO GAIN"?"autoGain":"motion";
                 bool old=button->getToggleState();button->setToggleState(!old,juce::sendNotificationSync);
                 if((processor->params.getRawParameterValue(id)->load()>.5f)==old) { fail("Button binding failed");return false; }
                 button->setToggleState(old,juce::sendNotificationSync);
             }
         }
+        if(std::abs(processor->params.getRawParameterValue("inputGain")->load()-3)>.1f || std::abs(processor->params.getRawParameterValue("outputGain")->load()+3)>.1f) {fail("Gain trim binding failed");return false;}
+        set("inputGain",0);set("outputGain",0);
         if(std::abs(processor->params.getRawParameterValue("noise")->load()-61)>.1f) { fail("Knob binding failed");return false; }
         for(int c=0;c<editor->getNumChildComponents();++c) {
             auto* value=dynamic_cast<juce::Label*>(editor->getChildComponent(c));
@@ -52,11 +57,12 @@ private:
                 if(processor->params.getRawParameterValue("noise")->load()!=100) { fail("Numeric edit clamp failed");return false; }
             }
         }
-        std::cout<<"Native knobs, four buttons, exact numeric edits and invalid-input handling passed\n";
+        std::cout<<"Native knobs, gain trims, five buttons, exact numeric edits and invalid-input handling passed\n";
         return true;
     }
     void startScenario(int next) {
         scenario=next;ticks=0;phase=0;
+        set("autoGain",scenario==10?1:0);set("inputGain",0);set("outputGain",scenario==11?24:0);
         set("noise",scenario==1?90:scenario>=6?0:45);
         set("ess",scenario==1 || scenario>=6?0:scenario==2?90:30);
         set("breath",scenario==6?100:0);
@@ -78,29 +84,30 @@ private:
             if(scenario==1)x=(random.nextFloat()-.5f)*.07f;
             else if(scenario==6)x=(random.nextFloat()-.5f)*.008f;
             else if(scenario!=0) {
-                const double frequency=scenario==2?8500:scenario>=8?50:400;
-                const float amplitude=scenario==3 || scenario==5?1.12f:.2f;
+                const double frequency=scenario==2?8500:scenario==8 || scenario==9?50:400;
+                const float amplitude=scenario==3 || scenario==5?1.12f:scenario==10?.07f:.2f;
                 x=amplitude*float(std::sin(phase*juce::MathConstants<double>::twoPi*frequency/48000));
             }
             ++phase;b.setSample(0,i,x);b.setSample(1,i,x*.95f);
         }
         processor->processBlock(b,midi);++ticks;
-        if(ticks>=4 && ticks%2==0 && !capture("frames/frame-"+juce::String(frameIndex++).paddedLeft('0',3)))return;
-        const int captureAt=scenario>=8?12:35;
+        if(recordFrames && ticks>=4 && ticks%2==0 && !capture("frames/frame-"+juce::String(frameIndex++).paddedLeft('0',3)))return;
+        const int captureAt=scenario==8 || scenario==9?12:35;
         if(ticks<captureAt)return;
-        static const char* names[]{"idle","noise","de-esser","input-hot","bypass","reduced-motion","breath","listen","filter-on","filter-off"};
-        static const LawyerState expected[]{LawyerState::idle,LawyerState::noise,LawyerState::deEss,LawyerState::hot,LawyerState::bypass,LawyerState::hot,LawyerState::breath,LawyerState::listen,LawyerState::idle,LawyerState::idle};
+        static const char* names[]{"idle","noise","de-esser","input-hot","bypass","reduced-motion","breath","listen","filter-on","filter-off","auto-gain","output-hot"};
+        static const LawyerState expected[]{LawyerState::idle,LawyerState::noise,LawyerState::deEss,LawyerState::hot,LawyerState::bypass,LawyerState::hot,LawyerState::breath,LawyerState::listen,LawyerState::idle,LawyerState::idle,LawyerState::idle,LawyerState::hot};
         if(!capture(names[scenario]))return;
         std::cout<<"Captured "<<names[scenario]<<"; state="<<int(editor->currentMotionState())<<'\n';
         if(editor->currentMotionState()!=expected[scenario]) { fail("Unexpected DSP-driven motion state");return; }
         if(scenario==0 && !controlsWork())return;
         if(scenario==3) {
-            for(auto size : {juce::Point<int>{864,608},juce::Point<int>{1620,1140}}) {
+            for(auto size : {juce::Point<int>{864,688},juce::Point<int>{1620,1290}}) {
                 editor->setSize(size.x,size.y);if(!capture("responsive-"+juce::String(size.x)))return;
             }
-            editor->setSize(1080,760);
+            editor->setSize(1080,860);
         }
-        if(scenario==9) {
+        if(scenario==10 && processor->meters.autoGainDb.load()<.1f){fail("Auto gain UI fixture did not engage");return;}
+        if(scenario==11) {
             juce::AudioBuffer<float> hot(2,1600);hot.clear();hot.setSample(0,1599,1.1f);
             processor->processBlock(hot,midi);stopped=true;ticks=0;return;
         }
@@ -112,6 +119,6 @@ private:
     juce::Random random {42};
     int ticks=0,scenario=0,frameIndex=0;
     double phase=0;
-    bool stopped=false;
+    bool stopped=false,recordFrames=false;
 };
 START_JUCE_APPLICATION(RenderApp)

@@ -10,6 +10,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout TatreeProcessor::layout() {
     p.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID{"listen",1},"Listen to removed signal",false));
     p.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID{"bypass",1},"Bypass",false));
     p.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID{"motion",1},"Motion FX",true));
+    for (auto item : {std::pair{"inputGain", "Input gain"}, {"outputGain", "Output gain"}})
+        p.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{item.first,1}, item.second,
+              juce::NormalisableRange<float>{-24,24,.1f}, 0.0f, juce::AudioParameterFloatAttributes().withLabel("dB")));
+    p.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID{"autoGain",1},"Input auto gain",false));
     return p;
 }
 TatreeProcessor::TatreeProcessor() : AudioProcessor(BusesProperties().withInput("Input",juce::AudioChannelSet::stereo(),true)
@@ -20,16 +24,21 @@ bool TatreeProcessor::isBusesLayoutSupported(const BusesLayout& l) const {
 }
 void TatreeProcessor::prepareToPlay(double sr, int) {
     rate = sr; setLatencySamples(SpectralDenoiser::size); dryCursor = 0;
+    autoGain.reset(sr);
     low.fill(0); envHigh = envFull = 0; essGain = breathGain = 1;
     crossover = 1.0f - std::exp(-juce::MathConstants<float>::twoPi * 4500.0f / float(sr));
     attack = std::exp(-1.0f / float(.002 * sr)); release = std::exp(-1.0f / float(.09 * sr));
     breathAttack = std::exp(-1.0f / float(.025 * sr));
     breathRelease = std::exp(-1.0f / float(.14 * sr));
     for (int c=0; c<2; ++c) {
-        denoisers[c].reset(); dryDelay[c].fill(0);
+        denoisers[c].reset(); dryDelay[c].fill(0); bypassDelay[c].fill(0);
         highpass[c].coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass(sr,75);
         highpass[c].reset(); // Allocate filter state here, not on the first audio callback.
         meters.input[c].store(0); meters.output[c].store(0);
+    }
+    meters.autoGainDb.store(0);
+    for (auto entry : {std::pair{&inputGain,"inputGain"}, {&outputGain,"outputGain"}}) {
+        entry.first->reset(sr,.025); entry.first->setCurrentAndTargetValue(juce::Decibels::decibelsToGain(params.getRawParameterValue(entry.second)->load()));
     }
     meters.hot.store(false); meters.noiseDb.store(0); meters.deEssDb.store(0); meters.breathDb.store(0); meters.reductionDb.store(0); meters.bypassed.store(false);
     for (auto entry : {std::pair{&noiseAmount,"noise"}, {&breathAmount,"breath"}, {&essAmount,"ess"}}) {
@@ -49,18 +58,30 @@ void TatreeProcessor::process(juce::AudioBuffer<float>& b, bool hostBypass) {
     bypassMix.setTargetValue(hostBypass ? 1 : params.getRawParameterValue("bypass")->load());
     listenMix.setTargetValue(params.getRawParameterValue("listen")->load());
     filterMix.setTargetValue(params.getRawParameterValue("filter")->load());
+    inputGain.setTargetValue(juce::Decibels::decibelsToGain(params.getRawParameterValue("inputGain")->load()));
+    outputGain.setTargetValue(juce::Decibels::decibelsToGain(params.getRawParameterValue("outputGain")->load()));
+    const bool autoEnabled=params.getRawParameterValue("autoGain")->load()>.5f;
     const int channels = std::min(2, std::min(b.getNumChannels(),getTotalNumInputChannels()));
     for (int c=channels; c<b.getNumChannels(); ++c) b.clear(c,0,b.getNumSamples());
     float inputPeak[2]{}, outputPeak[2]{}, maxEss=0, maxBreath=0;
     bool clipped=false;
     double dryEnergy = 0, wetEnergy = 0;
     for (int s=0; s<b.getNumSamples(); ++s) {
-        float dry[2]{}, wet[2]{}, high[2]{};
+        float dry[2]{}, rawDry[2]{}, wet[2]{}, high[2]{}, input[2]{};
+        const float inGain=inputGain.getNextValue(), outGain=outputGain.getNextValue();
+        float inputPower=0, inputMax=0;
+        for(int c=0;c<channels;++c) {
+            float x=b.getSample(c,s); if(!std::isfinite(x))x=0;
+            clipped |= std::abs(x)>=.98f;
+            rawDry[c]=bypassDelay[c][dryCursor]; bypassDelay[c][dryCursor]=x;
+            input[c]=x*inGain; inputPower+=input[c]*input[c]; inputMax=std::max(inputMax,std::abs(input[c]));
+        }
+        const float ag=autoGain.process(inputPower/float(std::max(1,channels)),inputMax,autoEnabled);
         const float n=noiseAmount.getNextValue(), e=essAmount.getNextValue(), br=breathAmount.getNextValue();
         const float bypass=bypassMix.getNextValue(), listen=listenMix.getNextValue(), filt=filterMix.getNextValue();
         float fullPower=0, highPower=0;
         for (int c=0; c<channels; ++c) {
-            float x=b.getSample(c,s); if (!std::isfinite(x)) x=0;
+            const float x=input[c]*ag;
             inputPeak[c]=std::max(inputPeak[c],std::abs(x)); clipped |= std::abs(x)>=.98f;
             dry[c]=dryDelay[c][dryCursor]; dryDelay[c][dryCursor]=x;
             const float hp=highpass[c].processSample(x);
@@ -89,7 +110,9 @@ void TatreeProcessor::process(juce::AudioBuffer<float>& b, bool hostBypass) {
             const float processed=(wet[c]-high[c]*(1-essGain))*breathGain;
             dryEnergy += double(dry[c]) * dry[c]; wetEnergy += double(processed) * processed;
             const float audition=processed+listen*((dry[c]-processed)-processed);
-            const float out=audition+bypass*(dry[c]-audition);
+            const float adjusted=audition*outGain;
+            const float out=bypass>=1.0f?rawDry[c]:bypass<=0.0f?adjusted:adjusted+bypass*(rawDry[c]-adjusted);
+            clipped |= std::abs(out)>=.98f;
             b.setSample(c,s,out); outputPeak[c]=std::max(outputPeak[c],std::abs(out));
         }
     }
@@ -100,6 +123,7 @@ void TatreeProcessor::process(juce::AudioBuffer<float>& b, bool hostBypass) {
         meters.output[c].store(std::max(outputPeak[c],meters.output[c].load()*decay));
         if(c<channels) noiseDb=std::max(noiseDb,denoisers[c].reductionDb);
     }
+    meters.autoGainDb.store(autoGain.decibels());
     meters.noiseDb.store(noiseDb); meters.deEssDb.store(maxEss); meters.breathDb.store(maxBreath);
     const bool isBypassed = hostBypass || params.getRawParameterValue("bypass")->load() > .5f;
     meters.bypassed.store(isBypassed);
