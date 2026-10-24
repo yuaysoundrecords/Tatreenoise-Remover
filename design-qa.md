@@ -45,3 +45,8 @@ Native integration harness exercises all knob attachments and all four button at
 ## Windows-first iteration
 
 The selected visual target and palette remain unchanged. Additional implementation evidence is in `docs/evidence/windows-first/`: exact editable percentages, held-peak markers/readouts, separate Breath/Listen/Filter feedback, de-esser/input-hot colour poses and paused-transport idle state. Native Linux integration now opens and commits the actual numeric editor, rejects invalid input and checks all ten state captures. The actual Windows/MSVC/DPI/audio/DAW surface is still **unverified**; the visual pass above does not certify Windows.
+
+
+## 2.0.1 gain update
+
+Preserved selected cream/cobalt composition and colour lawyer poses. Added a dedicated Input / Auto Gain / Output row under the meters; main controls retain their previous sizes. Canvas is now 1080×860, resizable 80–150%. Inspected native captures for all three requested banner captions: no clipping, correct Thai glyphs, consistent poses. Local integration passes all gain/control bindings, 12 DSP-driven scenes and stopped transport. Windows MSVC/native UI/pluginval pipeline also passed (run 40055383919); Windows artifact download into this environment is currently blocked by its storage hostname, so these checked-in captures are explicitly Linux evidence.

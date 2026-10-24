@@ -2,6 +2,21 @@
 
 **Windows x64 native build and automated validation passed. A Windows test ZIP is available.** This is an unsigned test build; DAW listening and installer testing on user machines remain required. macOS has not been built.
 
+## 2.0.1 gain and warning update — 2026-10-24
+
+Adds independent ±24 dB Input/Output trims, optional pre-chain stereo-linked Auto Gain, and the requested Thai warning captions on the lawyer banner. Auto Gain defaults off; the original dry bypass still ignores all gains. RMS target is -18 dBFS, bounded correction -24/+12 dB, silence gate -50 dBFS and requested peak headroom -3 dBFS. This is not a limiter and cannot repair clipped recordings.
+
+Native Windows MSVC build, CTest 2/2, **50 core assertions plus 3 speech checks**, native UI integration (12 driven scenes plus stopped transport), pluginval strictness 5 and packaging guards all passed. Local Linux checks also passed. These include gain/delta/bypass/recall/output-overload checks, Auto Gain at 44.1/48/96 kHz, and end-to-end stereo target/balance checks. Native Windows validation for this exact source:
+
+https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40055383919
+
+The Windows job passed in 5m23s. Tested ZIP artifact:
+https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40055383919/artifacts/12545221698
+
+GitHub reports artifact SHA-256 `234f1740b2d718e1de3cab24227d5bcd3e67fc52fa00253f492cea67bca4f7dc` (outer artifact archive). Download back into this environment is blocked at `productionresultssa9.blob.core.windows.net`; post-download ZIP/binary checks were therefore not repeated for 2.0.1. The runner itself checked and bound binary hashes before packaging. No installer/real DAW listening claim is made. Local UI images/logs: `docs/evidence/gain-update/`. Windows evidence is the `Windows-validation-evidence` artifact on the run page.
+
+The results below describe the preceding Windows-tested version (2.0.0).
+
 ## Latest verified work (Linux, 2026-10-23)
 
 - Native Release build passed: VST3, Standalone, test renderer and offline processor.
