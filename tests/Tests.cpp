@@ -73,6 +73,38 @@ int main(int argc, char** argv){
         check(breathDb<-3,"breath control still reduces quiet unvoiced broadband material");
     }
     {
+        TatreeProcessor p;set(p,"noise",0);set(p,"ess",0);set(p,"breath",100);set(p,"filter",0);p.prepareToPlay(48000,127);
+        std::vector<float> consonant(48000,0);
+        for(int i=12000;i<13920;++i)consonant[size_t(i)]=normal(rng)*.15f; // 40 ms unvoiced consonant-like burst.
+        auto out=run(p,consonant);double inEnergy=0,outEnergy=0;
+        for(int i=12000;i<13920;++i){inEnergy+=consonant[size_t(i)]*consonant[size_t(i)];outEnergy+=out[size_t(i+1024)]*out[size_t(i+1024)];}
+        const double change=10*std::log10(outEnergy/inEnergy);std::cout<<"Short unvoiced burst: "<<change<<" dB\n";
+        check(std::abs(change)<.75,"maximum de-breath preserves short unvoiced consonant-like bursts");
+        std::vector<float> phrase(96000,0);
+        for(int i=0;i<19200;++i)phrase[size_t(i)]=normal(rng)*.15f;
+        for(int i=19200;i<96000;++i)phrase[size_t(i)]=.04f*float(std::sin(juce::MathConstants<double>::twoPi*400*i/48000));
+        p.prepareToPlay(48000,127);out=run(p,phrase);inEnergy=outEnergy=0;
+        for(int i=19680;i<21600;++i){inEnergy+=phrase[size_t(i)]*phrase[size_t(i)];outEnergy+=out[size_t(i+1024)]*out[size_t(i+1024)];}
+        check(10*std::log10(outEnergy/inEnergy)>-.75,"de-breath recovers for the voiced word following a breath");
+    }
+    for(double sr:{16000.0,44100.0,48000.0,96000.0}) {
+        TatreeProcessor p;set(p,"noise",0);set(p,"ess",100);set(p,"breath",0);set(p,"filter",0);p.prepareToPlay(sr,127);
+        std::vector<float> sibilant(size_t(sr*2),0);
+        for(size_t i=0;i<sibilant.size();++i)sibilant[i]=.01f*float(std::sin(juce::MathConstants<double>::twoPi*6000*double(i)/sr));
+        auto out=run(p,sibilant);const double change=20*std::log10(rms(out,int(sr))/rms(sibilant,int(sr)));
+        std::cout<<"Quiet 6 kHz de-ess at "<<sr<<": "<<change<<" dB\n";
+        check(change<-2,"de-esser detects quiet sibilance at 16/44.1/48/96 kHz");
+    }
+    {
+        TatreeProcessor p;set(p,"noise",0);set(p,"ess",100);set(p,"breath",0);set(p,"filter",0);p.prepareToPlay(48000,127);
+        std::vector<float> mixed(96000,0);
+        for(size_t i=0;i<mixed.size();++i)mixed[i]=.1f*float(std::sin(juce::MathConstants<double>::twoPi*400*double(i)/48000))+.08f*float(std::sin(juce::MathConstants<double>::twoPi*8500*double(i)/48000));
+        auto out=run(p,mixed);const auto bandAmplitude=[&](double hz){double re=0,im=0;for(int i=48000;i<96000;++i){double phase=juce::MathConstants<double>::twoPi*hz*(i-1024)/48000;re+=out[size_t(i)]*std::cos(phase);im+=out[size_t(i)]*std::sin(phase);}return 2*std::sqrt(re*re+im*im)/48000;};
+        const double voiceDb=20*std::log10(bandAmplitude(400)/.1),essDb=20*std::log10(bandAmplitude(8500)/.08);
+        std::cout<<"Simultaneous voice/sibilance: "<<voiceDb<<" / "<<essDb<<" dB\n";
+        check(std::abs(voiceDb)<.2 && essDb<-2,"split-band de-esser reduces sibilance without ducking simultaneous vowel body");
+    }
+    {
         TatreeProcessor p;set(p,"noise",72);set(p,"motion",0);set(p,"filter",0);juce::MemoryBlock state;p.getStateInformation(state);
         TatreeProcessor restored;restored.setStateInformation(state.getData(),int(state.getSize()));
         check(restored.params.getRawParameterValue("noise")->load()==72 && restored.params.getRawParameterValue("motion")->load()==0,"host session restores controls and motion preference");
@@ -162,6 +194,34 @@ int main(int argc, char** argv){
             for(int i=0;i<n;++i){before+=std::pow(noisy[size_t(i)]-clean[size_t(i)],2);after+=std::pow(processed[size_t(i+1024)]-clean[size_t(i)],2);dot+=processed[size_t(i+1024)]*clean[size_t(i)];}
             std::cout<<"Real speech amount "<<amount<<": input SNR "<<10*std::log10(energy/before)<<" dB, output SNR "<<10*std::log10(energy/after)<<" dB, voice correlation gain "<<dot/energy<<"\n";
             if(amount==45)check(after<before*std::pow(10.0,-.3/10) && dot/energy>.85,"default noise amount improves noisy real-speech SNR and retains voice level");
+        }
+        {
+            TatreeProcessor p;set(p,"noise",45);set(p,"ess",0);set(p,"breath",0);set(p,"filter",0);p.prepareToPlay(reader->sampleRate,512);
+            auto input=clean;input.resize(size_t(n+1024),0);auto y=run(p,input,127);double dot=0,error=0;
+            for(int i=0;i<n;++i){dot+=y[size_t(i+1024)]*clean[size_t(i)];error+=std::pow(y[size_t(i+1024)]-clean[size_t(i)],2);}
+            const double gain=dot/energy, errorSnr=10*std::log10(energy/error);
+            std::cout<<"Clean speech gain "<<gain<<", error SNR "<<errorSnr<<" dB\n";
+            check(gain>.94 && errorSnr>21,"default denoiser preserves clean recorded speech instead of learning it as noise");
+        }
+        for(int kind=0;kind<4;++kind) {
+            const int pre=int(reader->sampleRate*.5),total=pre+n;
+            std::vector<float> fixture(size_t(total+1024),0), disturbance(size_t(total),0);
+            std::mt19937 gen(640+kind);std::normal_distribution<float> dist(0,1);float pink=0;double noiseEnergy=0;
+            for(int i=0;i<total;++i){
+                const double t=i/reader->sampleRate;float x=dist(gen);
+                if(kind==1){pink=.97f*pink+.03f*x;x=pink;}
+                if(kind==2)x=float(std::sin(juce::MathConstants<double>::twoPi*60*t)+.4*std::sin(juce::MathConstants<double>::twoPi*120*t))+.1f*x;
+                if(kind==3)x*=std::sin(juce::MathConstants<double>::twoPi*3.1*t)>0?1.0f:.15f;
+                disturbance[size_t(i)]=x;if(i>=pre)noiseEnergy+=x*x;
+            }
+            const float scale=float(std::sqrt(energy/(10*noiseEnergy)));
+            for(int i=0;i<total;++i)fixture[size_t(i)]=disturbance[size_t(i)]*scale+(i>=pre?clean[size_t(i-pre)]:0);
+            TatreeProcessor p;set(p,"noise",45);set(p,"ess",0);set(p,"breath",0);set(p,"filter",0);p.prepareToPlay(reader->sampleRate,512);
+            auto y=run(p,fixture,127);double error=0,dot=0;
+            for(int i=0;i<n;++i){float out=y[size_t(pre+i+1024)];error+=std::pow(out-clean[size_t(i)],2);dot+=out*clean[size_t(i)];}
+            const double snr=10*std::log10(energy/error),gain=dot/energy;
+            std::cout<<"Speech/noise case "<<kind<<": SNR "<<snr<<" dB, voice gain "<<gain<<"\n";
+            check(snr>10.25 && gain>.90,"default denoiser improves white/pink/hum/modulated speech fixtures while retaining voice");
         }
     }
     std::cout<<"All audio and motion checks passed.\n";return 0;

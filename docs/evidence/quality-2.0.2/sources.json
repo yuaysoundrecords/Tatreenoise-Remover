@@ -1,0 +1,30 @@
+[
+  {
+    "repo": "xiph/speexdsp",
+    "path": "libspeexdsp/preprocess.c",
+    "commit": "a2133f5904ddb616b6578920bd2199f5accb484d",
+    "url": "https://github.com/xiph/speexdsp/blob/a2133f5904ddb616b6578920bd2199f5accb484d/libspeexdsp/preprocess.c",
+    "snapshot_sha256": "f2579e284dc4ec49e2252901966fa4a93e62245969617e740affe8fda5051a7a"
+  },
+  {
+    "repo": "xiph/rnnoise",
+    "path": "README",
+    "commit": "130913db902535a19eb477a9f4cdd5c922d63cf2",
+    "url": "https://github.com/xiph/rnnoise/blob/130913db902535a19eb477a9f4cdd5c922d63cf2/README",
+    "snapshot_sha256": "ab97c68d2b59aeca4ccc7df2be1a4d2af03ebaa9ec5e51aca93b8d12233069db"
+  },
+  {
+    "repo": "airwindows/airwindows",
+    "path": "plugins/WinVST/DeEss/DeEssProc.cpp",
+    "commit": "f06250c08225d4040af3addab2026e99779ef42e",
+    "url": "https://github.com/airwindows/airwindows/blob/f06250c08225d4040af3addab2026e99779ef42e/plugins/WinVST/DeEss/DeEssProc.cpp",
+    "snapshot_sha256": "6478a8cc88d8558b94996e9966158869c648075859307cfb79adf36edd854029"
+  },
+  {
+    "repo": "webrtc-mirror/webrtc",
+    "path": "common_audio/vad/vad_core.c",
+    "commit": "c940dba16ab898003c8a93472c046c6178ce96e7",
+    "url": "https://github.com/webrtc-mirror/webrtc/blob/c940dba16ab898003c8a93472c046c6178ce96e7/common_audio/vad/vad_core.c",
+    "snapshot_sha256": "6d78d06869f0e85ef84cea4fa05397a6e7a8bfcd70ad415b39ba25de721706e3"
+  }
+]

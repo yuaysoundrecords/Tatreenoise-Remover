@@ -26,12 +26,17 @@ void TatreeProcessor::prepareToPlay(double sr, int) {
     rate = sr; setLatencySamples(SpectralDenoiser::size); dryCursor = 0;
     autoGain.reset(sr);
     low.fill(0); envHigh = envFull = 0; essGain = breathGain = 1;
-    crossover = 1.0f - std::exp(-juce::MathConstants<float>::twoPi * 4500.0f / float(sr));
+    const float g=std::tan(juce::MathConstants<float>::pi*std::min(4500.0f,float(sr)*.4f)/float(sr));
+    crossover=g/(1+g); // Bilinear/TPT complementary one-pole split, stable at every rate.
+    breathEvidence=breathPower=0;
+    breathPowerFollow=std::exp(-1.0f/float(.005*sr));
+    breathVoiceRelease=std::exp(-1.0f/float(.008*sr));
+    powerFollow=std::exp(-1.0f/float(.005*sr));
     attack = std::exp(-1.0f / float(.002 * sr)); release = std::exp(-1.0f / float(.09 * sr));
     breathAttack = std::exp(-1.0f / float(.025 * sr));
     breathRelease = std::exp(-1.0f / float(.14 * sr));
     for (int c=0; c<2; ++c) {
-        denoisers[c].reset(); dryDelay[c].fill(0); bypassDelay[c].fill(0);
+        denoisers[c].reset(sr); dryDelay[c].fill(0); bypassDelay[c].fill(0);
         highpass[c].coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass(sr,75);
         highpass[c].reset(); // Allocate filter state here, not on the first audio callback.
         meters.input[c].store(0); meters.output[c].store(0);
@@ -86,12 +91,13 @@ void TatreeProcessor::process(juce::AudioBuffer<float>& b, bool hostBypass) {
             dry[c]=dryDelay[c][dryCursor]; dryDelay[c][dryCursor]=x;
             const float hp=highpass[c].processSample(x);
             wet[c]=denoisers[c].process(x + filt*(hp-x),n);
-            low[c] += crossover*(wet[c]-low[c]); high[c]=wet[c]-low[c];
+            const float v=(wet[c]-low[c])*crossover;
+            const float lowBand=v+low[c];low[c]=lowBand+v;high[c]=wet[c]-lowBand;
             fullPower += wet[c]*wet[c]; highPower += high[c]*high[c];
         }
         dryCursor=(dryCursor+1)%SpectralDenoiser::size;
         fullPower/=float(std::max(1,channels)); highPower/=float(std::max(1,channels));
-        auto envelope=[this](float previous,float value) { auto a=value>previous?attack:release; return a*previous+(1-a)*value; };
+        auto envelope=[this](float previous,float value) { return powerFollow*previous+(1-powerFollow)*value; };
         envFull=envelope(envFull,fullPower); envHigh=envelope(envHigh,highPower);
         const float ratio=envHigh/(envFull+1e-12f);
         const float activity=juce::jlimit(0.0f,1.0f,(ratio-.22f)/.45f)*juce::jlimit(0.0f,1.0f,envHigh/.00008f);
@@ -102,9 +108,15 @@ void TatreeProcessor::process(juce::AudioBuffer<float>& b, bool hostBypass) {
         // Only attenuate low-level, noise-like high-band material. Quiet voiced
         // fundamentals should not be mistaken for breaths.
         const float unvoiced = juce::jlimit(0.0f,1.0f,(ratio-.18f)/.35f);
-        const float breathDb=br*unvoiced*std::min(12.0f,std::max(0.0f,(-34-level)*.65f));
+        breathPower=breathPowerFollow*breathPower+(1-breathPowerFollow)*fullPower;
+        const bool breathLike=unvoiced>.25f && level<-34 && breathPower>1e-7f && breathPower>envFull*.05f;
+        breathEvidence=std::clamp(breathEvidence+(breathLike?1.0f:-4.0f)/float(rate),0.0f,.14f);
+        // Require a sustained low-level unvoiced event. Short consonants must
+        // survive; no extra lookahead/latency is added to the audible signal.
+        const float durationConfidence=std::clamp((breathEvidence-.065f)/.035f,0.0f,1.0f);
+        const float breathDb=br*unvoiced*durationConfidence*std::min(12.0f,std::max(0.0f,(-34-level)*.65f));
         const float targetBreath = juce::Decibels::decibelsToGain(-breathDb);
-        breathGain = targetBreath + (breathGain - targetBreath) * (targetBreath < breathGain ? breathAttack : breathRelease);
+        breathGain = targetBreath + (breathGain - targetBreath) * (targetBreath < breathGain ? breathAttack : unvoiced<.1f ? breathVoiceRelease : breathRelease);
         if (envFull>1e-10f) { maxEss=std::max(maxEss,essDb); maxBreath=std::max(maxBreath,breathDb); }
         for (int c=0;c<channels;++c) {
             const float processed=(wet[c]-high[c]*(1-essGain))*breathGain;

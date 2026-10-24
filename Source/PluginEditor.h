@@ -24,6 +24,7 @@ public:
     LawyerState currentMotionState() const { return motion.state; }
 private:
     void timerCallback() override;
+    void drawSpeechBanner(juce::Graphics&);
     void meter(juce::Graphics&,juce::Rectangle<float>,juce::String,bool,bool);
     void caption(juce::Graphics&,juce::String,juce::Rectangle<float>,float,juce::Colour,bool=false);
     void caption(juce::Graphics& g, const char* text, juce::Rectangle<float> r, float size, juce::Colour c, bool body=false) {
@@ -42,6 +43,9 @@ private:
     std::array<std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>,5> buttonAttachments;
     juce::TooltipWindow tooltips {this,650};
     MotionState motion;
+    juce::String bannerText;
+    juce::GlyphArrangement bannerGlyphs;
+    juce::Rectangle<float> bannerFrame;
     unsigned long long lastBlock = 0;
     float noAudioSeconds = 0, meterFade = 1;
     std::array<std::array<float,2>,2> heldPeaks {}, peakTimers {};

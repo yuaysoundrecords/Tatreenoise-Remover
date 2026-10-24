@@ -47,7 +47,8 @@ private:
     int dryCursor = 0;
     double rate = 48000;
     float crossover = 0, envHigh = 0, envFull = 0, essGain = 1, breathGain = 1;
-    float attack = 0, release = 0, breathAttack = 0, breathRelease = 0;
+    float powerFollow = 0, attack = 0, release = 0, breathAttack = 0, breathRelease = 0;
+    float breathEvidence = 0, breathPower = 0, breathPowerFollow = 0, breathVoiceRelease = 0;
     juce::SmoothedValue<float> noiseAmount, breathAmount, essAmount, bypassMix, listenMix, filterMix, inputGain, outputGain;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TatreeProcessor)
 };

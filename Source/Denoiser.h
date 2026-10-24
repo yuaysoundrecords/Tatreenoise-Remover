@@ -13,9 +13,15 @@ public:
             window[i] = std::sqrt(0.5f - 0.5f * std::cos(juce::MathConstants<float>::twoPi * i / size));
         reset();
     }
-    void reset() {
+    void reset(double sampleRate = 48000) {
         input.fill(0); output.fill(0); noise.fill(0); gains.fill(1); power.fill(0);
-        cursor = count = 0; ready = false; reductionDb = 0;
+        smoothPower.fill(0); localMinimum.fill(1e30f); previousMinimum.fill(1e30f);
+        const float scale=float(48000/sampleRate);
+        powerRate=1-std::pow(.8f,scale);noiseDown=1-std::pow(.92f,scale);
+        noiseUp=1-std::pow(.94f,scale);noiseSpeech=1-std::pow(.9998f,scale);
+        gainDown=1-std::pow(.45f,scale);gainUp=1-std::pow(.82f,scale);
+        minimumPeriod=std::max(1,int(std::round(sampleRate*.25/hop)));
+        cursor = count = frames = minimumCounter = 0; reductionDb = 0;
     }
     float process(float x, float amount) {
         auto y = output[cursor]; output[cursor] = 0; input[cursor] = x;
@@ -26,9 +32,9 @@ public:
     float reductionDb = 0;
 private:
     void frame(float amount) {
-        // Progressive control taper keeps ordinary voice settings conservative,
-        // while retaining the full maximum attenuation for difficult noise.
-        amount *= amount;
+        // Apply stronger suppression to stationary background bins while
+        // retaining a conservative oversubtraction weight during speech.
+        amount=std::clamp(amount,0.0f,1.0f);
         fftData.fill(0);
         for (int i = 0; i < size; ++i) fftData[i] = input[(cursor + i) % size] * window[i];
         fft.performRealOnlyForwardTransform(fftData.data(), true);
@@ -36,19 +42,29 @@ private:
             power[k] = fftData[2*k]*fftData[2*k] + fftData[2*k+1]*fftData[2*k+1];
         float before = 1e-15f, after = 1e-15f;
         const float floor = juce::Decibels::decibelsToGain(-26.0f * amount);
+        frames=std::min(frames+1,5);
+        const bool rotateMinimum=++minimumCounter>=minimumPeriod;
+        if(rotateMinimum)minimumCounter=0;
         for (int k = 0; k < bins; ++k) {
             const float p = power[k];
-            const float neighbours = (power[std::max(0,k-2)] + power[std::max(0,k-1)]
-                                     + power[std::min(bins-1,k+1)] + power[std::min(bins-1,k+2)]) * .25f;
-            // Protect narrow harmonic peaks from being learned as broadband noise.
-            const float candidate = std::min(p, neighbours * 2.0f + 1e-15f);
-            if (!ready) noise[k] = candidate * .7f;
-            const float rate = candidate < noise[k] ? .075f : .0015f;
-            noise[k] += rate * (candidate - noise[k]);
-            float target = std::sqrt(std::max(floor * floor, 1.0f - amount * 2.8f * noise[k] / (p + 1e-15f)));
-            if (amount < 1e-6f) target = 1;
-            const float rateGain = target < gains[k] ? .55f : .18f;
-            gains[k] += rateGain * (target - gains[k]);
+            const float neighbours=(power[std::max(0,k-1)]+2*p+power[std::min(bins-1,k+1)])*.25f;
+            smoothPower[k]+=powerRate*(neighbours-smoothPower[k]);
+            if(frames<=4) {
+                // Full analysis window has not arrived yet. A conservative
+                // startup estimate avoids treating the first word as room tone.
+                noise[k]=neighbours*.15f;
+                localMinimum[k]=previousMinimum[k]=smoothPower[k];
+            }
+            if(rotateMinimum) {
+                previousMinimum[k]=localMinimum[k];localMinimum[k]=smoothPower[k];
+            } else localMinimum[k]=std::min(localMinimum[k],smoothPower[k]);
+            const float minimum=std::min(localMinimum[k],previousMinimum[k]);
+            const bool speechLikely=smoothPower[k]>2.5f*(minimum+1e-15f);
+            const float rate=p<noise[k]?noiseDown:speechLikely?noiseSpeech:noiseUp;
+            noise[k]+=rate*(p-noise[k]);
+            float target=std::sqrt(std::max(floor*floor,1-amount*2.8f*(speechLikely?.5f:1.0f)*noise[k]/(p+1e-15f)));
+            if(amount<1e-6f)target=1;
+            gains[k]+=(target<gains[k]?gainDown:gainUp)*(target-gains[k]);
         }
         for (int k = 0; k < bins; ++k) {
             const float g = (gains[std::max(0,k-1)] + 2*gains[k] + gains[std::min(bins-1,k+1)]) * .25f;
@@ -56,7 +72,6 @@ private:
             fftData[2*k] *= g; fftData[2*k+1] *= g;
         }
         reductionDb = before > 1e-10f ? std::clamp(10.0f * std::log10(before / after), 0.0f, 40.0f) : 0;
-        ready = true;
         fft.performRealOnlyInverseTransform(fftData.data());
         for (int i = 0; i < size; ++i) output[(cursor + i) % size] += fftData[i] * window[i] * .5f;
     }
@@ -64,6 +79,7 @@ private:
     std::array<float,size> input{}, output{}, window{};
     std::array<float,size*2> fftData{};
     std::array<float,bins> noise{}, gains{}, power{};
-    int cursor = 0, count = 0;
-    bool ready = false;
+    std::array<float,bins> smoothPower{},localMinimum{},previousMinimum{};
+    float powerRate=0,noiseDown=0,noiseUp=0,noiseSpeech=0,gainDown=0,gainUp=0;
+    int cursor=0,count=0,frames=0,minimumCounter=0,minimumPeriod=1;
 };

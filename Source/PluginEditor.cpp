@@ -167,6 +167,27 @@ void TatreeEditor::meter(juce::Graphics& g,juce::Rectangle<float> r,juce::String
     }
     caption(g,reduction ? juce::String(processor.meters.reductionDb.load()*meterFade,1)+" dB" : juce::String(juce::Decibels::gainToDecibels(std::max(heldPeaks[output?1:0][0],heldPeaks[output?1:0][1]),-60.0f),1)+" dBFS",{r.getX(),r.getY()+111,r.getWidth(),18},14,look.cream,true);
 }
+void TatreeEditor::drawSpeechBanner(juce::Graphics& g) {
+    const auto state=motion.state;
+    const char* speech=state==LawyerState::hot?"อย่าทำ Meter แตก":state==LawyerState::deEss?"อย่ากระเเทก Sibilance":state==LawyerState::noise?"จงระวัง Single Noise!":"เงียบไว้น้อง!";
+    const auto text=juce::String::fromUTF8(speech);
+    if(text!=bannerText) {
+        bannerText=text;bannerGlyphs.clear();
+        bannerGlyphs.addLineOfText(look.body(62.0f).boldened(),text,0,0);
+        // Outline bounds include the actual Thai combining marks and Latin ink,
+        // avoiding the font's asymmetric baseline/leading and side bearings.
+        juce::Path outline;bannerGlyphs.createPath(outline);
+        const auto ink=outline.getBounds();
+        constexpr float horizontalPadding=23, verticalPadding=12;
+        const auto width=ink.getWidth()+2*horizontalPadding, height=ink.getHeight()+2*verticalPadding;
+        bannerFrame={1040-width,191-height*.5f,width,height};
+        bannerGlyphs.moveRangeOfGlyphs(0,-1,bannerFrame.getX()+horizontalPadding-ink.getX(),bannerFrame.getY()+verticalPadding-ink.getY());
+    }
+    juce::Graphics::ScopedSaveState save(g);
+    g.addTransform(juce::AffineTransform::rotation(-.075f,bannerFrame.getCentreX(),bannerFrame.getCentreY()));
+    g.setColour(look.blue);g.fillRect(bannerFrame);
+    g.setColour(look.cream);bannerGlyphs.draw(g);
+}
 void TatreeEditor::paint(juce::Graphics& g){
     g.addTransform(juce::AffineTransform::scale(float(getWidth())/1080));
     g.setColour(look.cream);g.fillRect(0,0,1080,860);
@@ -191,13 +212,7 @@ void TatreeEditor::paint(juce::Graphics& g){
         const auto& pose = motion.state==LawyerState::hot ? lawyerHot : motion.state==LawyerState::deEss ? lawyerDeess : lawyer;
         g.drawImage(pose,{650,155,392,330},juce::RectanglePlacement::centred);
     }
-    {
-        juce::Graphics::ScopedSaveState save(g);g.addTransform(juce::AffineTransform::rotation(-.075f,828,183));
-        g.setColour(look.blue);g.fillRect(653,150,388,71);
-        const auto state=motion.state;
-        const char* speech=state==LawyerState::hot?"อย่าทำ Meter แตก":state==LawyerState::deEss?"อย่ากระเเทก Sibilance":state==LawyerState::noise?"จงระวัง Single Noise!":"เงียบไว้น้อง!";
-        caption(g,speech,{665,149,363,71},state==LawyerState::idle?58.0f:34.0f,look.cream,true);
-    }
+    drawSpeechBanner(g);
     auto state=motion.state;
     juce::String text=state==LawyerState::hot?"INPUT HOT!":state==LawyerState::deEss?"DE-ESSING":state==LawyerState::noise?"NOISE ACTIVE":state==LawyerState::breath?"BREATH CTRL":state==LawyerState::listen?"DELTA LISTEN":state==LawyerState::bypass?"BYPASSED":motion.touchHold>0 && motion.recentControl==LawyerControl::filter?(filter.getToggleState()?"LOW CUT 75Hz":"LOW CUT OFF"):"READY!";
     auto accent=state==LawyerState::hot?look.red:look.blue;

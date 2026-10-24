@@ -1,0 +1,373 @@
+{
+  "sample_rate": 16000,
+  "speex_latency": 160,
+  "seed": 749,
+  "preroll_seconds": 0.5,
+  "reference_scale": 0.5,
+  "reference_source_sha256": "59dfb9a4acb36fe2a2affc14bacbee2920ff435cb13cc314a08c13f66ba7860e",
+  "processor_sha256": "871ff4e14bde73f712835f8a4a446dc7ad0f0022ef6a6ef1a8f2346deb360d97",
+  "baseline_sha256": "1dfae651bf445f8508965c82f28ec7f5200c2d246143c2912b44678b15636e6e",
+  "speex_library_sha256": "1807fc27993c37d92c7e802baf1829f812f80ed4a4ef635411958012cdfffd56",
+  "python": "3.12.14",
+  "numpy": "2.3.5",
+  "rows": [
+    {
+      "noise": "white",
+      "input_snr": 0,
+      "processor": "SpeexDSP 1.2.1 -12dB",
+      "output_snr": 8.641,
+      "si_sdr": 8.175,
+      "voice_gain": 0.931
+    },
+    {
+      "noise": "white",
+      "input_snr": 0,
+      "processor": "Tatree current 45%",
+      "output_snr": 3.986,
+      "si_sdr": 3.293,
+      "voice_gain": 0.915
+    },
+    {
+      "noise": "white",
+      "input_snr": 0,
+      "processor": "Tatree current 65%",
+      "output_snr": 5.312,
+      "si_sdr": 4.466,
+      "voice_gain": 0.888
+    },
+    {
+      "noise": "white",
+      "input_snr": 0,
+      "processor": "Tatree 2.0.1 45%",
+      "output_snr": 1.702,
+      "si_sdr": 0.716,
+      "voice_gain": 0.884
+    },
+    {
+      "noise": "white",
+      "input_snr": 0,
+      "processor": "Tatree 2.0.1 65%",
+      "output_snr": 3.233,
+      "si_sdr": 1.565,
+      "voice_gain": 0.784
+    },
+    {
+      "noise": "white",
+      "input_snr": 10,
+      "processor": "SpeexDSP 1.2.1 -12dB",
+      "output_snr": 16.665,
+      "si_sdr": 16.571,
+      "voice_gain": 0.977
+    },
+    {
+      "noise": "white",
+      "input_snr": 10,
+      "processor": "Tatree current 45%",
+      "output_snr": 13.27,
+      "si_sdr": 13.068,
+      "voice_gain": 0.944
+    },
+    {
+      "noise": "white",
+      "input_snr": 10,
+      "processor": "Tatree current 65%",
+      "output_snr": 13.908,
+      "si_sdr": 13.858,
+      "voice_gain": 0.927
+    },
+    {
+      "noise": "white",
+      "input_snr": 10,
+      "processor": "Tatree 2.0.1 45%",
+      "output_snr": 10.876,
+      "si_sdr": 10.602,
+      "voice_gain": 0.881
+    },
+    {
+      "noise": "white",
+      "input_snr": 10,
+      "processor": "Tatree 2.0.1 65%",
+      "output_snr": 10.231,
+      "si_sdr": 10.94,
+      "voice_gain": 0.788
+    },
+    {
+      "noise": "pink",
+      "input_snr": 0,
+      "processor": "SpeexDSP 1.2.1 -12dB",
+      "output_snr": 3.225,
+      "si_sdr": 2.737,
+      "voice_gain": 0.942
+    },
+    {
+      "noise": "pink",
+      "input_snr": 0,
+      "processor": "Tatree current 45%",
+      "output_snr": 2.48,
+      "si_sdr": 1.827,
+      "voice_gain": 0.923
+    },
+    {
+      "noise": "pink",
+      "input_snr": 0,
+      "processor": "Tatree current 65%",
+      "output_snr": 3.189,
+      "si_sdr": 2.352,
+      "voice_gain": 0.898
+    },
+    {
+      "noise": "pink",
+      "input_snr": 0,
+      "processor": "Tatree 2.0.1 45%",
+      "output_snr": 1.381,
+      "si_sdr": 0.396,
+      "voice_gain": 0.885
+    },
+    {
+      "noise": "pink",
+      "input_snr": 0,
+      "processor": "Tatree 2.0.1 65%",
+      "output_snr": 2.477,
+      "si_sdr": 0.776,
+      "voice_gain": 0.789
+    },
+    {
+      "noise": "pink",
+      "input_snr": 10,
+      "processor": "SpeexDSP 1.2.1 -12dB",
+      "output_snr": 13.086,
+      "si_sdr": 12.947,
+      "voice_gain": 0.98
+    },
+    {
+      "noise": "pink",
+      "input_snr": 10,
+      "processor": "Tatree current 45%",
+      "output_snr": 12.147,
+      "si_sdr": 11.881,
+      "voice_gain": 0.949
+    },
+    {
+      "noise": "pink",
+      "input_snr": 10,
+      "processor": "Tatree current 65%",
+      "output_snr": 12.504,
+      "si_sdr": 12.264,
+      "voice_gain": 0.933
+    },
+    {
+      "noise": "pink",
+      "input_snr": 10,
+      "processor": "Tatree 2.0.1 45%",
+      "output_snr": 10.673,
+      "si_sdr": 10.353,
+      "voice_gain": 0.882
+    },
+    {
+      "noise": "pink",
+      "input_snr": 10,
+      "processor": "Tatree 2.0.1 65%",
+      "output_snr": 9.939,
+      "si_sdr": 10.355,
+      "voice_gain": 0.791
+    },
+    {
+      "noise": "hum",
+      "input_snr": 0,
+      "processor": "SpeexDSP 1.2.1 -12dB",
+      "output_snr": 11.408,
+      "si_sdr": 11.253,
+      "voice_gain": 0.979
+    },
+    {
+      "noise": "hum",
+      "input_snr": 0,
+      "processor": "Tatree current 45%",
+      "output_snr": 10.993,
+      "si_sdr": 10.702,
+      "voice_gain": 0.954
+    },
+    {
+      "noise": "hum",
+      "input_snr": 0,
+      "processor": "Tatree current 65%",
+      "output_snr": 14.613,
+      "si_sdr": 14.551,
+      "voice_gain": 0.94
+    },
+    {
+      "noise": "hum",
+      "input_snr": 0,
+      "processor": "Tatree 2.0.1 45%",
+      "output_snr": 0.893,
+      "si_sdr": -0.125,
+      "voice_gain": 0.882
+    },
+    {
+      "noise": "hum",
+      "input_snr": 0,
+      "processor": "Tatree 2.0.1 65%",
+      "output_snr": 2.084,
+      "si_sdr": 0.378,
+      "voice_gain": 0.793
+    },
+    {
+      "noise": "hum",
+      "input_snr": 10,
+      "processor": "SpeexDSP 1.2.1 -12dB",
+      "output_snr": 20.395,
+      "si_sdr": 20.367,
+      "voice_gain": 0.986
+    },
+    {
+      "noise": "hum",
+      "input_snr": 10,
+      "processor": "Tatree current 45%",
+      "output_snr": 18.952,
+      "si_sdr": 19.217,
+      "voice_gain": 0.958
+    },
+    {
+      "noise": "hum",
+      "input_snr": 10,
+      "processor": "Tatree current 65%",
+      "output_snr": 19.532,
+      "si_sdr": 20.359,
+      "voice_gain": 0.946
+    },
+    {
+      "noise": "hum",
+      "input_snr": 10,
+      "processor": "Tatree 2.0.1 45%",
+      "output_snr": 10.083,
+      "si_sdr": 9.659,
+      "voice_gain": 0.881
+    },
+    {
+      "noise": "hum",
+      "input_snr": 10,
+      "processor": "Tatree 2.0.1 65%",
+      "output_snr": 9.563,
+      "si_sdr": 9.648,
+      "voice_gain": 0.795
+    },
+    {
+      "noise": "modulated",
+      "input_snr": 0,
+      "processor": "SpeexDSP 1.2.1 -12dB",
+      "output_snr": 0.393,
+      "si_sdr": 0.204,
+      "voice_gain": 0.978
+    },
+    {
+      "noise": "modulated",
+      "input_snr": 0,
+      "processor": "Tatree current 45%",
+      "output_snr": 0.824,
+      "si_sdr": 0.361,
+      "voice_gain": 0.946
+    },
+    {
+      "noise": "modulated",
+      "input_snr": 0,
+      "processor": "Tatree current 65%",
+      "output_snr": 1.071,
+      "si_sdr": 0.465,
+      "voice_gain": 0.93
+    },
+    {
+      "noise": "modulated",
+      "input_snr": 0,
+      "processor": "Tatree 2.0.1 45%",
+      "output_snr": 1.562,
+      "si_sdr": 0.533,
+      "voice_gain": 0.879
+    },
+    {
+      "noise": "modulated",
+      "input_snr": 0,
+      "processor": "Tatree 2.0.1 65%",
+      "output_snr": 2.666,
+      "si_sdr": 0.971,
+      "voice_gain": 0.788
+    },
+    {
+      "noise": "modulated",
+      "input_snr": 10,
+      "processor": "SpeexDSP 1.2.1 -12dB",
+      "output_snr": 10.477,
+      "si_sdr": 10.358,
+      "voice_gain": 0.985
+    },
+    {
+      "noise": "modulated",
+      "input_snr": 10,
+      "processor": "Tatree current 45%",
+      "output_snr": 10.748,
+      "si_sdr": 10.452,
+      "voice_gain": 0.955
+    },
+    {
+      "noise": "modulated",
+      "input_snr": 10,
+      "processor": "Tatree current 65%",
+      "output_snr": 10.854,
+      "si_sdr": 10.512,
+      "voice_gain": 0.94
+    },
+    {
+      "noise": "modulated",
+      "input_snr": 10,
+      "processor": "Tatree 2.0.1 45%",
+      "output_snr": 10.703,
+      "si_sdr": 10.408,
+      "voice_gain": 0.878
+    },
+    {
+      "noise": "modulated",
+      "input_snr": 10,
+      "processor": "Tatree 2.0.1 65%",
+      "output_snr": 9.934,
+      "si_sdr": 10.379,
+      "voice_gain": 0.789
+    }
+  ],
+  "clean": [
+    {
+      "processor": "Tatree current",
+      "amount": 0,
+      "voice_gain": 0.999941417929823,
+      "error_snr": 76.37300114398404
+    },
+    {
+      "processor": "Tatree current",
+      "amount": 45,
+      "voice_gain": 0.9604149637382631,
+      "error_snr": 23.01455798921037
+    },
+    {
+      "processor": "Tatree current",
+      "amount": 65,
+      "voice_gain": 0.9479264353218523,
+      "error_snr": 20.876656413154322
+    },
+    {
+      "processor": "Tatree 2.0.1",
+      "amount": 0,
+      "voice_gain": 0.999941417929823,
+      "error_snr": 76.37300114398404
+    },
+    {
+      "processor": "Tatree 2.0.1",
+      "amount": 45,
+      "voice_gain": 0.881122032424463,
+      "error_snr": 17.25220554405288
+    },
+    {
+      "processor": "Tatree 2.0.1",
+      "amount": 65,
+      "voice_gain": 0.7955158953288739,
+      "error_snr": 12.658622601636882
+    }
+  ]
+}

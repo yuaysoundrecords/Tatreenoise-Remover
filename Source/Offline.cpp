@@ -3,7 +3,7 @@
 #include <iostream>
 int main(int argc,char** argv){
     juce::ScopedJuceInitialiser_GUI gui;
-    if(argc<3){std::cerr<<"Usage: TatreeOffline input.wav output.wav [noise%=45] [de-ess%=30] [breath%=25]\n";return 1;}
+    if(argc<3){std::cerr<<"Usage: TatreeOffline input.wav output.wav [noise%=45] [de-ess%=30] [breath%=25] [--filter-off]\n";return 1;}
     juce::AudioFormatManager formats;formats.registerBasicFormats();
     const auto input=juce::File::getCurrentWorkingDirectory().getChildFile(argv[1]);
     const auto output=juce::File::getCurrentWorkingDirectory().getChildFile(argv[2]);
@@ -15,6 +15,10 @@ int main(int argc,char** argv){
     const char* ids[]{"noise","ess","breath"};const float defaults[]{45,30,25};
     try{for(int i=0;i<3;++i){const float v=argc>i+3?std::stof(argv[i+3]):defaults[i];if(!std::isfinite(v)||v<0||v>100)throw std::runtime_error("range");auto* param=p.params.getParameter(ids[i]);param->setValueNotifyingHost(param->convertTo0to1(v));}}
     catch(...){std::cerr<<"Amounts must be numbers between 0 and 100.\n";return 1;}
+    for(int i=6;i<argc;++i) {
+        if(juce::String(argv[i])!="--filter-off"){std::cerr<<"Unknown option.\n";return 1;}
+        p.params.getParameter("filter")->setValueNotifyingHost(0);
+    }
     p.prepareToPlay(reader->sampleRate,512);
     juce::WavAudioFormat wav;
     auto stream=output.createOutputStream();if(!stream){std::cerr<<"Cannot write output.\n";return 1;}
