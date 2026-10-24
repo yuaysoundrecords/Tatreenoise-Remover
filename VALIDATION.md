@@ -2,6 +2,15 @@
 
 **Windows x64 native build and automated validation passed. A Windows test ZIP is available.** This is an unsigned test build; DAW listening and installer testing on user machines remain required. macOS has not been built.
 
+## 2.0.3 — interaction quotes and smooth vocal staging
+
+- Four new user-provided captions use a shared fitted bold font and semantic two-line wrapping. Actual outline padding is 23 px horizontally / 12 px vertically. Quotes trigger from Input/Output, Ess, Noise, and Auto Gain ON **and OFF**, and expire about 3 s after the last change. Audio detectors continue driving independent meter/motion states.
+- Vocal Auto Gain now uses 20 ms windows, 400 ms RMS integration, bounded -12/+3 dB/s correction, 350 ms downward / 1.5 s upward smoothing, a 0.15 dB deadband and absolute/relative breath/silence HOLD. Targets -18 dBFS active RMS with -24/+12 dB correction limits. It is not a lookahead limiter or LUFS normalizer.
+- Local CTest 2/2 passed: **64 core assertions plus 9 speech checks** (the speech suite repeats the core tests). Includes smooth gain-slew bounds at 44.1/48/96 kHz, breath HOLD, settled vocal staging, and gain headroom/slew on actual recorded speech. The reference vocal showed max rise/fall about 3.00/12.00 dB/s and peak 0.862 on that fixture.
+- Native UI integration passed all DSP scenes and actual user-control quote captures: Peak, Ess, Noise, Auto ON, Auto OFF, quote expiry and resize. See `docs/evidence/vocal-quotes-2.0.3/` (Linux captures).
+- The Noise/Ess/Breath improvements from 2.0.2 remain. Both 2.0.2 native Windows runs 40057766709 and 40057912614 passed. Full external comparison, including unfavorable cases, is in `docs/DSP-QUALITY.md`; peer comparison was executed on Linux and does not establish commercial parity.
+- Final 2.0.3 native Windows packaging is in progress; no final Windows-tested artifact is claimed until that job succeeds. The package includes self-contained A/B speech examples, source notices, quality report and recorded validation.
+
 ## 2.0.1 gain and warning update — 2026-10-24
 
 Adds independent ±24 dB Input/Output trims, optional pre-chain stereo-linked Auto Gain, and the requested Thai warning captions on the lawyer banner. Auto Gain defaults off; the original dry bypass still ignores all gains. RMS target is -18 dBFS, bounded correction -24/+12 dB, silence gate -50 dBFS and requested peak headroom -3 dBFS. This is not a limiter and cannot repair clipped recordings.

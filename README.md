@@ -12,7 +12,7 @@ Windows x64 is the first target for this new native C++17/JUCE development versi
 - Exact percentage entry, drag/keyboard knobs, delta listen, latency-matched bypass, host automation and session recall.
 - No runtime network connection, account or model download. Mono/stereo, 44.1/48/96 kHz checks.
 
-[Download Windows 2.0.1 test package](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40055383919/artifacts/12545221698) (GitHub sign-in may be required).
+[Latest Windows test builds](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions?query=branch%3Acodex%2Fwindows-first-tatree2) (GitHub sign-in may be required).
 
 ## Vocal staging and interaction quotes (2.0.3)
 
