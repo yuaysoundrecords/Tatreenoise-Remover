@@ -1,6 +1,6 @@
 # Current validation — Windows-first development
 
-**Windows x64 native build and automated validation passed. A Windows test ZIP is available.** This is an unsigned test build; DAW listening and installer testing on user machines remain required. macOS has not been built.
+**Windows 2.0.3 x64 native build and automated validation passed. A Windows test ZIP is available.** This is an unsigned test build; DAW listening and installer testing on user machines remain required. macOS has not been built.
 
 ## 2.0.3 — interaction quotes and smooth vocal staging
 
@@ -9,7 +9,9 @@
 - Local CTest 2/2 passed: **64 core assertions plus 9 speech checks** (the speech suite repeats the core tests). Includes smooth gain-slew bounds at 44.1/48/96 kHz, breath HOLD, settled vocal staging, and gain headroom/slew on actual recorded speech. The reference vocal showed max rise/fall about 3.00/12.00 dB/s and peak 0.862 on that fixture.
 - Native UI integration passed all DSP scenes and actual user-control quote captures: Peak, Ess, Noise, Auto ON, Auto OFF, quote expiry and resize. See `docs/evidence/vocal-quotes-2.0.3/` (Linux captures).
 - The Noise/Ess/Breath improvements from 2.0.2 remain. Both 2.0.2 native Windows runs 40057766709 and 40057912614 passed. Full external comparison, including unfavorable cases, is in `docs/DSP-QUALITY.md`; peer comparison was executed on Linux and does not establish commercial parity.
-- Final 2.0.3 native Windows packaging is in progress; no final Windows-tested artifact is claimed until that job succeeds. The package includes self-contained A/B speech examples, source notices, quality report and recorded validation.
+- Final 2.0.3 native Windows validation **passed** in 5m37s: MSVC build, both CTest suites (64 core + 9 speech checks), native GUI/control-quote tests, pluginval strictness 5 and package guards. [Tested Windows package](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40074931266/artifacts/12552657419). The package includes self-contained A/B speech examples, source notices, quality report and recorded validation.
+- Windows test startup stack exhaustion was resolved by heap-allocating large processor fixtures; no assertions were disabled or relaxed. Tests also pass on the final Linux 2.0.3 build.
+- GitHub reports outer package artifact SHA-256 `e4df4a851c128ebfb117894243d4390d1ce9cf5e6598829c7dba574fa1d48a8b`. Downloading the final run evidence back into this environment was denied at `productionresultssa2.blob.core.windows.net`; no independent post-download binary/ZIP verification is claimed for this run. The runner itself validates binary hashes before packaging. Native Windows screenshots/logs are the `Windows-validation-evidence` artifact (ID 12553135620).
 
 ## 2.0.1 gain and warning update — 2026-10-24
 

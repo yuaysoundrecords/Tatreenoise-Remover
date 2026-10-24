@@ -12,7 +12,7 @@ Windows x64 is the first target for this new native C++17/JUCE development versi
 - Exact percentage entry, drag/keyboard knobs, delta listen, latency-matched bypass, host automation and session recall.
 - No runtime network connection, account or model download. Mono/stereo, 44.1/48/96 kHz checks.
 
-[Latest Windows test builds](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions?query=branch%3Acodex%2Fwindows-first-tatree2) (GitHub sign-in may be required).
+[Download Windows 2.0.3 test package](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40074931266/artifacts/12552657419) (GitHub sign-in may be required).
 
 ## Vocal staging and interaction quotes (2.0.3)
 
@@ -36,7 +36,7 @@ Install Visual Studio 2022 **Desktop development with C++**, Windows SDK, Git an
 
 The script builds, tests, captures the native UI, verifies the pinned Windows pluginval download, validates the actual plugin, and packages only matching binaries that passed. [Windows instructions and testing checklist](docs/WINDOWS.md).
 
-GitHub Actions successfully ran the Windows pipeline: [validated Windows build](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40055383919). Its macOS job is optional and runs only after Windows success.
+GitHub Actions successfully ran the Windows pipeline: [validated Windows build](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40074931266). Its macOS job is optional and runs only after Windows success.
 
 ## Development checks
 

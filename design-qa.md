@@ -50,3 +50,8 @@ The selected visual target and palette remain unchanged. Additional implementati
 ## 2.0.1 gain update
 
 Preserved selected cream/cobalt composition and colour lawyer poses. Added a dedicated Input / Auto Gain / Output row under the meters; main controls retain their previous sizes. Canvas is now 1080×860, resizable 80–150%. Inspected native captures for all three requested banner captions: no clipping, correct Thai glyphs, consistent poses. Local integration passes all gain/control bindings, 12 DSP-driven scenes and stopped transport. Windows MSVC/native UI/pluginval pipeline also passed (run 40055383919); Windows artifact download into this environment is currently blocked by its storage hostname, so these checked-in captures are explicitly Linux evidence.
+
+
+## 2.0.3 final interaction quotes
+
+Inspected all four new long captions: semantic two-line wrapping, one common fitted bold size, actual glyph-outline padding (23 px horizontal / 12 px vertical), dynamic frame width and right alignment. No clipping/overlap in inspected native captures, including the longest Peak caption at 80/150% sizes. Quote triggers are control-driven and expire after 3 seconds; audio detectors retain independent meter/motion state. Actual native click tests cover Auto Gain ON and OFF. Windows MSVC/native GUI/pluginval validation passed on run 40074931266; archived Windows evidence is artifact 12553135620. Checked-in visual captures remain explicitly Linux.
