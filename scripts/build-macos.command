@@ -46,8 +46,21 @@ plutil -extract NSMicrophoneUsageDescription raw -o - "$STAGE/Standalone/Tatree 
 if [[ "${CI:-}" == true ]]; then
   mkdir -p "$HOME/Library/Audio/Plug-Ins/Components"
   ditto "$STAGE/AU/Tatree Noise Remover 2.component" "$HOME/Library/Audio/Plug-Ins/Components/Tatree Noise Remover 2.component"
-  if ! auval -v aufx Ttr2 Yuay > "$BUILD_DIR/validation/auval.txt" 2>&1; then
-    cat "$BUILD_DIR/validation/auval.txt"; exit 1
+  # A fresh hosted Mac may have started its registrar before this folder existed.
+  # Refresh that runner-only cache, then wait briefly for discovery.
+  killall AudioComponentRegistrar 2>/dev/null || true
+  INFO="$STAGE/AU/Tatree Noise Remover 2.component/Contents/Info.plist"
+  AU_TYPE=$(/usr/libexec/PlistBuddy -c 'Print :AudioComponents:0:type' "$INFO")
+  AU_SUBTYPE=$(/usr/libexec/PlistBuddy -c 'Print :AudioComponents:0:subtype' "$INFO")
+  AU_MAKER=$(/usr/libexec/PlistBuddy -c 'Print :AudioComponents:0:manufacturer' "$INFO")
+  for attempt in 1 2 3 4 5; do
+    auval -a > "$BUILD_DIR/validation/au-list.txt" 2>&1
+    if grep -q "$AU_SUBTYPE.*$AU_MAKER" "$BUILD_DIR/validation/au-list.txt"; then break; fi
+    sleep 2
+  done
+  echo "Validating registered AU: $AU_TYPE / $AU_SUBTYPE / $AU_MAKER"
+  if ! auval -v "$AU_TYPE" "$AU_SUBTYPE" "$AU_MAKER" > "$BUILD_DIR/validation/auval.txt" 2>&1; then
+    cat "$BUILD_DIR/validation/au-list.txt" "$BUILD_DIR/validation/auval.txt"; exit 1
   fi
 fi
 cp docs/MACOS.md "$STAGE/READ-ME-MACOS.md"
