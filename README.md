@@ -2,7 +2,7 @@
 
 Windows x64 is the first target for this new native C++17/JUCE development version. It keeps the selected Thai indie cream/cobalt UI, the colour lawyer character and playful Thai tone, with functional controls and audio-driven Motion FX. macOS follows after Windows validation.
 
-**Status:** development in progress. Linux tests and native UI checks passed; a native Windows build is still pending. See [actual validation and blockers](VALIDATION.md). There is no claim of a completed official Windows release yet.
+**Status:** development in progress. Native Windows x64 build, audio/motion tests, UI integration and pluginval passed; an unsigned test ZIP is ready. See [validation evidence](VALIDATION.md). There is no claim of a completed official Windows release yet.
 
 ## Features
 
@@ -22,7 +22,7 @@ Install Visual Studio 2022 **Desktop development with C++**, Windows SDK, Git an
 
 The script builds, tests, captures the native UI, verifies the pinned Windows pluginval download, validates the actual plugin, and packages only matching binaries that passed. [Windows instructions and testing checklist](docs/WINDOWS.md).
 
-GitHub Actions contains the same Windows pipeline; it has not been run by this session yet. Its macOS job is optional and runs only after Windows success.
+GitHub Actions successfully ran the Windows pipeline: [validated Windows build](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/39935476433). Its macOS job is optional and runs only after Windows success.
 
 ## Development checks
 

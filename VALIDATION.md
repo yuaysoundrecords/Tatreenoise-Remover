@@ -1,6 +1,6 @@
 # Current validation — Windows-first development
 
-**Windows x64 is the first release target. It is not yet certified or packaged as a Windows-tested release.** macOS work is deferred until Windows passes. Source and scripts are prepared; native Windows validation is still required.
+**Windows x64 native build and automated validation passed. A Windows test ZIP is available.** This is an unsigned test build; DAW listening and installer testing on user machines remain required. macOS has not been built.
 
 ## Latest verified work (Linux, 2026-10-23)
 
@@ -22,17 +22,18 @@ Evidence: `docs/evidence/windows-first/`. Older evidence in `docs/evidence/` bel
 
 The package includes VST3, Standalone, a per-user installer, instructions, checksums and selected evidence. GitHub Actions runs Windows first; the optional macOS job depends on Windows success and is off by default.
 
-These scripts/workflow have **not yet completed a native Windows build** in this session. Passing syntax/filesystem tests does not establish that MSVC, Windows graphics/audio, the installer or a DAW work.
+The native Windows job completed successfully: MSVC build, both CTest suites, audio/speech evidence, native UI integration, pluginval strictness 5, and packaging guards. The packaged VST3 and Standalone hashes were independently checked against the runner validation metadata after download.
 
-## Current external blocker
+## Native Windows execution
 
-- GitHub API access is blocked; `gh api` cannot currently reach `api.github.com` to operate/inspect a Windows workflow. Existing GH_TOKEN presence was checked without exposing its value; permission remains to be tested after connectivity works.
-- The alternative SDK path is blocked at `download.visualstudio.microsoft.com` after Microsoft's allowed `aka.ms` redirect. The required custom network additions have been saved to the environment draft but not observed applied to the current instance.
-- JUCE 8 explicitly rejects MinGW, so that attempted compiler was abandoned without patching the vendor restriction. A supported Clang/MSVC-compatible route requires the Microsoft SDK above.
-- The Wine Windows runtime and official Windows pluginval can start, but that is not a native Windows machine. Original v1 loaded in Wine; its GUI validator timed out there. This is an emulation limitation/undiagnosed Wine interaction, **not evidence that v1 is defective**.
+GitHub API connectivity and repository push permissions were verified on 2026-10-23. Source was pushed to the review branch `codex/windows-first-tatree2`; native Windows execution completed successfully:
+
+https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/39935476433
+
+The Windows job passed in approximately six minutes. All 10 UI states plus stopped transport were captured; macOS was intentionally skipped. The resulting test ZIP was downloaded and its archive integrity and validated binary hashes checked.
 
 ## Still unverified
 
-Actual Windows MSVC build/installer, Windows 10/11 DAWs and devices, real user recordings, signing/public release, and every macOS build. No source changes have been pushed to GitHub and no workflow run is claimed.
+Installer behavior on user machines, Windows 10/11 DAWs and devices, real user recordings, signing/public release, and every macOS build.
 
 The original v1 ZIP and JPG remain unchanged. The new code uses different plugin IDs and does not replace v1 DAW sessions.
