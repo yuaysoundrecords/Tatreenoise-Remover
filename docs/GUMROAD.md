@@ -2,7 +2,11 @@
 
 Product: https://benjilennon.gumroad.com/l/rsecg
 
-Upload the validated Windows ZIP and the separate Mac source kit. Label the Mac kit as **source to build**, not a notarized installer. Keep v1 available separately for existing sessions if desired; v2 has different IDs. No pricing/licence change or subscriber email is included in this update.
+Windows download: https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40083443048/artifacts/12556048528
+
+Mac Universal test build: https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40083443048/artifacts/12556491264 (ad-hoc signed, not a notarized public installer).
+
+Upload the validated Windows ZIP and the separate Mac source kit. GitHub artifact downloads wrap the actual package ZIP: extract the outer artifact once and upload the inner Windows ZIP to Gumroad, so customers do not receive unnecessary nested archives. Label the Mac kit as **source to build**, not a notarized installer. Keep v1 available separately for existing sessions if desired; v2 has different IDs. No pricing/licence change or subscriber email is included in this update.
 
 Suggested Thai release text:
 

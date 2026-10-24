@@ -7,6 +7,10 @@ Native audio cleanup plugin by Yuay Sound Records. Cream/cobalt Thai indie UI, c
 - No speech banner on startup. Five user-control captions appear for 3 seconds, including De-breath and both Auto Gain ON/OFF clicks.
 - Real IN/OUT/GR meters, automation/state recall, fixed 1024-sample latency and original-dry Bypass.
 
+[Windows 2.0.4 tested ZIP](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40083443048/artifacts/12556048528) · [Mac Universal test build](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40083443048/artifacts/12556491264)
+
+Windows and Mac automated validation passed. Mac builds have ad-hoc test signatures, not Developer ID notarization. For a local Mac build use the source kit and BUILD-MAC.command below.
+
 ## Build and test
 
 **Windows:** Visual Studio 2022 Desktop C++, Windows SDK, Git and CMake ≥3.22; run `./scripts/build-windows.ps1` in PowerShell. It builds, tests audio/UI, validates VST3 and packages only matching validated binaries. [Windows guide](docs/WINDOWS.md).

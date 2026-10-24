@@ -1,0 +1,43 @@
+{
+  "version": "2.0.4",
+  "run_id": 40083443048,
+  "validated_source_commit": "f1bd09ef65dbb980a62f8d9b57d6fd6ff2f5f798",
+  "windows": "passed",
+  "macos": "passed",
+  "core_checks": 64,
+  "speech_checks": 9,
+  "macos_architectures": [
+    "arm64",
+    "x86_64"
+  ],
+  "macos_auval": "passed",
+  "macos_signature": "ad-hoc verified",
+  "gumroad_upload": "not performed: no authenticated editor tool",
+  "post_download_local_binary_verification": "unrun: artifact storage network denial",
+  "artifacts": [
+    {
+      "digest": "sha256:fe71dbd64ef6a71e31cda02ce62258e5fd1b0603467d1ac9fae2850d0e80b83c",
+      "id": 12556491264,
+      "name": "Tatree-2-macOS-universal-tested",
+      "size_in_bytes": 66533762
+    },
+    {
+      "digest": "sha256:eb58bfada8445819c4002c6036168da26222c16bbdcacc432123d76dc95bbf9e",
+      "id": 12556376693,
+      "name": "macOS-validation-evidence",
+      "size_in_bytes": 30098225
+    },
+    {
+      "digest": "sha256:8c32272f97f8eed3b8b9eac53ca938bb0f5ed4f7a067a2205239ebf5aede6253",
+      "id": 12556048528,
+      "name": "Tatree-2-Windows-x64-tested",
+      "size_in_bytes": 53017107
+    },
+    {
+      "digest": "sha256:a18c8fcaf814a100a4be4cd4a0902d53cba14191d8504136641c28c7c1dec4e8",
+      "id": 12555719730,
+      "name": "Windows-validation-evidence",
+      "size_in_bytes": 29767426
+    }
+  ]
+}

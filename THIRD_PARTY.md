@@ -4,7 +4,7 @@
 - Anton (display font), SIL Open Font License 1.1. Licence in `assets/OFL-Anton.txt`.
 - Noto Sans Thai (UI/Thai font), SIL Open Font License 1.1. Licence in `assets/OFL-NotoSansThai.txt`.
 - `assets/lawyer-colour.png`, `assets/lawyer-deess.png`, `assets/lawyer-hot.png`: generated with Image Gen using the repository's original promotional image as the user-directed identity/pose reference. It is a generated reconstruction, not recovery of the original source photo. `assets/paper.png`: generated paper texture. The user selected the reference visual and requested this use.
-- Original v1.02 ZIP, documents and promotional JPG remain unchanged with their original terms. No reverse engineering of the binary was performed.
+- Original v1.02 ZIP, documents and promotional JPG are preserved unchanged in Git history and the verified external recovery archive, with their original terms; they are not needed in the current source kit. No reverse engineering of the binary was performed.
 
 - Development-test fixture `tests/fixtures/jfk.wav` comes from ggml-org/whisper.cpp; source/digest metadata and upstream MIT licence are retained in that directory. It is not embedded in the plugin binary.
 
