@@ -22,7 +22,22 @@ jobs:
         run: ./tests/PackageWindows.Tests.ps1
       - name: Build, test, validate and package Windows x64
         shell: pwsh
-        run: ./scripts/build-windows.ps1 -BuildDirectory build-windows-msvc
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $Log = Join-Path $PWD 'windows-build.log'
+          try {
+            ./scripts/build-windows.ps1 -BuildDirectory build-windows-msvc *>&1 | Tee-Object -FilePath $Log
+          } catch {
+            $Lines = if (Test-Path $Log) { @(Get-Content $Log) } else { @() }
+            $Errors = @($Lines | Where-Object { $_ -match 'error [A-Z][0-9]+|FAIL |failed|Exception' } | Select-Object -First 20)
+            $Detail = (@($_.ToString()) + $Errors + @($Lines | Select-Object -Last 35)) -join "`n"
+            $Detail = $Detail.Replace('%','%25').Replace("`r",'%0D').Replace("`n",'%0A')
+            Write-Host "::error title=Windows build or validation failed::$Detail"
+            throw
+          } finally {
+            New-Item -ItemType Directory -Force 'build-windows-msvc/validation' | Out-Null
+            if (Test-Path $Log) { Copy-Item $Log 'build-windows-msvc/validation/build-log.txt' }
+          }
       - uses: actions/upload-artifact@v4
         if: always()
         with:
