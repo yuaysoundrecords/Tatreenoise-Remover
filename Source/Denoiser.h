@@ -3,6 +3,8 @@
 #include <array>
 #include <cmath>
 
+// Minimum-tracking estimation informed by SpeexDSP (Xiph/Jean-Marc Valin).
+// BSD attribution and algorithm references: THIRD_PARTY.md, docs/DSP-QUALITY.md.
 // Causal, 4x-overlapped square-root Hann analysis/synthesis; fixed latency N.
 // All work buffers are allocated at construction, never on the audio thread.
 class SpectralDenoiser {

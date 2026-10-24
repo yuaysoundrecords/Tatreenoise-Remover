@@ -7,7 +7,7 @@
 - [airwindows/airwindows](https://github.com/airwindows/airwindows/blob/f06250c08225d4040af3addab2026e99779ef42e/plugins/WinVST/DeEss/DeEssProc.cpp): pinned source, SHA-256 in `evidence/quality-2.0.2/sources.json`.
 - [webrtc-mirror/webrtc](https://github.com/webrtc-mirror/webrtc/blob/c940dba16ab898003c8a93472c046c6178ce96e7/common_audio/vad/vad_core.c): pinned source, SHA-256 in `evidence/quality-2.0.2/sources.json`.
 
-SpeexDSP provides noise/speech estimation, gain floors and statistical suppression; Airwindows DeEss illustrates dedicated sibilance detection, split-band attenuation and sample-rate scaling; WebRTC VAD uses band evidence and temporal hangover. RNNoise is a trained RNN speech-enhancement system. This plugin does **not** contain RNNoise, SpeexDSP, Airwindows or WebRTC code/models. Their source was inspected as reference; only SpeexDSP was executed as a comparative processor. No claim is made of audio A/B parity with Airwindows, RNNoise or a commercial de-breath product.
+SpeexDSP provides noise/speech estimation, gain floors and statistical suppression; Airwindows DeEss illustrates dedicated sibilance detection, split-band attenuation and sample-rate scaling; WebRTC VAD uses band evidence and temporal hangover. RNNoise is a trained RNN speech-enhancement system. The local C++ minimum-tracking estimator is informed by the SpeexDSP algorithm; its upstream BSD notice/credits are retained in `THIRD_PARTY.md`. No SpeexDSP library, RNNoise model, Airwindows or WebRTC source is linked/bundled. Only SpeexDSP was executed as a comparative processor. No claim is made of audio A/B parity with Airwindows, RNNoise or a commercial de-breath product.
 
 ## Changes driven by the review
 

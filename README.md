@@ -14,6 +14,10 @@ Windows x64 is the first target for this new native C++17/JUCE development versi
 
 [Download Windows 2.0.1 test package](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40055383919/artifacts/12545221698) (GitHub sign-in may be required).
 
+## Quality and banner update (2.0.2)
+
+Bold Thai/Latin banners fit their actual glyph outlines with balanced padding. Revised minimum-statistics denoising, sample-rate-correct split-band de-essing and duration-gated de-breath protection. [Measured comparisons, sources and remaining limits](docs/DSP-QUALITY.md).
+
 ## Gain update (2.0.1)
 
 Input and Output trims (±24 dB), optional pre-chain stereo-linked Auto Gain (-18 dBFS RMS target), and new lawyer warning captions. Auto Gain defaults off; Bypass preserves original dry audio. See [gain behaviour and controls](docs/WINDOWS.md).
