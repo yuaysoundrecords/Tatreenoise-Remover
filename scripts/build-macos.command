@@ -39,7 +39,7 @@ for bundle in "$STAGE/VST3/Tatree Noise Remover 2.vst3" "$STAGE/AU/Tatree Noise 
   codesign --verify --deep --strict "$bundle"
   if [[ "$ARCHS" == 'arm64;x86_64' ]]; then
     binary="$bundle/Contents/MacOS/Tatree Noise Remover 2"
-    lipo -verify_arch arm64 x86_64 "$binary"
+    lipo "$binary" -verify_arch arm64 x86_64
   fi
 done
 plutil -extract NSMicrophoneUsageDescription raw -o - "$STAGE/Standalone/Tatree Noise Remover 2.app/Contents/Info.plist"

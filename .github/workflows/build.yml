@@ -51,7 +51,6 @@ jobs:
           if-no-files-found: error
   macos:
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.build_macos)
-    needs: windows
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4

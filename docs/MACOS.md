@@ -26,4 +26,4 @@ TATREE_MAC_ARCHS="$(uname -m)" bash BUILD-MAC.command
 
 สคริปต์ใช้ ad-hoc signature เพื่อทดสอบในเครื่อง ไม่ใช่ Developer ID และยังไม่ใช่ notarized public Mac release อย่าปิด Gatekeeper ทั้งระบบ การเซ็นและ notarization สำหรับเผยแพร่เชิงพาณิชย์เป็นขั้น release แยกจากการบิลด์ source
 
-CI รัน Windows ก่อน แล้วทดสอบ Mac Universal, core/speech tests, native UI, Mach-O architectures, signature verification และ AU validation (`auval`) ดูผลรอบจริงใน VALIDATION.md ก่อนอ้างว่า Mac-tested
+Windows รุ่นหลักผ่านแล้ว และ CI แยกตรวจ Windows กับ Mac Universal, core/speech tests, native UI, Mach-O architectures, signature verification และ AU validation (`auval`) ดูผลรอบจริงใน VALIDATION.md ก่อนอ้างว่า Mac-tested
