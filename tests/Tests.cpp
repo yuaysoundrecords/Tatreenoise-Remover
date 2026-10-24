@@ -150,7 +150,14 @@ int main(int argc, char** argv){
         set(p,"bypass",0);set(p,"listen",1);set(p,"autoGain",0);p.prepareToPlay(48000,512);
         auto removed=run(p,noise);check(rms(removed,48000)<1e-5,"delta listen excludes input and output gain from removed-signal reference");
         juce::MemoryBlock state;p.getStateInformation(state);auto restoredStorage=std::make_unique<TatreeProcessor>();auto& restored=*restoredStorage;restored.setStateInformation(state.getData(),int(state.getSize()));
-        check(restored.params.getRawParameterValue("inputGain")->load()==6 && restored.params.getRawParameterValue("outputGain")->load()==24 && restored.params.getRawParameterValue("autoGain")->load()==0,"gain controls and auto preference survive session recall");
+        const float savedInput=p.params.getRawParameterValue("inputGain")->load();
+        const float recalledInput=restored.params.getRawParameterValue("inputGain")->load();
+        const float recalledOutput=restored.params.getRawParameterValue("outputGain")->load();
+        std::cout<<"Gain recall: input "<<savedInput<<" -> "<<recalledInput<<", output "<<recalledOutput<<"\n";
+        // Normalising a bipolar 0.1 dB range may round differently on ARM.
+        // Check recall against the saved value and intended setting, far below
+        // one control step, instead of demanding bit equality with literal 6.
+        check(std::abs(recalledInput-savedInput)<1e-4f && std::abs(recalledInput-6)<1e-4f && std::abs(recalledOutput-24)<1e-4f && restored.params.getRawParameterValue("autoGain")->load()==0,"gain controls and auto preference survive session recall");
         set(p,"listen",0);set(p,"bypass",0);set(p,"autoGain",0);set(p,"inputGain",0);set(p,"outputGain",24);p.prepareToPlay(48000,512);
         run(p,std::vector<float>(4096,.2f));check(p.meters.hot.exchange(false),"output overload warns even when raw input is safe");
     }
