@@ -1,7 +1,7 @@
 #pragma once
 #include <algorithm>
 
-enum class SpeechCue { idle, peak, deEss, noise, autoGain };
+enum class SpeechCue { idle, peak, deEss, noise, autoGain, breath };
 
 // User/control movement drives the quote. DSP activity independently drives
 // meters and MotionState, so a sentence never fabricates processing activity.

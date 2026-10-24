@@ -131,6 +131,7 @@ void TatreeEditor::timerCallback(){
         if(std::abs(value-previousControls[i])>.01f){
             if(i<6)motion.touch(controls[i]);
             if(i==0)speech.trigger(SpeechCue::noise);
+            if(i==1)speech.trigger(SpeechCue::breath);
             if(i==2)speech.trigger(SpeechCue::deEss);
             if(i==6 || i==7)speech.trigger(SpeechCue::peak);
             if(i==8)speech.trigger(SpeechCue::autoGain);
@@ -180,21 +181,23 @@ void TatreeEditor::meter(juce::Graphics& g,juce::Rectangle<float> r,juce::String
 }
 void TatreeEditor::drawSpeechBanner(juce::Graphics& g) {
     // Semantic line breaks preserve the exact wording without splitting Thai
-    // combining marks. One shared size fits all four quotes in the free space.
-    static const char* quotes[]{"เงียบไว้น้อง!",
+    // combining marks. One shared size fits all five quotes in the free space.
+    static const char* quotes[]{"",
         "คุณมีสิทธิที่จะไม่พูด\nเพราะคำพูดของคุณอาจทำให้ Peak ได้!",
         "กระบวนการยุติธรรม\nSibilance นำเสมอ... ลดหน่อย!",
         "ศาลมีคำสั่ง! ให้ตัดเสียงรบกวน\nออกจากกระบวนการพิจารณา!",
-        "ศาลมีคำสั่ง! ให้ปรับระดับเสียง\nของจำเลยให้เท่าเทียมกัน!"};
+        "ศาลมีคำสั่ง! ให้ปรับระดับเสียง\nของจำเลยให้เท่าเทียมกัน!",
+        "เก็บลมหายใจของท่าน\nไปใช้บนชั้นศาล"};
+    if(speech.cue==SpeechCue::idle)return;
     const auto text=juce::String::fromUTF8(quotes[int(speech.cue)]);
     if(text!=bannerText) {
         bannerText=text;
         constexpr float maxInkWidth=514,maxInkHeight=76,gap=8,padX=23,padY=12;
-        // Fit the longest of the four phrases once, keeping a consistent size.
+        // Fit the longest of the five phrases once, keeping a consistent size.
         speechFontSize=42;
         for(;speechFontSize>24;speechFontSize-=.5f) {
             bool fits=true;
-            for(int q=1;q<5;++q) {
+            for(int q=1;q<6;++q) {
                 auto lines=juce::StringArray::fromLines(juce::String::fromUTF8(quotes[q]));float h=0;
                 for(auto& line:lines) {
                     juce::GlyphArrangement glyphs;glyphs.addLineOfText(look.body(speechFontSize).boldened(),line,0,0);
@@ -210,7 +213,7 @@ void TatreeEditor::drawSpeechBanner(juce::Graphics& g) {
         std::array<juce::GlyphArrangement,2> rows;
         std::array<juce::Rectangle<float>,2> ink;
         for(int i=0;i<lines.size();++i) {
-            rows[size_t(i)].addLineOfText(look.body(speech.cue==SpeechCue::idle?62:speechFontSize).boldened(),lines[i],0,0);
+            rows[size_t(i)].addLineOfText(look.body(speechFontSize).boldened(),lines[i],0,0);
             juce::Path outline;rows[size_t(i)].createPath(outline);ink[size_t(i)]=outline.getBounds();
             width=std::max(width,ink[size_t(i)].getWidth());
         }
@@ -262,7 +265,7 @@ void TatreeEditor::paint(juce::Graphics& g){
         caption(g,text,{925,256,112,48},23,accent,false);
         g.setColour(accent);g.drawLine(928,310,1034,310,2);
     }
-    caption(g,state==LawyerState::hot?"ลดระดับ Input / Output ลงหน่อยน้อง!":state==LawyerState::deEss?"กำลังลดเสียงเสียดแทรก":state==LawyerState::noise?"กำลังลดเสียงรบกวน":state==LawyerState::breath?"เบาลมหายใจหน่อยน้อง!":state==LawyerState::listen?"กำลังฟังเฉพาะเสียงที่เอาออก":state==LawyerState::bypass?"พักก่อน • ฟังเสียงต้นฉบับ":"อย่าดัง Noise ต่ำ เดี๋ยวโดนจับ",{650,471,392,22},16,look.blue,true);
+    caption(g,state==LawyerState::hot?"ลดระดับ Input / Output ลงหน่อยน้อง!":state==LawyerState::deEss?"กำลังลดเสียงเสียดแทรก":state==LawyerState::noise?"กำลังลดเสียงรบกวน":state==LawyerState::breath?"กำลังลดลมหายใจ":state==LawyerState::listen?"กำลังฟังเฉพาะเสียงที่เอาออก":state==LawyerState::bypass?"พักก่อน • ฟังเสียงต้นฉบับ":"",{650,471,392,22},16,look.blue,true);
     g.setColour(look.ink);g.fillRoundedRectangle(22,498,1036,143,5);
     meter(g,{39,507,320,125},"IN",false,false);
     meter(g,{383,507,310,125},"GAIN REDUCTION",false,true);

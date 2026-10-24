@@ -28,12 +28,12 @@ Copy-Item (Join-Path $Root 'THIRD_PARTY.md') $Stage
 Copy-Item (Join-Path $Root 'assets/OFL-*.txt') $Stage
 # Keep the shipped readme's A/B audio and quality-report links self-contained.
 Copy-Item (Join-Path $Root 'docs/DSP-QUALITY.md') $Stage
-New-Item -ItemType Directory -Force (Join-Path $Stage 'audio'),(Join-Path $Stage 'evidence/quality-2.0.2') | Out-Null
+New-Item -ItemType Directory -Force (Join-Path $Stage 'audio'),(Join-Path $Stage 'evidence') | Out-Null
 foreach ($Name in @('vocal-gain-before.wav','vocal-gain-after.wav','quality-speech-before.wav','quality-speech-after.wav','README.md')) {
     Copy-Item (Join-Path $Root ('docs/audio/' + $Name)) (Join-Path $Stage 'audio')
 }
 Copy-Item (Join-Path $Root 'tests/fixtures/WHISPER-LICENSE.txt'),(Join-Path $Root 'tests/fixtures/jfk.json') (Join-Path $Stage 'audio')
-Copy-Item (Join-Path $Root 'docs/evidence/quality-2.0.2/comparison-linux.json'),(Join-Path $Root 'docs/evidence/quality-2.0.2/sources.json') (Join-Path $Stage 'evidence/quality-2.0.2')
+Copy-Item (Join-Path $Root 'docs/evidence/dsp-comparison.json'),(Join-Path $Root 'docs/evidence/dsp-sources.json') (Join-Path $Stage 'evidence')
 $Evidence = Join-Path $Stage 'validation'
 New-Item -ItemType Directory -Force (Join-Path $Evidence 'ui') | Out-Null
 Get-ChildItem (Join-Path $Build 'validation') -File | Copy-Item -Destination $Evidence

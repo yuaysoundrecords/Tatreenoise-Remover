@@ -2,10 +2,10 @@
 
 ## What was actually inspected
 
-- [xiph/speexdsp](https://github.com/xiph/speexdsp/blob/a2133f5904ddb616b6578920bd2199f5accb484d/libspeexdsp/preprocess.c): pinned source, SHA-256 in `evidence/quality-2.0.2/sources.json`.
-- [xiph/rnnoise](https://github.com/xiph/rnnoise/blob/130913db902535a19eb477a9f4cdd5c922d63cf2/README): pinned source, SHA-256 in `evidence/quality-2.0.2/sources.json`.
-- [airwindows/airwindows](https://github.com/airwindows/airwindows/blob/f06250c08225d4040af3addab2026e99779ef42e/plugins/WinVST/DeEss/DeEssProc.cpp): pinned source, SHA-256 in `evidence/quality-2.0.2/sources.json`.
-- [webrtc-mirror/webrtc](https://github.com/webrtc-mirror/webrtc/blob/c940dba16ab898003c8a93472c046c6178ce96e7/common_audio/vad/vad_core.c): pinned source, SHA-256 in `evidence/quality-2.0.2/sources.json`.
+- [xiph/speexdsp](https://github.com/xiph/speexdsp/blob/a2133f5904ddb616b6578920bd2199f5accb484d/libspeexdsp/preprocess.c): pinned source, SHA-256 in `evidence/dsp-sources.json`.
+- [xiph/rnnoise](https://github.com/xiph/rnnoise/blob/130913db902535a19eb477a9f4cdd5c922d63cf2/README): pinned source, SHA-256 in `evidence/dsp-sources.json`.
+- [airwindows/airwindows](https://github.com/airwindows/airwindows/blob/f06250c08225d4040af3addab2026e99779ef42e/plugins/WinVST/DeEss/DeEssProc.cpp): pinned source, SHA-256 in `evidence/dsp-sources.json`.
+- [webrtc-mirror/webrtc](https://github.com/webrtc-mirror/webrtc/blob/c940dba16ab898003c8a93472c046c6178ce96e7/common_audio/vad/vad_core.c): pinned source, SHA-256 in `evidence/dsp-sources.json`.
 
 SpeexDSP provides noise/speech estimation, gain floors and statistical suppression; Airwindows DeEss illustrates dedicated sibilance detection, split-band attenuation and sample-rate scaling; WebRTC VAD uses band evidence and temporal hangover. RNNoise is a trained RNN speech-enhancement system. The local C++ minimum-tracking estimator is informed by the SpeexDSP algorithm; its upstream BSD notice/credits are retained in `THIRD_PARTY.md`. No SpeexDSP library, RNNoise model, Airwindows or WebRTC source is linked/bundled. Only SpeexDSP was executed as a comparative processor. No claim is made of audio A/B parity with Airwindows, RNNoise or a commercial de-breath product.
 
@@ -19,7 +19,7 @@ SpeexDSP provides noise/speech estimation, gain floors and statistical suppressi
 
 One fixed JFK speech sample, scaled by 0.5 to prevent clipping; deterministic seed 749; white, pink, 60/120 Hz hum and modulated broadband noise; SNR 0/10 dB. Each input has 0.5 s noise-only preroll and a 1 s tail. Both processors receive identical 16-bit WAV samples. No AGC, de-essing, breath processing or low-cut filter. Tatree removes its declared 1024-sample delay; SpeexDSP 1.2.1-3 removes its measured 160-sample delay. Speex uses 10 ms frames and noise suppression -12 dB, VAD/AGC/dereverb off. Knob positions are not equivalent suppression settings.
 
-Values below are output SNR in dB; higher is better against this specific clean reference. Full SI-SDR, correlation gain, binary hashes and environment versions are in [raw results](evidence/quality-2.0.2/comparison-linux.json). Correlation gain is not an intelligibility or listening score.
+Values below are output SNR in dB; higher is better against this specific clean reference. Full SI-SDR, correlation gain, binary hashes and environment versions are in [raw results](evidence/dsp-comparison.json). Correlation gain is not an intelligibility or listening score.
 
 | Noise | Input SNR | 2.0.1 at 45% | 2.0.2 at 45% | SpeexDSP -12 dB |
 | --- | ---: | ---: | ---: | ---: |

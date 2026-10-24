@@ -1,7 +1,0 @@
-Test project /workspace/Tatreenoise-Remover/build
-    Start 1: audio-and-motion
-1/1 Test #1: audio-and-motion .................   Passed    0.37 sec
-
-100% tests passed out of 1
-
-Total Test time (real) =   0.37 sec

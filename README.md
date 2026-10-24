@@ -1,60 +1,20 @@
-# Tatree Noise Remover 2
+# Tatree Noise Remover 2.0.4
 
-Windows x64 is the first target for this new native C++17/JUCE development version. It keeps the selected Thai indie cream/cobalt UI, the colour lawyer character and playful Thai tone, with functional controls and audio-driven Motion FX. macOS follows after Windows validation.
+Native audio cleanup plugin by Yuay Sound Records. Cream/cobalt Thai indie UI, colour lawyer and audio-driven Motion FX. Mono/stereo VST3 + Standalone on Windows; Universal AU/VST3/Standalone source build on macOS 11+.
 
-**Status:** development in progress. Native Windows x64 build, audio/motion tests, UI integration and pluginval passed; an unsigned test ZIP is ready. See [validation evidence](VALIDATION.md). There is no claim of a completed official Windows release yet.
+- Noise Reduction, split-band De-esser, duration-gated Breath Reduction, 75 Hz filter and removed-signal Listen.
+- Input/Output gain and optional smooth vocal Auto Gain (-18 dBFS active RMS target, breath/silence HOLD).
+- No speech banner on startup. Five user-control captions appear for 3 seconds, including De-breath and both Auto Gain ON/OFF clicks.
+- Real IN/OUT/GR meters, automation/state recall, fixed 1024-sample latency and original-dry Bypass.
 
-## Features
+## Build and test
 
-- Progressive noise reduction, voice-conscious low-level/breath control, de-esser and 75 Hz low-cut.
-- Colour lawyer reactions for noise, de-essing, input hot, breath, removed-signal listening and bypass; filter/control-touch feedback and a motion-off preference.
-- Stereo IN/OUT peak meters with peak hold; actual energy-based gain-reduction meter.
-- Exact percentage entry, drag/keyboard knobs, delta listen, latency-matched bypass, host automation and session recall.
-- No runtime network connection, account or model download. Mono/stereo, 44.1/48/96 kHz checks.
+**Windows:** Visual Studio 2022 Desktop C++, Windows SDK, Git and CMake ≥3.22; run `./scripts/build-windows.ps1` in PowerShell. It builds, tests audio/UI, validates VST3 and packages only matching validated binaries. [Windows guide](docs/WINDOWS.md).
 
-[Download Windows 2.0.3 test package](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40074931266/artifacts/12552657419) (GitHub sign-in may be required).
+**Mac:** install Apple Command Line Tools and CMake once, then double-click **BUILD-MAC.command**. Default builds Universal Apple Silicon + Intel with AU/VST3/Standalone. [Mac guide](docs/MACOS.md).
 
-## Vocal staging and interaction quotes (2.0.3)
+[Current validation](VALIDATION.md) · [UI and captions](docs/UI.md) · [Measured DSP comparison and limits](docs/DSP-QUALITY.md) · [Component licences](THIRD_PARTY.md)
 
-Four new two-line lawyer captions appear when their controls move; Auto Gain speaks on both ON/OFF clicks. Text stays about 3 seconds after the last change, independently of real audio detection. Smooth vocal Auto Gain uses windowed RMS, bounded gain rides and breath/silence HOLD. Input and Output trims remain independent. [Controls, exact captions and gain behaviour](docs/WINDOWS.md).
+No runtime network, browser or model download. Test builds are unsigned on Windows / ad-hoc signed on Mac; real DAW listening, Developer ID/notarization and commercial-release licensing remain separate checks. Numerical fixtures do not establish perceptual or commercial parity.
 
-## Quality and banner update (2.0.2)
-
-Bold Thai/Latin banners fit their actual glyph outlines with balanced padding. Revised minimum-statistics denoising, sample-rate-correct split-band de-essing and duration-gated de-breath protection. [Measured comparisons, sources and remaining limits](docs/DSP-QUALITY.md).
-
-## Gain update (2.0.1)
-
-Input and Output trims (±24 dB), optional pre-chain stereo-linked Auto Gain (-18 dBFS RMS target), and new lawyer warning captions. Auto Gain defaults off; Bypass preserves original dry audio. See [gain behaviour and controls](docs/WINDOWS.md).
-
-## Windows first
-
-Install Visual Studio 2022 **Desktop development with C++**, Windows SDK, Git and CMake ≥3.22. In PowerShell:
-
-```powershell
-./scripts/build-windows.ps1
-```
-
-The script builds, tests, captures the native UI, verifies the pinned Windows pluginval download, validates the actual plugin, and packages only matching binaries that passed. [Windows instructions and testing checklist](docs/WINDOWS.md).
-
-GitHub Actions successfully ran the Windows pipeline: [validated Windows build](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40074931266). Its macOS job is optional and runs only after Windows success.
-
-## Development checks
-
-```sh
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build --config Release --parallel 3
-ctest --test-dir build -C Release --output-on-failure
-```
-
-JUCE 8.0.8 is pinned by commit; a local copy can be selected with `-DJUCE_PATH=/path/to/JUCE`. Debian/Ubuntu development dependencies include ALSA, X11/extensions, Freetype and Fontconfig. WebKit and curl are disabled.
-
-- [Current UI/audio review page](TEST-ME.html) — recorded native UI and audio examples, not a browser audio plugin.
-- [Architecture](docs/ARCHITECTURE.md)
-- [Visual QA](design-qa.md)
-- [Third-party components/licences](THIRD_PARTY.md)
-
-## Original v1.02
-
-The original Windows VST3 distribution, promotional image and its terms remain unchanged in this repository. Original download: https://benjilennon.gumroad.com/l/rsecg . Developer: Yuay Sound Records, Thailand.
-
-Version 2 is a new implementation with new plugin IDs, not recovered v1 source or a patched v1 binary. Listening comparisons with the original and the user's recordings remain necessary.
+Original v1 distribution and old design evidence are preserved in Git history and a verified recovery archive outside the active project; they are not needed to build v2. This source uses new IDs (`Yuay` / `Ttr2`) and does not replace v1 sessions. Original product: https://benjilennon.gumroad.com/l/rsecg .

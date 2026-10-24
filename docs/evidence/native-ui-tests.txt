@@ -1,8 +1,0 @@
-Captured idle; state=0
-Native knobs and all four button bindings passed
-Captured noise; state=1
-Captured de-esser; state=2
-Captured input-hot; state=3
-Captured bypass; state=4
-Captured reduced-motion; state=3
-Stopped transport decays meters and returns motion to idle

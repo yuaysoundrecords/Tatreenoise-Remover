@@ -5,7 +5,7 @@
 class RenderApp final : public juce::JUCEApplication, private juce::Timer {
 public:
     const juce::String getApplicationName() override { return "Tatree render"; }
-    const juce::String getApplicationVersion() override { return "2.0.3"; }
+    const juce::String getApplicationVersion() override { return "2.0.4"; }
     void initialise(const juce::String& args) override {
         auto arguments=juce::StringArray::fromTokens(args,true);arguments.removeEmptyStrings();
         recordFrames=arguments.contains("--frames");arguments.removeString("--frames");
@@ -15,6 +15,8 @@ public:
         processor=std::make_unique<TatreeProcessor>();
         editor.reset(static_cast<TatreeEditor*>(processor->createEditor()));
         editor->addToDesktop(0);editor->setVisible(true);
+        if(editor->currentSpeechCue()!=SpeechCue::idle){fail("Editor must open without speech");return;}
+        if(!capture("startup"))return;
         startScenario(0);startTimerHz(30);
     }
     void shutdown() override { stopTimer();editor.reset();processor.reset(); }
@@ -71,12 +73,12 @@ private:
         processor->prepareToPlay(48000,1600);
     }
     void quoteAction() {
-        if(quoteIndex<3) {
-            const char* names[]{"inputGain","De-esser","Noise reduction"};
+        if(quoteIndex<4) {
+            const char* names[]{"inputGain","De-esser","Noise reduction","Breath reduction"};
             for(int i=0;i<editor->getNumChildComponents();++i)
                 if(auto* knob=dynamic_cast<juce::Slider*>(editor->getChildComponent(i)))
                     if(knob->getName()==names[quoteIndex]) {knob->setValue(knob->getValue()+1,juce::sendNotificationSync);return;}
-        } else if(quoteIndex<5) {
+        } else if(quoteIndex<6) {
             for(int i=0;i<editor->getNumChildComponents();++i)
                 if(auto* button=dynamic_cast<juce::TextButton*>(editor->getChildComponent(i)))
                     if(button->getButtonText()=="AUTO GAIN") {button->triggerClick();return;}
@@ -85,16 +87,17 @@ private:
     }
     void quoteTick() {
         ++ticks;
-        if(quoteIndex==5) {
+        if(quoteIndex==6) {
             if(ticks<100)return;
             if(editor->currentSpeechCue()!=SpeechCue::idle){fail("Quote did not expire after control release");return;}
+            if(!capture("quote-expired"))return;
             std::cout<<"Control quotes expire without fabricating DSP activity\n";stopTimer();quit();return;
         }
         if(ticks<10)return;
-        const SpeechCue expected[]{SpeechCue::peak,SpeechCue::deEss,SpeechCue::noise,SpeechCue::autoGain,SpeechCue::autoGain};
-        const char* names[]{"quote-peak","quote-de-esser","quote-noise","quote-auto-on","quote-auto-off"};
+        const SpeechCue expected[]{SpeechCue::peak,SpeechCue::deEss,SpeechCue::noise,SpeechCue::breath,SpeechCue::autoGain,SpeechCue::autoGain};
+        const char* names[]{"quote-peak","quote-de-esser","quote-noise","quote-breath","quote-auto-on","quote-auto-off"};
         if(editor->currentSpeechCue()!=expected[quoteIndex]){fail("User control did not show its assigned quote");return;}
-        if(quoteIndex>=3 && (processor->params.getRawParameterValue("autoGain")->load()>.5f)!=(quoteIndex==3)){fail("Auto Gain quote must work on both ON and OFF clicks");return;}
+        if(quoteIndex>=4 && (processor->params.getRawParameterValue("autoGain")->load()>.5f)!=(quoteIndex==4)){fail("Auto Gain quote must work on both ON and OFF clicks");return;}
         if(editor->currentMotionState()!=LawyerState::idle){fail("Control quote fabricated DSP activity");return;}
         if(!capture(names[quoteIndex]))return;
         if(quoteIndex==0) {

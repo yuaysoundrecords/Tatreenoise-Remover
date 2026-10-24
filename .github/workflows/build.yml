@@ -1,4 +1,4 @@
-name: Windows x64 build and validation
+name: Build and validate Windows and macOS
 on:
   workflow_dispatch:
     inputs:
@@ -50,22 +50,30 @@ jobs:
           path: build-windows-msvc/package/*.zip
           if-no-files-found: error
   macos:
-    if: github.event_name == 'workflow_dispatch' && inputs.build_macos
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.build_macos)
     needs: windows
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
-      - name: Configure universal build
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release '-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64'
-      - name: Build
-        run: cmake --build build --config Release --parallel 3
-      - name: Audio and motion tests
-        run: ctest --test-dir build -C Release --output-on-failure
+      - name: Build universal AU, VST3 and Standalone; test and package
+        run: |
+          set +e
+          bash scripts/build-macos.command 2>&1 | tee macos-build.log
+          result=${PIPESTATUS[0]}
+          mkdir -p build-macos/validation
+          cp macos-build.log build-macos/validation/build-log.txt
+          if [ "$result" -ne 0 ]; then
+            python3 -c 'from pathlib import Path; s="\n".join(Path("macos-build.log").read_text(errors="replace").splitlines()[-65:]); print("::error title=macOS validation failed::"+s.replace("%","%25").replace("\r","%0D").replace("\n","%0A"))'
+          fi
+          exit "$result"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: macOS-validation-evidence
+          path: build-macos/validation/
+          if-no-files-found: warn
       - uses: actions/upload-artifact@v4
         with:
-          name: Tatree-2-macOS-test-build
-          path: |
-            build/Tatree_artefacts/Release/VST3/
-            build/Tatree_artefacts/Release/AU/
-            build/Tatree_artefacts/Release/Standalone/
+          name: Tatree-2-macOS-universal-tested
+          path: build-macos/package/*.zip
           if-no-files-found: error
