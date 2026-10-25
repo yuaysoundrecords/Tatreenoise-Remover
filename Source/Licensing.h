@@ -4,7 +4,7 @@
 #include <atomic>
 #include <memory>
 
-class TatreeLicense final : private juce::Thread {
+class TatreeLicense final : public ProcessingEntitlement, private juce::Thread {
 public:
     enum class Verdict { accepted, rejected, unavailable };
     static std::shared_ptr<TatreeLicense> shared();
@@ -12,7 +12,7 @@ public:
     bool isUnlocked() const noexcept { return unlocked.load(); }
     bool isBusy() const noexcept { return busy.load(); }
     double secondsRemaining() const noexcept;
-    bool expired() const noexcept { return !isUnlocked() && secondsRemaining() <= 0; }
+    bool expired() const noexcept override { return !isUnlocked() && secondsRemaining() <= 0; }
     bool configured() const;
     juce::String statusText() const;
     void activate(juce::String key);

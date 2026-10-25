@@ -32,3 +32,15 @@ Buy a US$5 key for uninterrupted use. Click UNLOCK, paste the key from your Gumr
 ## Release status
 
 Implementation and automated tests are under development. Product ID and live paid-key verification are not yet available. Gumroad pricing, key delivery and uploads have not been changed by this environment. Existing Windows/Mac 2.0.4 validation remains historical evidence only; it does not validate 2.1.
+
+## Protocol reference and test scope
+
+Reviewed Gumroad's official open-source implementation at commit `f65338532556550e4f96d65fe0b53a35ac81bef7`:
+
+- https://github.com/antiwork/gumroad/blob/f65338532556550e4f96d65fe0b53a35ac81bef7/app/controllers/api/v2/licenses_controller.rb
+- https://github.com/antiwork/gumroad/blob/f65338532556550e4f96d65fe0b53a35ac81bef7/app/modules/purchase/ping_notification.rb
+- https://github.com/antiwork/gumroad/blob/f65338532556550e4f96d65fe0b53a35ac81bef7/spec/controllers/api/v2/licenses_controller_spec.rb
+
+These establish the POST parameters and response fields, including integer-cent price, currency, refunded/disputed flags, optional test flag and 404 disabled/invalid-key response. No Gumroad implementation code is linked into Tatree. Reviewing the protocol is not a live verification of this seller's product or key.
+
+Automated coverage includes synthetic-time 30-minute boundaries, shared-session lifetime, invalid/free/wrong-product/refunded/test/under-price responses, and a deterministic entitlement injected into the real audio processor to verify exact delayed dry at expiry, the 15 ms transition, no reset on prepare/state recall, and restoration after unlock. Production host entry points always construct the normal shared Gumroad entitlement; no environment-variable clock override or UI bypass is provided. Native UI tests exercise the activation panel at 80%, 100% and 150% size and ensure closing it clears entered key text.

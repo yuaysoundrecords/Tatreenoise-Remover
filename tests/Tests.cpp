@@ -25,6 +25,34 @@ int main(int argc, char** argv){
  // the first assertion. Plugin instances themselves are heap-created by JUCE.
  juce::ScopedJuceInitialiser_GUI gui;
  try {
+    {
+        struct TestEntitlement final : ProcessingEntitlement {
+            bool ended=false;
+            bool expired() const noexcept override { return ended; }
+        };
+        auto entitlement=std::make_shared<TestEntitlement>();
+        auto storage=std::make_unique<TatreeProcessor>(entitlement);auto& p=*storage;
+        set(p,"noise",0);set(p,"breath",0);set(p,"ess",0);set(p,"filter",0);
+        set(p,"inputGain",6);set(p,"outputGain",-3);set(p,"listen",1);
+        p.prepareToPlay(48000,127);
+        std::vector<float> tone(12000);
+        for(size_t i=0;i<tone.size();++i)tone[i]=.1f*float(std::sin(double(i)*.057));
+        auto before=run(p,tone);
+        check(rms(before,4096)<1e-5,"trial initially permits removed-signal Listen processing");
+        entitlement->ended=true;
+        auto expired=run(p,tone);float error=0;
+        for(size_t i=4096;i<tone.size();++i)error=std::max(error,std::abs(expired[i]-tone[i-1024]));
+        check(error<1e-7f,"trial expiry returns exact latency-matched original dry, skipping gain and Listen");
+        const float firstExpected=tone[tone.size()-1024];
+        check(std::abs(expired[0]-firstExpected/720.0f)<1e-5f,"expiry begins a 15 ms fade rather than abrupt bypass");
+        check(p.meters.bypassed.load() && p.params.getRawParameterValue("bypass")->load()<.5f,"expired trial reports bypass without changing user's saved setting");
+        juce::MemoryBlock state;p.getStateInformation(state);p.setStateInformation(state.getData(),int(state.getSize()));
+        p.prepareToPlay(48000,127);auto restored=run(p,tone);error=0;
+        for(size_t i=1024;i<tone.size();++i)error=std::max(error,std::abs(restored[i]-tone[i-1024]));
+        check(error<1e-7f,"reprepare and preset recall cannot reset trial expiry");
+        entitlement->ended=false;auto unlocked=run(p,tone);
+        check(rms(unlocked,4096)<1e-5 && !p.meters.bypassed.load(),"activation resumes original processing without reloading processor");
+    }
     std::mt19937 rng(42);std::normal_distribution<float> normal(0,.03f);
     std::vector<float> noise(48000*3);for(auto& x:noise)x=normal(rng);
     {

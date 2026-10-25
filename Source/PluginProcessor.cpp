@@ -16,8 +16,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout TatreeProcessor::layout() {
     p.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID{"autoGain",1},"Input auto gain",false));
     return p;
 }
-TatreeProcessor::TatreeProcessor() : AudioProcessor(BusesProperties().withInput("Input",juce::AudioChannelSet::stereo(),true)
-    .withOutput("Output",juce::AudioChannelSet::stereo(),true)), params(*this,nullptr,"Tatree2",layout()) { setLatencySamples(SpectralDenoiser::size); }
+TatreeProcessor::TatreeProcessor() : TatreeProcessor(TatreeLicense::shared()) {}
+TatreeProcessor::TatreeProcessor(std::shared_ptr<const ProcessingEntitlement> access) : AudioProcessor(BusesProperties().withInput("Input",juce::AudioChannelSet::stereo(),true)
+    .withOutput("Output",juce::AudioChannelSet::stereo(),true)), params(*this,nullptr,"Tatree2",layout()),
+    processingAccess(access ? std::move(access) : licence) { setLatencySamples(SpectralDenoiser::size); }
 bool TatreeProcessor::isBusesLayoutSupported(const BusesLayout& l) const {
     return l.getMainInputChannelSet() == l.getMainOutputChannelSet()
         && (l.getMainInputChannelSet() == juce::AudioChannelSet::mono() || l.getMainInputChannelSet() == juce::AudioChannelSet::stereo());
@@ -52,7 +54,7 @@ void TatreeProcessor::prepareToPlay(double sr, int) {
     for (auto entry : {std::pair{&bypassMix,"bypass"}, {&listenMix,"listen"}, {&filterMix,"filter"}}) {
         entry.first->reset(sr,.015); entry.first->setCurrentAndTargetValue(params.getRawParameterValue(entry.second)->load());
     }
-    if (licence->expired()) bypassMix.setCurrentAndTargetValue(1);
+    if (processingAccess->expired()) bypassMix.setCurrentAndTargetValue(1);
 }
 void TatreeProcessor::processBlock(juce::AudioBuffer<float>& b, juce::MidiBuffer&) { process(b,false); }
 void TatreeProcessor::processBlockBypassed(juce::AudioBuffer<float>& b, juce::MidiBuffer&) { process(b,true); }
@@ -61,7 +63,7 @@ void TatreeProcessor::process(juce::AudioBuffer<float>& b, bool hostBypass) {
     noiseAmount.setTargetValue(params.getRawParameterValue("noise")->load() * .01f);
     breathAmount.setTargetValue(params.getRawParameterValue("breath")->load() * .01f);
     essAmount.setTargetValue(params.getRawParameterValue("ess")->load() * .01f);
-    const bool trialExpired=licence->expired();
+    const bool trialExpired=processingAccess->expired();
     bypassMix.setTargetValue(hostBypass || trialExpired ? 1 : params.getRawParameterValue("bypass")->load());
     listenMix.setTargetValue(params.getRawParameterValue("listen")->load());
     filterMix.setTargetValue(params.getRawParameterValue("filter")->load());

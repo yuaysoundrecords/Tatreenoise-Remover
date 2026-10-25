@@ -8,6 +8,7 @@
 class TatreeProcessor final : public juce::AudioProcessor {
 public:
     TatreeProcessor();
+    explicit TatreeProcessor(std::shared_ptr<const ProcessingEntitlement>);
     void prepareToPlay(double, int) override;
     void releaseResources() override {}
     bool isBusesLayoutSupported(const BusesLayout&) const override;
@@ -40,6 +41,7 @@ public:
         std::atomic<bool> hot {false};
     } meters;
 private:
+    const std::shared_ptr<const ProcessingEntitlement> processingAccess;
     static juce::AudioProcessorValueTreeState::ParameterLayout layout();
     void process(juce::AudioBuffer<float>&, bool);
     std::array<SpectralDenoiser,2> denoisers;

@@ -2,6 +2,13 @@
 #include <algorithm>
 #include <cmath>
 
+// The processor consumes only this realtime-safe decision. Tests can supply a
+// deterministic clock without sleeping for thirty minutes or making HTTP calls.
+struct ProcessingEntitlement {
+    virtual ~ProcessingEntitlement() = default;
+    virtual bool expired() const noexcept = 0;
+};
+
 // Wall-clock session time, shared by every instance in this host process.
 // Reopening an editor, restoring state or preparing audio must not reset it.
 struct SessionTrial {
