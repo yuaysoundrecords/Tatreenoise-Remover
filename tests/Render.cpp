@@ -29,7 +29,8 @@ private:
     bool capture(const juce::String& name) {
         auto image=editor->createComponentSnapshot(editor->getLocalBounds());
         juce::FileOutputStream out(folder.getChildFile(name+".png"));
-        if(!out.openedOk() || !juce::PNGImageFormat().writeImageToStream(image,out)) { fail("Capture write failed");return false; }
+        if(!out.openedOk() || !out.setPosition(0) || out.truncate().failed()
+            || !juce::PNGImageFormat().writeImageToStream(image,out)) { fail("Capture write failed");return false; }
         return true;
     }
     bool controlsWork() {
@@ -69,7 +70,7 @@ private:
         for(int i=0;i<editor->getNumChildComponents();++i)
             if(auto* b=dynamic_cast<juce::TextButton*>(editor->getChildComponent(i)))
                 if(b->getName()=="license-unlock")unlock=b;
-        if(!unlock || !unlock->onClick){fail("License button missing");return false;}
+        if(!unlock || !unlock->onClick || !unlock->getButtonText().startsWith("TRIAL ")){fail("License button or initial countdown missing");return false;}
         unlock->onClick();
         juce::Component* panel=nullptr;juce::TextEditor* key=nullptr;juce::TextButton* close=nullptr;
         for(int i=0;i<editor->getNumChildComponents();++i) {
@@ -81,6 +82,13 @@ private:
             }
         }
         if(!panel || !panel->isVisible() || !key || !close){fail("Activation panel did not open");return false;}
+        if(!processor->licence->configured()) {
+            for(int i=0;i<panel->getNumChildComponents();++i)
+                if(auto* b=dynamic_cast<juce::TextButton*>(panel->getChildComponent(i)))
+                    if((b->getButtonText()=="ACTIVATE" || b->getButtonText()=="BUY / US$5") && b->isEnabled()) {
+                        fail("Unconfigured staging build must disable activation and purchase");return false;
+                    }
+        }
         key->setText("UI-TEST-NOT-A-REAL-KEY",false);
         if(!capture("license-panel"))return false;
         for(auto size:{juce::Point<int>{864,688},juce::Point<int>{1620,1290}}) {

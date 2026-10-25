@@ -36,15 +36,15 @@ void TatreeLook::drawButtonBackground(juce::Graphics& g,juce::Button& b,const ju
     auto active=b.getToggleState();
     auto color=active?blue:cream;
     if(b.getButtonText()=="BYPASS" && active)color=red;
-    if(over)color=color.darker(.08f);
-    if(down)r.translate(0,1);
+    if(over && b.isEnabled())color=color.darker(.08f);
+    if(down && b.isEnabled())r.translate(0,1);
     g.setColour(ink.withAlpha(.15f));g.fillRoundedRectangle(r.translated(0,2),3);
     g.setColour(color);g.fillRoundedRectangle(r,3);
-    g.setColour(ink);g.drawRoundedRectangle(r,3,1.5f);
+    g.setColour(ink.withMultipliedAlpha(b.isEnabled()?1.0f:.3f));g.drawRoundedRectangle(r,3,1.5f);
     if(b.hasKeyboardFocus(false)){g.setColour(blue);g.drawRect(b.getLocalBounds(),1);}
 }
 void TatreeLook::drawButtonText(juce::Graphics& g,juce::TextButton& b,bool,bool){
-    g.setColour(b.getToggleState()?cream:ink);g.setFont(headline(float(b.getHeight())*(b.getButtonText()=="MOTION FX"?20.0f/26:32.0f/52)));
+    g.setColour((b.getToggleState()?cream:ink).withMultipliedAlpha(b.isEnabled()?1.0f:.3f));g.setFont(headline(float(b.getHeight())*(b.getButtonText()=="MOTION FX"?20.0f/26:32.0f/52)));
     g.drawText(b.getButtonText(),b.getLocalBounds(),juce::Justification::centred);
 }
 TatreeEditor::TatreeEditor(TatreeProcessor& p):AudioProcessorEditor(p),processor(p){
