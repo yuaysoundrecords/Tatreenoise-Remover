@@ -52,6 +52,7 @@ void TatreeProcessor::prepareToPlay(double sr, int) {
     for (auto entry : {std::pair{&bypassMix,"bypass"}, {&listenMix,"listen"}, {&filterMix,"filter"}}) {
         entry.first->reset(sr,.015); entry.first->setCurrentAndTargetValue(params.getRawParameterValue(entry.second)->load());
     }
+    if (licence->expired()) bypassMix.setCurrentAndTargetValue(1);
 }
 void TatreeProcessor::processBlock(juce::AudioBuffer<float>& b, juce::MidiBuffer&) { process(b,false); }
 void TatreeProcessor::processBlockBypassed(juce::AudioBuffer<float>& b, juce::MidiBuffer&) { process(b,true); }
@@ -60,7 +61,8 @@ void TatreeProcessor::process(juce::AudioBuffer<float>& b, bool hostBypass) {
     noiseAmount.setTargetValue(params.getRawParameterValue("noise")->load() * .01f);
     breathAmount.setTargetValue(params.getRawParameterValue("breath")->load() * .01f);
     essAmount.setTargetValue(params.getRawParameterValue("ess")->load() * .01f);
-    bypassMix.setTargetValue(hostBypass ? 1 : params.getRawParameterValue("bypass")->load());
+    const bool trialExpired=licence->expired();
+    bypassMix.setTargetValue(hostBypass || trialExpired ? 1 : params.getRawParameterValue("bypass")->load());
     listenMix.setTargetValue(params.getRawParameterValue("listen")->load());
     filterMix.setTargetValue(params.getRawParameterValue("filter")->load());
     inputGain.setTargetValue(juce::Decibels::decibelsToGain(params.getRawParameterValue("inputGain")->load()));
@@ -137,7 +139,7 @@ void TatreeProcessor::process(juce::AudioBuffer<float>& b, bool hostBypass) {
     }
     meters.autoGainDb.store(autoGain.decibels());meters.autoGainHolding.store(autoGain.isHolding());
     meters.noiseDb.store(noiseDb); meters.deEssDb.store(maxEss); meters.breathDb.store(maxBreath);
-    const bool isBypassed = hostBypass || params.getRawParameterValue("bypass")->load() > .5f;
+    const bool isBypassed = hostBypass || trialExpired || params.getRawParameterValue("bypass")->load() > .5f;
     meters.bypassed.store(isBypassed);
     meters.reductionDb.store(!isBypassed && dryEnergy > 1e-12 ? std::clamp(float(10 * std::log10((dryEnergy+1e-20)/(wetEnergy+1e-20))),0.0f,40.0f) : 0.0f);
     meters.blocks.fetch_add(1, std::memory_order_relaxed);

@@ -19,6 +19,7 @@ try {
     Set-Content (Join-Path $Evidence 'audio-tests.txt') 'fixture'
     Set-Content (Join-Path $Evidence 'native-ui-tests.txt') 'fixture'
     Set-Content (Join-Path $Evidence 'pluginval.txt') 'SUCCESS'
+    [ordered]@{version='2.1.0';activation_configured=$false;product_id='';trial_seconds=1800} | ConvertTo-Json | Set-Content (Join-Path $Fixture 'licensing-build.json')
     [IO.File]::WriteAllBytes((Join-Path $Evidence 'ui/idle.png'),[Convert]::FromBase64String('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jN1sAAAAASUVORK5CYII='))
     Expect-Rejection 'Missing validation metadata was accepted.'
     Write-Host 'PASS package refuses missing validation metadata'

@@ -3,6 +3,7 @@
 #include <juce_dsp/juce_dsp.h>
 #include "Denoiser.h"
 #include "AutoGain.h"
+#include "Licensing.h"
 
 class TatreeProcessor final : public juce::AudioProcessor {
 public:
@@ -28,6 +29,7 @@ public:
     void setStateInformation(const void*, int) override;
     juce::AudioProcessorParameter* getBypassParameter() const override { return params.getParameter("bypass"); }
     juce::AudioProcessorValueTreeState params;
+    std::shared_ptr<TatreeLicense> licence = TatreeLicense::shared();
     struct Metering {
         std::array<std::atomic<float>,2> input {{0,0}}, output {{0,0}};
         std::atomic<float> autoGainDb {0};

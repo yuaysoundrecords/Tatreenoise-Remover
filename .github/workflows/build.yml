@@ -11,6 +11,8 @@ on:
   pull_request:
 permissions:
   contents: read
+env:
+  TATREE_GUMROAD_PRODUCT_ID: ${{ vars.TATREE_GUMROAD_PRODUCT_ID }}
 jobs:
   windows:
     runs-on: windows-2022
