@@ -65,12 +65,8 @@ if [[ "${CI:-}" == true ]]; then
 fi
 cp docs/MACOS.md "$STAGE/READ-ME-MACOS.md"
 cp THIRD_PARTY.md assets/OFL-*.txt "$STAGE/"
-cp docs/LICENSING.md "$BUILD_DIR/licensing-build.json" "$STAGE/"
 FLAVOR=universal
 if [[ "$ARCHS" != 'arm64;x86_64' ]]; then FLAVOR="${ARCHS//;/_}"; fi
-if grep -q '"activation_configured": false' "$BUILD_DIR/licensing-build.json"; then
-  FLAVOR="$FLAVOR-TRIAL-ONLY-STAGING-DO-NOT-SELL"
-fi
 mkdir -p "$STAGE/validation"
 cp "$BUILD_DIR/validation/native-ui.txt" "$STAGE/validation/"
 if [[ -f "$BUILD_DIR/validation/auval.txt" ]]; then cp "$BUILD_DIR/validation/auval.txt" "$STAGE/validation/"; fi

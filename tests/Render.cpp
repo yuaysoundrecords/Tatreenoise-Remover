@@ -17,7 +17,6 @@ public:
         editor->addToDesktop(0);editor->setVisible(true);
         if(editor->currentSpeechCue()!=SpeechCue::idle){fail("Editor must open without speech");return;}
         if(!capture("startup"))return;
-        if(!licencePanelWorks())return;
         startScenario(0);startTimerHz(30);
     }
     void shutdown() override { stopTimer();editor.reset();processor.reset(); }
@@ -38,7 +37,13 @@ private:
             auto* child=editor->getChildComponent(c);
             if(auto* knob=dynamic_cast<juce::Slider*>(child))knob->setValue(knob->getName()=="inputGain"?3:knob->getName()=="outputGain"?-3:61,juce::sendNotificationSync);
             if(auto* button=dynamic_cast<juce::TextButton*>(child)) {
-                if(button->getName()=="license-unlock")continue;
+                if(button->getName()=="kofi-tip") {
+                    if(button->getButtonText()!="TIP / KO-FI" || button->getClickingTogglesState()
+                        || !button->onClick || button->getRight()>editor->getWidth()) {
+                        fail("Optional tip control is not configured correctly");return false;
+                    }
+                    continue; // Do not open a browser in the automated UI harness.
+                }
                 const char* id=button->getButtonText()=="FILTER"?"filter":button->getButtonText()=="LISTEN"?"listen":button->getButtonText()=="BYPASS"?"bypass":button->getButtonText()=="AUTO GAIN"?"autoGain":"motion";
                 bool old=button->getToggleState();button->setToggleState(!old,juce::sendNotificationSync);
                 if((processor->params.getRawParameterValue(id)->load()>.5f)==old) { fail("Button binding failed");return false; }
@@ -63,41 +68,6 @@ private:
             }
         }
         std::cout<<"Native knobs, gain trims, five buttons, exact numeric edits and invalid-input handling passed\n";
-        return true;
-    }
-    bool licencePanelWorks() {
-        juce::TextButton* unlock=nullptr;
-        for(int i=0;i<editor->getNumChildComponents();++i)
-            if(auto* b=dynamic_cast<juce::TextButton*>(editor->getChildComponent(i)))
-                if(b->getName()=="license-unlock")unlock=b;
-        if(!unlock || !unlock->onClick || !unlock->getButtonText().startsWith("TRIAL ")){fail("License button or initial countdown missing");return false;}
-        unlock->onClick();
-        juce::Component* panel=nullptr;juce::TextEditor* key=nullptr;juce::TextButton* close=nullptr;
-        for(int i=0;i<editor->getNumChildComponents();++i) {
-            auto* candidate=editor->getChildComponent(i);
-            for(int j=0;j<candidate->getNumChildComponents();++j) {
-                auto* child=candidate->getChildComponent(j);
-                if(child->getName()=="Gumroad license key") {panel=candidate;key=dynamic_cast<juce::TextEditor*>(child);}
-                if(child->getName()=="license-close")close=dynamic_cast<juce::TextButton*>(child);
-            }
-        }
-        if(!panel || !panel->isVisible() || !key || !close){fail("Activation panel did not open");return false;}
-        if(!processor->licence->configured()) {
-            for(int i=0;i<panel->getNumChildComponents();++i)
-                if(auto* b=dynamic_cast<juce::TextButton*>(panel->getChildComponent(i)))
-                    if((b->getButtonText()=="ACTIVATE" || b->getButtonText()=="BUY / US$5") && b->isEnabled()) {
-                        fail("Unconfigured staging build must disable activation and purchase");return false;
-                    }
-        }
-        key->setText("UI-TEST-NOT-A-REAL-KEY",false);
-        if(!capture("license-panel"))return false;
-        for(auto size:{juce::Point<int>{864,688},juce::Point<int>{1620,1290}}) {
-            editor->setSize(size.x,size.y);if(!capture("license-panel-"+juce::String(size.x)))return false;
-        }
-        editor->setSize(1080,860);close->onClick();
-        if(panel->isVisible() || key->getText().isNotEmpty()){fail("Closing activation did not clear key");return false;}
-        if(editor->currentSpeechCue()!=SpeechCue::idle){fail("Licensing fabricated a speech cue");return false;}
-        std::cout<<"License panel opens, resizes, closes and clears key without touching DSP\n";
         return true;
     }
     void startScenario(int next) {

@@ -36,15 +36,15 @@ void TatreeLook::drawButtonBackground(juce::Graphics& g,juce::Button& b,const ju
     auto active=b.getToggleState();
     auto color=active?blue:cream;
     if(b.getButtonText()=="BYPASS" && active)color=red;
-    if(over && b.isEnabled())color=color.darker(.08f);
-    if(down && b.isEnabled())r.translate(0,1);
+    if(over)color=color.darker(.08f);
+    if(down)r.translate(0,1);
     g.setColour(ink.withAlpha(.15f));g.fillRoundedRectangle(r.translated(0,2),3);
     g.setColour(color);g.fillRoundedRectangle(r,3);
-    g.setColour(ink.withMultipliedAlpha(b.isEnabled()?1.0f:.3f));g.drawRoundedRectangle(r,3,1.5f);
+    g.setColour(ink);g.drawRoundedRectangle(r,3,1.5f);
     if(b.hasKeyboardFocus(false)){g.setColour(blue);g.drawRect(b.getLocalBounds(),1);}
 }
 void TatreeLook::drawButtonText(juce::Graphics& g,juce::TextButton& b,bool,bool){
-    g.setColour((b.getToggleState()?cream:ink).withMultipliedAlpha(b.isEnabled()?1.0f:.3f));g.setFont(headline(float(b.getHeight())*(b.getButtonText()=="MOTION FX"?20.0f/26:32.0f/52)));
+    g.setColour(b.getToggleState()?cream:ink);g.setFont(headline(float(b.getHeight())*(b.getButtonText()=="MOTION FX"?20.0f/26:32.0f/52)));
     g.drawText(b.getButtonText(),b.getLocalBounds(),juce::Justification::centred);
 }
 TatreeEditor::TatreeEditor(TatreeProcessor& p):AudioProcessorEditor(p),processor(p){
@@ -99,28 +99,10 @@ TatreeEditor::TatreeEditor(TatreeProcessor& p):AudioProcessorEditor(p),processor
     const char* observed[]{"noise","breath","ess","filter","listen","bypass","inputGain","outputGain","autoGain"};
     for(int i=0;i<9;++i)previousControls[i]=p.params.getRawParameterValue(observed[i])->load();
     autoButton.onClick=[this]{speech.trigger(SpeechCue::autoGain);};
-    addAndMakeVisible(unlockButton);
-    unlockButton.setName("license-unlock");
-    addChildComponent(activationPanel);
-    for(auto* label : {&activationTitle,&activationInfo,&activationMessage}) {
-        activationPanel.addAndMakeVisible(*label);
-        label->setColour(juce::Label::textColourId,look.ink);
-    }
-    activationTitle.setText("TATREE / LICENSE",juce::dontSendNotification);
-    activationInfo.setText("30-minute trial per DAW session. Restart your DAW to try again.\nUS$5 unlock. Internet required to verify once per DAW session.\nPaste the license key from your Gumroad receipt:",juce::dontSendNotification);
-    activationPanel.addAndMakeVisible(activationKey);
-    activationKey.setTextToShowWhenEmpty("Gumroad license key",look.ink.withAlpha(.5f));
-    activationKey.setPasswordCharacter(juce::juce_wchar(0x2022));
-    activationKey.setMultiLine(false); activationKey.setName("Gumroad license key");
-    for(auto* button : {&activateButton,&buyButton,&closeActivation}) activationPanel.addAndMakeVisible(*button);
-    closeActivation.setName("license-close");
-    unlockButton.onClick=[this]{activationPanel.setVisible(true);activationPanel.toFront(false);activationKey.grabKeyboardFocus();};
-    closeActivation.onClick=[this]{activationPanel.setVisible(false);activationKey.clear();};
-    activateButton.onClick=[this]{processor.licence->activate(activationKey.getText());};
-    activationKey.onReturnKey=[this]{activateButton.triggerClick();};
-    buyButton.onClick=[]{juce::URL("https://benjilennon.gumroad.com/l/rsecg").launchInDefaultBrowser();};
-    buyButton.setEnabled(processor.licence->configured());
-    updateLicensingUI();
+    addAndMakeVisible(tipButton);
+    tipButton.setName("kofi-tip");
+    tipButton.setTooltip("This plug-in is free. Support Yuaylooper on Ko-fi.");
+    tipButton.onClick=[]{juce::URL("https://ko-fi.com/yuaylooper").launchInDefaultBrowser();};
     setSize(1080,860);startTimerHz(30);
 }
 TatreeEditor::~TatreeEditor(){stopTimer();setLookAndFeel(nullptr);}
@@ -140,30 +122,9 @@ void TatreeEditor::resized(){
     gainSliders[1].setBounds(juce::Rectangle<int>(738,691,286,37)*scale);
     autoButton.setBounds(juce::Rectangle<int>(427,667,220,42)*scale);
     motionButton.setBounds(juce::Rectangle<int>(900,787,128,26)*scale);
-    unlockButton.setBounds(juce::Rectangle<int>(815,123,232,29)*scale);
-    activationPanel.setBounds(juce::Rectangle<int>(180,240,720,340)*scale);
-    activationTitle.setBounds(juce::Rectangle<int>(24,14,660,37)*scale);
-    activationTitle.setFont(look.headline(30*scale));
-    activationInfo.setBounds(juce::Rectangle<int>(24,55,672,85)*scale);
-    activationInfo.setFont(juce::Font(juce::FontOptions(17*scale)));
-    activationKey.setBounds(juce::Rectangle<int>(24,148,672,37)*scale);
-    activationKey.setFont(juce::Font(juce::FontOptions(18*scale)));
-    activationMessage.setBounds(juce::Rectangle<int>(24,193,672,76)*scale);
-    activationMessage.setFont(juce::Font(juce::FontOptions(16*scale)));
-    activateButton.setBounds(juce::Rectangle<int>(24,280,198,40)*scale);
-    buyButton.setBounds(juce::Rectangle<int>(244,280,210,40)*scale);
-    closeActivation.setBounds(juce::Rectangle<int>(476,280,220,40)*scale);
-}
-void TatreeEditor::updateLicensingUI(){
-    const auto& licence=*processor.licence;
-    const int left=int(std::ceil(licence.secondsRemaining()));
-    unlockButton.setButtonText(licence.isUnlocked()?"LICENSED":left<=0?"TRIAL ENDED / UNLOCK":"TRIAL "+juce::String(left/60)+":"+juce::String(left%60).paddedLeft('0',2)+" / UNLOCK");
-    activateButton.setEnabled(!licence.isBusy() && licence.configured());
-    activationKey.setEnabled(!licence.isBusy());
-    activationMessage.setText(!licence.configured()?"Staging build: activation is unavailable until the seller configures the Gumroad product ID.":licence.statusText(),juce::dontSendNotification);
+    tipButton.setBounds(juce::Rectangle<int>(918,100,126,30)*scale);
 }
 void TatreeEditor::timerCallback(){
-    updateLicensingUI();
     const auto block = processor.meters.blocks.load(std::memory_order_relaxed);
     noAudioSeconds = block != lastBlock ? 0 : noAudioSeconds + 1.0f/30;
     lastBlock = block;
@@ -282,7 +243,7 @@ void TatreeEditor::paint(juce::Graphics& g){
     caption(g,"AUDIO",{920,43,125,22},21,look.blue);
     caption(g,"DENOISER",{920,65,125,22},21,look.blue);
     caption(g,"Y U A Y   S O U N D   R E C O R D S",{244,127,566,24},16,look.blue,true);
-    g.setColour(look.blue.withAlpha(.65f));g.drawLine(36,138,230,138,1);
+    g.setColour(look.blue.withAlpha(.65f));g.drawLine(36,138,230,138,1);g.drawLine(815,138,1040,138,1);
     caption(g,"NOISE REDUCTION",{36,166,272,45},54,look.blue);
     caption(g,"BREATH",{308,252,164,31},28,look.blue);
     caption(g,"REDUCTION",{308,278,164,27},23,look.blue);

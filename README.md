@@ -1,4 +1,4 @@
-# Tatree Noise Remover 2.1.0 — licensing staging
+# Tatree Noise Remover 2.1.0 — free
 
 Native audio cleanup plugin by Yuay Sound Records. Cream/cobalt Thai indie UI, colour lawyer and audio-driven Motion FX. Mono/stereo VST3 + Standalone on Windows; Universal AU/VST3/Standalone source build on macOS 11+.
 
@@ -7,11 +7,13 @@ Native audio cleanup plugin by Yuay Sound Records. Cream/cobalt Thai indie UI, c
 - No speech banner on startup. Five user-control captions appear for 3 seconds, including De-breath and both Auto Gain ON/OFF clicks.
 - Real IN/OUT/GR meters, automation/state recall, fixed 1024-sample latency and original-dry Bypass.
 
-**2.1 status:** licensing implementation and platform validation are in progress. Activation needs the public Gumroad product ID and a real paid-key integration test. Do not sell an unconfigured staging build as unlockable. See [licensing setup](docs/LICENSING.md).
+[Windows 2.0.4 tested ZIP](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40083443048/artifacts/12556048528) · [Mac Universal test build](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40083443048/artifacts/12556491264)
 
-Previous **2.0.4** binaries (no trial or key system): [Windows 2.0.4 tested ZIP](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40083443048/artifacts/12556048528) · [Mac Universal test build](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40083443048/artifacts/12556491264)
+The linked **2.0.4** Windows and Mac packages passed validation. Version **2.1.0 free** is being rebuilt; those older packages do not contain the tip button. Mac builds have ad-hoc test signatures, not Developer ID notarization. For a local Mac build use the source kit and BUILD-MAC.command below.
 
-Windows and Mac automated validation passed for **2.0.4**; those results do not validate the new licensing changes. Mac builds have ad-hoc test signatures, not Developer ID notarization. For a local Mac build use the source kit and BUILD-MAC.command below.
+## Free to use
+
+All features are free, with no trial timer, activation key, account or payment requirement. The optional **TIP / KO-FI** button at the top right opens [Yuaylooper on Ko-fi](https://ko-fi.com/yuaylooper) only when clicked. Tipping does not unlock or change any feature.
 
 ## Build and test
 
@@ -21,6 +23,6 @@ Windows and Mac automated validation passed for **2.0.4**; those results do not 
 
 [Current validation](VALIDATION.md) · [UI and captions](docs/UI.md) · [Measured DSP comparison and limits](docs/DSP-QUALITY.md) · [Component licences](THIRD_PARTY.md)
 
-Audio processing remains local. Version 2.1 checks Gumroad keys over HTTPS outside the audio callback; a remembered key is verified once per new host process. All instances share a 30-minute trial and expiry fades to latency-matched dry. No audio or project data is uploaded. No model downloads. Test builds are unsigned on Windows / ad-hoc signed on Mac; the owner accepted 2.0.4 in their DAW; Developer ID/notarization and live 2.1 paid-key checks remain separate release steps. Numerical fixtures do not establish perceptual or commercial parity.
+Audio processing works offline, with no activation checks or model downloads. Clicking TIP / KO-FI opens the external donation page in your browser; nothing opens automatically. Test builds are unsigned on Windows / ad-hoc signed on Mac; the owner accepted 2.0.4 in their DAW; Developer ID/notarization remains separate. Numerical fixtures do not establish perceptual or commercial parity.
 
 Original v1 distribution and old design evidence are preserved in Git history and a verified recovery archive outside the active project; they are not needed to build v2. This source uses new IDs (`Yuay` / `Ttr2`) and does not replace v1 sessions. Original product: https://benjilennon.gumroad.com/l/rsecg .

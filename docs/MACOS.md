@@ -2,6 +2,10 @@
 
 รองรับ Apple Silicon และ Intel (macOS 11 ขึ้นไป) ค่าเริ่มต้นบิลด์ Universal ทั้งสองสถาปัตยกรรม ได้ VST3, AU และ Standalone
 
+ใช้ฟรีทุกฟังก์ชัน ไม่จำกัดเวลา ไม่ต้องใส่คีย์ ปุ่ม TIP / KO-FI มุมขวาบนเปิด https://ko-fi.com/yuaylooper เมื่อกดเท่านั้น การให้ทิปเป็นทางเลือกและไม่มีผลต่อการใช้งาน
+
+Free, with all features available and no time limit or activation key. The optional TIP / KO-FI button opens Yuaylooper’s donation page only when clicked.
+
 ## เริ่มครั้งแรก
 
 1. เปิด Terminal รัน `xcode-select --install` และติดตั้ง Apple Command Line Tools ให้เสร็จ
@@ -10,7 +14,7 @@
 
 ครั้งแรกต้องต่ออินเทอร์เน็ตเพื่อดึง JUCE เวอร์ชันที่ตรึงไว้ สคริปต์จะ configure, build, รัน CTest, เปิด native UI เพื่อทดสอบข้อความ/สถานะ และสร้าง ZIP เมื่อผ่าน ไม่มีการติดตั้งปลั๊กอินทับเครื่องอัตโนมัติ
 
-ผลลัพธ์อยู่ใน `build-macos/package/` (ชื่อ ZIP มี `TRIAL-ONLY-STAGING-DO-NOT-SELL` หากยังไม่มี Gumroad product ID) ภายในมี AU / VST3 / Standalone, notices และ SHA256SUMS.txt ส่วนหลักฐานอยู่ใน `build-macos/validation/`
+ผลลัพธ์อยู่ที่ `build-macos/package/Tatree-2-macOS-universal.zip` ภายในมี AU / VST3 / Standalone, notices และ SHA256SUMS.txt ส่วนหลักฐานอยู่ใน `build-macos/validation/`
 
 สำหรับรอบพัฒนาที่ต้องการเฉพาะสถาปัตยกรรมเครื่อง:
 
@@ -27,7 +31,3 @@ TATREE_MAC_ARCHS="$(uname -m)" bash BUILD-MAC.command
 สคริปต์ใช้ ad-hoc signature เพื่อทดสอบในเครื่อง ไม่ใช่ Developer ID และยังไม่ใช่ notarized public Mac release อย่าปิด Gatekeeper ทั้งระบบ การเซ็นและ notarization สำหรับเผยแพร่เชิงพาณิชย์เป็นขั้น release แยกจากการบิลด์ source
 
 Windows รุ่นหลักผ่านแล้ว และ CI แยกตรวจ Windows กับ Mac Universal, core/speech tests, native UI, Mach-O architectures, signature verification และ AU validation (`auval`) ดูผลรอบจริงใน VALIDATION.md ก่อนอ้างว่า Mac-tested
-
-## Trial / คีย์ในรุ่น 2.1
-
-ทดลอง 30 นาทีต่อ host process ทุก instance ใช้เวลาร่วมกัน ครบเวลาแล้วกลับเป็นเสียงเดิมอย่างนุ่มนวล ปิด DAW ให้หมดแล้วเปิดใหม่เพื่อทดลองซ้ำได้ คีย์ US$5 ตรวจผ่าน Gumroad เมื่อเริ่ม host process ใหม่ ต้องต่ออินเทอร์เน็ตตอนตรวจคีย์ ดู [LICENSING.md](LICENSING.md) สำหรับการตั้งค่า product ID และสถานะก่อนแจก ชุด staging ที่ยังไม่มี ID ไม่สามารถปลดล็อกได้

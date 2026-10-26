@@ -18,19 +18,13 @@ if ($Result.status -ne 'passed' -or $Result.platform -ne 'Windows x64' -or
     $Result.app_sha256 -ne (Get-FileHash $App -Algorithm SHA256).Hash.ToLowerInvariant()) {
     throw 'Validation result does not match these binaries. Refusing to package stale or failed output.'
 }
-$LicenseConfig = Join-Path $Build 'licensing-build.json'
-if (-not (Test-Path $LicenseConfig)) { throw 'Licensing build metadata missing. Reconfigure and rebuild.' }
-$License = Get-Content $LicenseConfig -Raw | ConvertFrom-Json
-$Flavor = if ($License.activation_configured -eq $true) { '' } else { '-TRIAL-ONLY-STAGING-DO-NOT-SELL' }
-$Stage = Join-Path $Build ('package/Tatree-' + $License.version + '-Windows-x64' + $Flavor + '-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
+$Stage = Join-Path $Build ('package/Tatree-2-Windows-x64-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
 New-Item -ItemType Directory -Force (Join-Path $Stage 'VST3'),(Join-Path $Stage 'Standalone') | Out-Null
 Copy-Item $Plugin (Join-Path $Stage 'VST3') -Recurse
 Copy-Item $App (Join-Path $Stage 'Standalone')
 Copy-Item (Join-Path $Root 'scripts/Install-VST3.cmd') $Stage
 Copy-Item (Join-Path $Root 'docs/WINDOWS.md') (Join-Path $Stage 'READ-ME-WINDOWS.md')
 Copy-Item (Join-Path $Root 'THIRD_PARTY.md') $Stage
-Copy-Item $LicenseConfig $Stage
-Copy-Item (Join-Path $Root 'docs/LICENSING.md') $Stage
 Copy-Item (Join-Path $Root 'assets/OFL-*.txt') $Stage
 # Keep the shipped readme's A/B audio and quality-report links self-contained.
 Copy-Item (Join-Path $Root 'docs/DSP-QUALITY.md') $Stage

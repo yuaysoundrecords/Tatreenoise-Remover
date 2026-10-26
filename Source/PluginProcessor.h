@@ -3,12 +3,10 @@
 #include <juce_dsp/juce_dsp.h>
 #include "Denoiser.h"
 #include "AutoGain.h"
-#include "Licensing.h"
 
 class TatreeProcessor final : public juce::AudioProcessor {
 public:
     TatreeProcessor();
-    explicit TatreeProcessor(std::shared_ptr<const ProcessingEntitlement>);
     void prepareToPlay(double, int) override;
     void releaseResources() override {}
     bool isBusesLayoutSupported(const BusesLayout&) const override;
@@ -30,7 +28,6 @@ public:
     void setStateInformation(const void*, int) override;
     juce::AudioProcessorParameter* getBypassParameter() const override { return params.getParameter("bypass"); }
     juce::AudioProcessorValueTreeState params;
-    std::shared_ptr<TatreeLicense> licence = TatreeLicense::shared();
     struct Metering {
         std::array<std::atomic<float>,2> input {{0,0}}, output {{0,0}};
         std::atomic<float> autoGainDb {0};
@@ -41,7 +38,6 @@ public:
         std::atomic<bool> hot {false};
     } meters;
 private:
-    const std::shared_ptr<const ProcessingEntitlement> processingAccess;
     static juce::AudioProcessorValueTreeState::ParameterLayout layout();
     void process(juce::AudioBuffer<float>&, bool);
     std::array<SpectralDenoiser,2> denoisers;

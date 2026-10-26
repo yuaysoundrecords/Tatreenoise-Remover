@@ -1,8 +1,8 @@
-## 2.1 licensing status
+## 2.1.0 free update — validation in progress
 
-New 30-minute-per-host-process trial, Gumroad activation UI and strict paid-key validation are under test. The public Gumroad product ID is missing, so activation is disabled in staging. No real checkout/key-delivery or paid-key verification is claimed. See [LICENSING.md](docs/LICENSING.md).
+Removed the entire trial/key-verification implementation. Audio processor, DSP and audio tests are identical to the accepted 2.0.4 source; the only product UI change is an optional top-right Ko-fi tip button. No startup requests, trial timer, activation controls or payment gating remain. Windows/Mac native builds are pending for this update.
 
-# Validation history — 2.0.4; 2.1 in progress
+# Current validation — 2.0.4
 
 Latest changes: no startup/idle speech banner; new Breath control caption; compact source tree; one-click Universal Mac build helper. Native Windows and Mac CI validation **passed** on [run 40083443048](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40083443048), source commit `f1bd09ef65dbb980a62f8d9b57d6fd6ff2f5f798`.
 

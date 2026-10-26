@@ -26,7 +26,6 @@ public:
     SpeechCue currentSpeechCue() const { return speech.cue; }
 private:
     void timerCallback() override;
-    void updateLicensingUI();
     void drawSpeechBanner(juce::Graphics&);
     void meter(juce::Graphics&,juce::Rectangle<float>,juce::String,bool,bool);
     void caption(juce::Graphics&,juce::String,juce::Rectangle<float>,float,juce::Colour,bool=false);
@@ -41,16 +40,7 @@ private:
     std::array<float,9> previousControls {};
     std::array<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>,3> knobAttachments;
     juce::TextButton filter {"FILTER"}, listen {"LISTEN"}, bypass {"BYPASS"}, motionButton {"MOTION FX"}, autoButton {"AUTO GAIN"};
-    juce::TextButton unlockButton {"UNLOCK"};
-    struct ActivationPanel final : juce::Component {
-        void paint(juce::Graphics& g) override {
-            g.fillAll(juce::Colour(0xffeee9df)); g.setColour(juce::Colour(0xff123d91));
-            g.drawRect(getLocalBounds(),2);
-        }
-    } activationPanel;
-    juce::Label activationTitle, activationInfo, activationMessage;
-    juce::TextEditor activationKey;
-    juce::TextButton activateButton {"ACTIVATE"}, buyButton {"BUY / US$5"}, closeActivation {"CLOSE"};
+    juce::TextButton tipButton {"TIP / KO-FI"};
     std::array<juce::Slider,2> gainSliders;
     std::array<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>,2> gainAttachments;
     std::array<std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>,5> buttonAttachments;
