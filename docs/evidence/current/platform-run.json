@@ -1,43 +1,54 @@
 {
-  "version": "2.0.4",
-  "run_id": 40083443048,
-  "validated_source_commit": "f1bd09ef65dbb980a62f8d9b57d6fd6ff2f5f798",
-  "windows": "passed",
-  "macos": "passed",
-  "core_checks": 64,
-  "speech_checks": 9,
-  "macos_architectures": [
-    "arm64",
-    "x86_64"
+  "version": "2.1.0",
+  "edition": "free",
+  "run_id": 40320381346,
+  "url": "https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40320381346",
+  "source_commit": "b3ab9d57b4c0fffb4e853e345d8a3ce8fdfd4b6a",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "id": 121563511177,
+      "name": "windows",
+      "conclusion": "success",
+      "started_at": "2026-10-26T12:09:35Z",
+      "completed_at": "2026-10-26T12:15:06Z"
+    },
+    {
+      "id": 121563511366,
+      "name": "macos",
+      "conclusion": "success",
+      "started_at": "2026-10-26T12:09:35Z",
+      "completed_at": "2026-10-26T12:14:57Z"
+    }
   ],
-  "macos_auval": "passed",
-  "macos_signature": "ad-hoc verified",
-  "gumroad_upload": "not performed: no authenticated editor tool",
-  "post_download_local_binary_verification": "unrun: artifact storage network denial",
   "artifacts": [
     {
-      "digest": "sha256:fe71dbd64ef6a71e31cda02ce62258e5fd1b0603467d1ac9fae2850d0e80b83c",
-      "id": 12556491264,
-      "name": "Tatree-2-macOS-universal-tested",
-      "size_in_bytes": 66533762
-    },
-    {
-      "digest": "sha256:eb58bfada8445819c4002c6036168da26222c16bbdcacc432123d76dc95bbf9e",
-      "id": 12556376693,
-      "name": "macOS-validation-evidence",
-      "size_in_bytes": 30098225
-    },
-    {
-      "digest": "sha256:8c32272f97f8eed3b8b9eac53ca938bb0f5ed4f7a067a2205239ebf5aede6253",
-      "id": 12556048528,
-      "name": "Tatree-2-Windows-x64-tested",
-      "size_in_bytes": 53017107
-    },
-    {
-      "digest": "sha256:a18c8fcaf814a100a4be4cd4a0902d53cba14191d8504136641c28c7c1dec4e8",
-      "id": 12555719730,
+      "id": 12649081557,
       "name": "Windows-validation-evidence",
-      "size_in_bytes": 29767426
+      "size_in_bytes": 29753674,
+      "digest": "sha256:c734b4d40ca941f8c42a08541a12a276194c54476f234c552eee3460b46baa45",
+      "url": "https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40320381346/artifacts/12649081557"
+    },
+    {
+      "id": 12648702859,
+      "name": "Tatree-2-macOS-universal-tested",
+      "size_in_bytes": 66538620,
+      "digest": "sha256:94b31825bf3c3e40302134acef99ab2b1e71ae91708c5b79cb14dd5b45275a5d",
+      "url": "https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40320381346/artifacts/12648702859"
+    },
+    {
+      "id": 12648308649,
+      "name": "Tatree-2-Windows-x64-tested",
+      "size_in_bytes": 53004393,
+      "digest": "sha256:b4aa6067e06943b1ae9226823491bb7ca2e6762b51a6d16260a718c74e589fe9",
+      "url": "https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40320381346/artifacts/12648308649"
+    },
+    {
+      "id": 12647944349,
+      "name": "macOS-validation-evidence",
+      "size_in_bytes": 30084590,
+      "digest": "sha256:61635715b94dcb33c986275ab5ad3333239c14de1bd75f8d157178011355bc97",
+      "url": "https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40320381346/artifacts/12647944349"
     }
   ]
 }

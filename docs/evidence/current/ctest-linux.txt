@@ -1,9 +1,9 @@
 Test project /workspace/Tatreenoise-Remover/build
     Start 1: audio-and-motion
-1/2 Test #1: audio-and-motion .................   Passed    1.14 sec
+1/2 Test #1: audio-and-motion .................   Passed    0.59 sec
     Start 2: speech-preservation
-2/2 Test #2: speech-preservation ..............   Passed    1.72 sec
+2/2 Test #2: speech-preservation ..............   Passed    0.93 sec
 
 100% tests passed out of 2
 
-Total Test time (real) =   2.86 sec
+Total Test time (real) =   1.52 sec

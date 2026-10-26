@@ -1,3 +1,4 @@
+Fontconfig error: No writable cache directories
 Captured idle; state=0
 Native knobs, gain trims, five buttons, exact numeric edits and invalid-input handling passed
 Captured noise; state=1

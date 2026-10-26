@@ -1,8 +1,16 @@
-## 2.1.0 free update — validation in progress
+# Current validation — 2.1.0 free
 
-Removed the entire trial/key-verification implementation. Audio processor, DSP and audio tests are identical to the accepted 2.0.4 source; the only product UI change is an optional top-right Ko-fi tip button. No startup requests, trial timer, activation controls or payment gating remain. Windows/Mac native builds are pending for this update.
+Native Windows and Mac validation **passed** on [run 40320381346](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40320381346), source commit `b3ab9d57b4c0fffb4e853e345d8a3ce8fdfd4b6a`.
 
-# Current validation — 2.0.4
+- [Windows x64 free package](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40320381346/artifacts/12648308649): MSVC build, audio/speech tests, native UI with optional Ko-fi tip, pluginval strictness 5, package guards and hash-bound packaging passed.
+- [Mac Universal free package](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40320381346/artifacts/12648702859): AU/VST3/Standalone, both architectures, audio/speech tests, native UI, ad-hoc signatures and `auval` passed. Not Developer ID notarized.
+- Local CTest 2/2 and all native audio/UI/caption/resize scenarios passed. Current screenshots/logs are in `docs/evidence/current/`.
+- No trial timer, licence-key verification, activation UI, payment gating or startup network requests remain. The only product UI change from accepted 2.0.4 is the optional top-right **TIP / KO-FI** button, opening `https://ko-fi.com/yuaylooper` only on a user click. Automated tests do not open the external browser; the owner-provided profile URL has not been independently checked.
+- Processor, DSP, Motion, speech-caption logic and audio tests match accepted commit `9fe5511` byte-for-byte. Hash evidence: `docs/evidence/current/source-scope.json`.
+- Run IDs, artifact sizes and outer ZIP digests: `docs/evidence/current/platform-run.json`. This cloud has not downloaded and rechecked the final platform ZIPs; package binary binding is verified inside CI.
+- Gumroad price/settings/files have **not** been changed by this environment; the free listing handoff is in `docs/GUMROAD.md`.
+
+## Historical 2.0.4 validation
 
 Latest changes: no startup/idle speech banner; new Breath control caption; compact source tree; one-click Universal Mac build helper. Native Windows and Mac CI validation **passed** on [run 40083443048](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40083443048), source commit `f1bd09ef65dbb980a62f8d9b57d6fd6ff2f5f798`.
 

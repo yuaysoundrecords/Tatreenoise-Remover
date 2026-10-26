@@ -2,9 +2,9 @@
 
 Product: https://benjilennon.gumroad.com/l/rsecg
 
-Windows download: https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40083443048/artifacts/12556048528
+Windows download: https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40320381346/artifacts/12648308649
 
-Mac Universal test build: https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40083443048/artifacts/12556491264 (ad-hoc signed, not a notarized public installer).
+Mac Universal test build: https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40320381346/artifacts/12648702859 (ad-hoc signed, not a notarized public installer).
 
 Upload the validated Windows ZIP and Mac Universal binary ZIP as the two customer downloads. The source kit is optional developer material. GitHub artifact downloads wrap the actual package ZIP: extract the outer artifact once and upload the inner platform ZIP to Gumroad, so customers do not receive unnecessary nested archives. After both new uploads complete, remove all older downloadable versions from this product, as explicitly requested by the owner. Keep recovery copies outside the customer download list. Version 2 has different plugin IDs from v1; it does not replace v1 instances in existing sessions. Label Mac binaries as ad-hoc signed and not Apple-notarized. No pricing/licence change or subscriber email is included in this update.
 

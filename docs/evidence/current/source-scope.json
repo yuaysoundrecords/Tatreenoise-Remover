@@ -1,0 +1,41 @@
+{
+  "commit": "b3ab9d57b4c0fffb4e853e345d8a3ce8fdfd4b6a",
+  "accepted_baseline": "9fe5511",
+  "files": [
+    {
+      "path": "Source/PluginProcessor.cpp",
+      "unchanged_from_accepted_source": true,
+      "sha256": "c1bca21438bdb0c22e528f79316410f2541a6bc6088713226b6cc30c699bf7b3"
+    },
+    {
+      "path": "Source/PluginProcessor.h",
+      "unchanged_from_accepted_source": true,
+      "sha256": "884e0639eadc5f09e00b9291b15ae3749d629aa29e29dea06ed7b882d6f2b15b"
+    },
+    {
+      "path": "Source/AutoGain.h",
+      "unchanged_from_accepted_source": true,
+      "sha256": "e485827b3081297faabf63d455a5ef4dcec499b37ed67fb67ccdbc8bb7bbb1c4"
+    },
+    {
+      "path": "Source/Denoiser.h",
+      "unchanged_from_accepted_source": true,
+      "sha256": "b1837e7144f455586f09b3f1fce454425511b2499c57be932a65d4da2578878d"
+    },
+    {
+      "path": "Source/MotionState.h",
+      "unchanged_from_accepted_source": true,
+      "sha256": "4404823cd980e7c0489102b3435195f8e91bd3f0dcbd1eb1935e3095e3ac3f19"
+    },
+    {
+      "path": "Source/SpeechFeedback.h",
+      "unchanged_from_accepted_source": true,
+      "sha256": "8a2adc717c84e8c9852448f64082cf680e250cb32218e8402217abc64109c3d6"
+    },
+    {
+      "path": "tests/Tests.cpp",
+      "unchanged_from_accepted_source": true,
+      "sha256": "3e938ccacaca14813c16f5a2963f9d7239e579599dff3bc51c9815283d1a3106"
+    }
+  ]
+}
