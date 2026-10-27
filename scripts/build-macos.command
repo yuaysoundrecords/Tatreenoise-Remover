@@ -93,6 +93,20 @@ cp "scripts/1.Mac กดอันนี้ก่อนครับ - Mac Start w
 cp docs/MACOS-APPROVAL-TH-EN.txt "$CUSTOMER_STAGE/INSTALL-TH-EN.txt"
 (cd "$CUSTOMER_STAGE" && shasum -a 256 * > SHA256SUMS.txt)
 ditto -c -k --sequesterRsrc "$CUSTOMER_STAGE" "$BUILD_DIR/installer/Tatree-$VERSION-macOS-Setup.zip"
+python3 - "$BUILD_DIR/installer/Tatree-$VERSION-macOS-Setup.zip" "$CUSTOMER_STAGE" <<'PYZIP'
+import hashlib,pathlib,sys,zipfile
+stage=pathlib.Path(sys.argv[2])
+with zipfile.ZipFile(sys.argv[1]) as z:
+    assert z.testzip() is None
+    entries={i.filename:i for i in z.infolist() if not i.is_dir() and not i.filename.startswith('__MACOSX/')}
+    expected={p.name for p in stage.iterdir() if p.is_file()}
+    assert set(entries)==expected, 'Unexpected customer ZIP entries'
+    for name,entry in entries.items():
+        assert hashlib.sha256(z.read(name)).digest()==hashlib.sha256((stage/name).read_bytes()).digest(), name
+    helper='1.Mac กดอันนี้ก่อนครับ - Mac Start with This!.command'
+    assert (entries[helper].external_attr >> 16) & 0o111, 'Helper lost executable permissions'
+print('PASS Mac customer ZIP contents, binary binding, UTF-8 helper name and executable mode')
+PYZIP
 rm -rf "$CUSTOMER_STAGE"
 printf '\nBuild, automated audio/UI tests and ad-hoc signature checks passed.\n%s/package\n' "$BUILD_DIR"
 echo 'Local test build; Developer ID notarization and real DAW listening are separate release checks.'

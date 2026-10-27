@@ -7,6 +7,15 @@ $Build = [IO.Path]::GetFullPath((Join-Path $Root $BuildDirectory))
 $VersionLine = Get-Content (Join-Path $Build 'CMakeCache.txt') | Where-Object { $_ -match '^CMAKE_PROJECT_VERSION:STATIC=' }
 $Version = ($VersionLine -split '=',2)[1]
 $Setup = Join-Path $Build "installer/Tatree-$Version-Windows-x64-Setup.exe"
+$Zip = Join-Path $Build "installer/Tatree-$Version-Windows-Setup.zip"
+$Extracted = Join-Path $Build 'validation/setup-download'
+Expand-Archive -Path $Zip -DestinationPath $Extracted -Force
+$Entries = @(Get-ChildItem $Extracted -Recurse -File)
+if ($Entries.Count -ne 2 -or -not (Test-Path (Join-Path $Extracted 'INSTALL-TH-EN.txt'))) { throw 'Unexpected customer Setup archive contents.' }
+$DownloadedSetup = Join-Path $Extracted (Split-Path $Setup -Leaf)
+if ((Get-FileHash $DownloadedSetup).Hash -ne (Get-FileHash $Setup).Hash) { throw 'Customer Setup archive binary mismatch.' }
+$Setup = $DownloadedSetup
+Write-Host 'PASS customer ZIP contains only Setup and bilingual guide; installer bytes match'
 $Target = Join-Path $env:CommonProgramW6432 'VST3/Tatree Noise Remover 2.vst3'
 $AppDir = Join-Path $env:ProgramW6432 'Yuay Sound Records/Tatree Noise Remover 2'
 $LogDir = Join-Path $Build 'validation'
