@@ -5,4 +5,7 @@ for bundle in '/Library/Audio/Plug-Ins/Components/Tatree Noise Remover 2.compone
   /usr/bin/codesign --verify --deep --strict "$bundle"
 done
 /usr/bin/touch /Library/Audio/Plug-Ins/Components
+# Installer runs as root and can refresh both system and per-user registrars.
+# This is the metadata service, not a DAW or audio engine. No trust policy changes.
+/usr/bin/killall AudioComponentRegistrar 2>/dev/null || true
 echo 'Tatree installed. Open your DAW as your normal user and rescan plug-ins.'

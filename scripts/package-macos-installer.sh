@@ -53,6 +53,15 @@ for i in 0 1 2; do
     codesign --verify --deep --strict "$bundle"
   fi
 done
+# Do not ship build-machine ACLs or private directory modes to system loaders.
+# This changes only the temporary payload, never Gatekeeper/quarantine policy.
+chmod -RN "$payload"
+find "$payload" -type d -exec chmod 755 {} +
+find "$payload" -type f -exec chmod 644 {} +
+for relative in "${destinations[@]}"; do
+  chmod 755 "$payload/$relative/Contents/MacOS/Tatree Noise Remover 2"
+  codesign --verify --deep --strict "$payload/$relative"
+done
 cp "$ROOT/macos/installer/preinstall" "$ROOT/macos/installer/postinstall" "$work/scripts/"
 chmod 755 "$work/scripts/"*
 pkgbuild --analyze --root "$payload" "$work/components.plist"
@@ -67,7 +76,7 @@ for c in components:
 with open(p,'wb') as f: plistlib.dump(components,f)
 PY
 pkgbuild --root "$payload" --component-plist "$work/components.plist" --scripts "$work/scripts" \
-  --install-location / --identifier net.yuaysoundrecords.tatree2.installer --version "$version" "$work/TatreePayload.pkg"
+  --ownership recommended --install-location / --identifier net.yuaysoundrecords.tatree2.installer --version "$version" "$work/TatreePayload.pkg"
 cat > "$work/Distribution.xml" <<EOF
 <?xml version="1.0" encoding="utf-8"?>
 <installer-gui-script minSpecVersion="2">
