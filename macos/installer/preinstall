@@ -1,0 +1,37 @@
+#!/bin/bash
+set -euo pipefail
+fail() { echo "Tatree: $*" >&2; exit 1; }
+[[ "${3:-/}" == / ]] || fail 'Install on the running Mac startup disk only.'
+
+# Never terminate a host: its project may contain unsaved work.
+while IFS= read -r process; do
+  case "$process" in
+    *'/Logic Pro.app/'*|*'/GarageBand.app/'*|*'/Ableton Live '*|*'/REAPER.app/'*|*'/Cubase '*|*'/Nuendo '*|*'/Studio One '*|*'/Pro Tools.app/'*|*'/Bitwig Studio.app/'*|*'/FL Studio.app/'*|*'/Tatree Noise Remover 2.app/'*|*'/AUHostingService'*|*'/AUHostingCompatibilityService'*)
+      fail "Close your DAW and Tatree before installing, then try again. Running: $process" ;;
+  esac
+done < <(/bin/ps -axo comm=)
+
+# Old manually installed per-user copies take precedence in some hosts. Leave
+# them untouched and ask the owner to move them outside the scan paths first.
+console_user=$(/usr/bin/stat -f '%Su' /dev/console)
+if [[ "$console_user" != root && "$console_user" != loginwindow ]]; then
+  user_home=$(/usr/bin/dscl . -read "/Users/$console_user" NFSHomeDirectory | /usr/bin/sed 's/^NFSHomeDirectory: //')
+  [[ "$user_home" == /* ]] || fail 'Could not locate the logged-in user home folder.'
+  for relative in 'Components/Tatree Noise Remover 2.component' 'VST3/Tatree Noise Remover 2.vst3'; do
+    old="$user_home/Library/Audio/Plug-Ins/$relative"
+    if [[ -e "$old" || -L "$old" ]]; then
+      fail "Move the older per-user Tatree copy to a backup folder outside Audio/Plug-Ins, then retry: $old"
+    fi
+  done
+fi
+
+backup="/Library/Application Support/Yuay Sound Records/Tatree/Backups/$(date -u +%Y%m%dT%H%M%SZ)-$$"
+for relative in 'Library/Audio/Plug-Ins/Components/Tatree Noise Remover 2.component' 'Library/Audio/Plug-Ins/VST3/Tatree Noise Remover 2.vst3' 'Applications/Tatree Noise Remover 2.app'; do
+  destination="/$relative"
+  [[ ! -L "$destination" ]] || fail "Refusing to replace a symbolic link: $destination"
+  if [[ -e "$destination" ]]; then
+    /bin/mkdir -p "$backup/$(dirname "$relative")"
+    /usr/bin/ditto "$destination" "$backup/$relative"
+    echo "Tatree: backed up $destination to $backup/$relative"
+  fi
+done

@@ -7,7 +7,7 @@ on:
         type: boolean
         default: false
   push:
-    paths: ['Source/**', 'assets/**', 'tests/**', 'scripts/**', 'CMakeLists.txt', '.github/workflows/build.yml']
+    paths: ['Source/**', 'assets/**', 'tests/**', 'scripts/**', 'macos/**', 'CMakeLists.txt', '.github/workflows/build.yml']
   pull_request:
 permissions:
   contents: read
@@ -75,4 +75,11 @@ jobs:
         with:
           name: Tatree-2-macOS-universal-tested
           path: build-macos/package/*.zip
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Tatree-2-macOS-Setup-UNSIGNED-TEST
+          path: |
+            build-macos/installer/*.pkg
+            build-macos/installer/*.sha256
           if-no-files-found: error

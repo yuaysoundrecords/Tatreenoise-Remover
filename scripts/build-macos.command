@@ -73,6 +73,13 @@ if [[ -f "$BUILD_DIR/validation/auval.txt" ]]; then cp "$BUILD_DIR/validation/au
 # Include validation text in the checksum manifest as well.
 (cd "$STAGE" && find . -type f ! -name SHA256SUMS.txt -exec shasum -a 256 {} \; > SHA256SUMS.txt)
 ditto -c -k --sequesterRsrc --keepParent "$STAGE" "$BUILD_DIR/package/Tatree-2-macOS-$FLAVOR.zip"
+VERSION=$(sed -n 's/^CMAKE_PROJECT_VERSION:STATIC=//p' "$BUILD_DIR/CMakeCache.txt")
+bash scripts/package-macos-installer.sh --stage "$STAGE" --output "$BUILD_DIR/installer" --version "$VERSION" --test-unsigned
+if [[ "${CI:-}" == true ]]; then
+  if ! bash tests/MacInstallerTests.sh "$BUILD_DIR/installer/Tatree-$VERSION-macOS-Setup-UNSIGNED-TEST.pkg" "$STAGE" "$BUILD_DIR/validation" > "$BUILD_DIR/validation/installer-tests.txt" 2>&1; then
+    cat "$BUILD_DIR/validation/installer-tests.txt"; exit 1
+  fi
+fi
 printf '\nBuild, automated audio/UI tests and ad-hoc signature checks passed.\n%s/package\n' "$BUILD_DIR"
 echo 'Local test build; Developer ID notarization and real DAW listening are separate release checks.'
 if [[ "${CI:-}" != true ]]; then open "$BUILD_DIR/package"; fi

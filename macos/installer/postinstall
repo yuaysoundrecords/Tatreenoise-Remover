@@ -1,0 +1,8 @@
+#!/bin/bash
+set -euo pipefail
+# Verify files without executing plug-in code or launching a host as root.
+for bundle in '/Library/Audio/Plug-Ins/Components/Tatree Noise Remover 2.component' '/Library/Audio/Plug-Ins/VST3/Tatree Noise Remover 2.vst3' '/Applications/Tatree Noise Remover 2.app'; do
+  /usr/bin/codesign --verify --deep --strict "$bundle"
+done
+/usr/bin/touch /Library/Audio/Plug-Ins/Components
+echo 'Tatree installed. Open your DAW as your normal user and rescan plug-ins.'

@@ -6,6 +6,10 @@
 
 Free, with all features available and no time limit or activation key. The optional TIP / KO-FI button opens Yuaylooper’s donation page only when clicked.
 
+## ติดตั้งผ่าน Setup
+
+มีตัวติดตั้ง native `.pkg` สำหรับลง AU/VST3 และ Standalone ให้ทุกบัญชี โดยตรวจว่า DAW ปิดแล้วและสำรองรุ่นเดิมก่อน ตัวที่ชื่อ **UNSIGNED-TEST** ยังไม่ได้ notarize กับ Apple และไม่รับรองว่าจะผ่าน Gatekeeper หลังดาวน์โหลด ดู [ขั้นตอนติดตั้งและสถานะ Gatekeeper](MACOS-INSTALLER.md)
+
 ## เริ่มครั้งแรก
 
 1. เปิด Terminal รัน `xcode-select --install` และติดตั้ง Apple Command Line Tools ให้เสร็จ

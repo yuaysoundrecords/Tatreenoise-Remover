@@ -1,4 +1,4 @@
-# Tatree Noise Remover 2.1.0 — free
+# Tatree Noise Remover 2.1.1 — free
 
 Native audio cleanup plugin by Yuay Sound Records. Cream/cobalt Thai indie UI, colour lawyer and audio-driven Motion FX. Mono/stereo VST3 + Standalone on Windows; Universal AU/VST3/Standalone source build on macOS 11+.
 
@@ -14,6 +14,10 @@ Version **2.1.0 free** passed native Windows and Mac validation on [run 40320381
 ## Free to use
 
 All features are free, with no trial timer, activation key, account or payment requirement. The optional **TIP / KO-FI** button at the top right opens [Yuaylooper on Ko-fi](https://ko-fi.com/yuaylooper) only when clicked. Tipping does not unlock or change any feature.
+
+## Mac installer
+
+Native `.pkg` setup is being added with host-close checks, backups, fixed AU/VST3/App paths and vendor verification. The owner has no Apple Developer membership, so the test installer is unsigned and **does not establish Gatekeeper approval**. [Installer and notarization details](docs/MACOS-INSTALLER.md).
 
 ## Build and test
 

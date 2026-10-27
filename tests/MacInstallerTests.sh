@@ -1,0 +1,87 @@
+#!/bin/bash
+set -euo pipefail
+[[ "$(uname -s)" == Darwin && "${CI:-}" == true ]] || { echo 'Run on a disposable Mac CI runner only.' >&2; exit 1; }
+pkg="$1"; stage="$2"; evidence="$3"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+mkdir -p "$evidence"
+work=$(mktemp -d "${TMPDIR:-/tmp}/tatree-installer-tests.XXXXXX")
+trap 'rm -rf "$work"' EXIT
+
+# Product releases must never silently fall back to unsigned packaging.
+if bash "$ROOT/scripts/package-macos-installer.sh" --stage "$stage" --output "$work/should-not-exist" --version 2.1.1 > "$work/release-guard.txt" 2>&1; then
+  echo 'FAIL release without Developer ID was accepted' >&2; exit 1
+fi
+grep -q 'No unsigned fallback' "$work/release-guard.txt"
+echo 'PASS release requires signing and notarization credentials'
+
+# Exercise the actual preflight, with a harmless process using a host-like name.
+mkdir -p "$work/Logic Pro.app/Contents/MacOS"
+cp /bin/sleep "$work/Logic Pro.app/Contents/MacOS/Logic Pro"
+"$work/Logic Pro.app/Contents/MacOS/Logic Pro" 30 &
+fake_pid=$!
+sleep .3
+host_blocked=false
+if ! bash "$ROOT/macos/installer/preinstall" dummy 0 / > "$work/open-host.txt" 2>&1; then host_blocked=true; fi
+kill "$fake_pid" 2>/dev/null || true
+wait "$fake_pid" 2>/dev/null || true
+[[ "$host_blocked" == true ]]
+grep -q 'Close your DAW' "$work/open-host.txt"
+echo 'PASS preflight refuses installation while a DAW is running without killing it'
+
+pkgutil --expand-full "$pkg" "$work/expanded"
+for relative in 'Library/Audio/Plug-Ins/Components/Tatree Noise Remover 2.component/Contents/MacOS/Tatree Noise Remover 2' 'Library/Audio/Plug-Ins/VST3/Tatree Noise Remover 2.vst3/Contents/MacOS/Tatree Noise Remover 2' 'Applications/Tatree Noise Remover 2.app/Contents/MacOS/Tatree Noise Remover 2'; do
+  test -f "$work/expanded/TatreePayload.pkg/Payload/$relative"
+done
+echo 'PASS installer contains AU, VST3 and Standalone at fixed system paths'
+
+# The prior build validation installs its own AU fixture in the runner home.
+# Move only that exact fixture outside the scan path before installation.
+user_au="$HOME/Library/Audio/Plug-Ins/Components/Tatree Noise Remover 2.component"
+if [[ -d "$user_au" ]]; then
+  cmp "$user_au/Contents/MacOS/Tatree Noise Remover 2" "$stage/AU/Tatree Noise Remover 2.component/Contents/MacOS/Tatree Noise Remover 2"
+  mv "$user_au" "$work/previous-ci-au.component"
+fi
+
+# Seed a real prior system copy, then verify it is preserved outside scan paths.
+global_au='/Library/Audio/Plug-Ins/Components/Tatree Noise Remover 2.component'
+sudo mkdir -p '/Library/Audio/Plug-Ins/Components'
+sudo ditto "$stage/AU/Tatree Noise Remover 2.component" "$global_au"
+marker="tatree-ci-backup-$$.txt"
+echo 'Installer backup fixture' | sudo tee "$global_au/$marker" >/dev/null
+sudo /usr/sbin/installer -pkg "$pkg" -target / > "$evidence/installer-install.txt" 2>&1 || { cat "$evidence/installer-install.txt"; exit 1; }
+test ! -e "$global_au/$marker"
+sudo find '/Library/Application Support/Yuay Sound Records/Tatree/Backups' -name "$marker" -print > "$evidence/installer-backup.txt"
+test -s "$evidence/installer-backup.txt"
+echo 'PASS native Installer replaces old copy and preserves backup'
+
+sources=('AU/Tatree Noise Remover 2.component' 'VST3/Tatree Noise Remover 2.vst3' 'Standalone/Tatree Noise Remover 2.app')
+destinations=('/Library/Audio/Plug-Ins/Components/Tatree Noise Remover 2.component' '/Library/Audio/Plug-Ins/VST3/Tatree Noise Remover 2.vst3' '/Applications/Tatree Noise Remover 2.app')
+for i in 0 1 2; do
+  cmp "$stage/${sources[$i]}/Contents/MacOS/Tatree Noise Remover 2" "${destinations[$i]}/Contents/MacOS/Tatree Noise Remover 2"
+  codesign --verify --deep --strict "${destinations[$i]}"
+  lipo "${destinations[$i]}/Contents/MacOS/Tatree Noise Remover 2" -verify_arch arm64 x86_64
+done
+echo 'PASS installed binaries match tested stage and remain signed Universal bundles'
+
+INFO="$global_au/Contents/Info.plist"
+TYPE=$(/usr/libexec/PlistBuddy -c 'Print :AudioComponents:0:type' "$INFO")
+SUBTYPE=$(/usr/libexec/PlistBuddy -c 'Print :AudioComponents:0:subtype' "$INFO")
+MAKER=$(/usr/libexec/PlistBuddy -c 'Print :AudioComponents:0:manufacturer' "$INFO")
+NAME=$(/usr/libexec/PlistBuddy -c 'Print :AudioComponents:0:name' "$INFO")
+[[ "$NAME" == 'Yuay Sound Records:'* ]]
+VENDOR="$stage/VST3/Tatree Noise Remover 2.vst3/Contents/Resources/moduleinfo.json"
+python3 - "$VENDOR" <<'PY'
+import json,sys
+with open(sys.argv[1]) as f: m=json.load(f)
+assert m['Factory Info']['Vendor']=='Yuay Sound Records',m['Factory Info']
+PY
+echo 'PASS AU manufacturer name and VST3 vendor are Yuay Sound Records'
+killall AudioComponentRegistrar 2>/dev/null || true
+for attempt in 1 2 3 4 5; do
+  auval -a > "$evidence/installer-au-list.txt" 2>&1
+  if grep -q "$SUBTYPE.*$MAKER" "$evidence/installer-au-list.txt"; then break; fi
+  sleep 2
+done
+auval -v "$TYPE" "$SUBTYPE" "$MAKER" > "$evidence/installer-auval.txt" 2>&1 || { cat "$evidence/installer-auval.txt"; exit 1; }
+echo 'PASS installed system AU passes auval as normal user'
+echo 'NOTE: unsigned CI installation is not proof of Gatekeeper approval on a quarantined customer download.'
