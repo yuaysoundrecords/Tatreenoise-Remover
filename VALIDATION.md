@@ -1,4 +1,8 @@
-# Current validation — 2.1.1 free / Mac setup
+# Current source — 2.1.2
+
+The illustrated Ko-fi badge and optional bilingual AU/VST3 approval helper are implemented. Shell syntax, UTF-8 ZIP entries, executable permissions and archive integrity were checked locally. Current platform CI results are not yet confirmed; GitHub authentication began returning HTTP 401 during this update. The helper has not been tested here with browser-quarantined current bundles on a customer Mac. Historical test evidence below applies only to its recorded versions.
+
+## Historical validation — 2.1.1 free / Mac setup
 
 Windows and Mac native validation **passed** on [run 40474891230](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230), source `c1d4e81d4f0bdc8b2b91cf886616b156b47fea5a`.
 

@@ -1,4 +1,4 @@
-# Tatree Noise Remover 2.1.1 — free
+# Tatree Noise Remover 2.1.2 — free
 
 Native audio cleanup plugin by Yuay Sound Records. Cream/cobalt Thai indie UI, colour lawyer and audio-driven Motion FX. Mono/stereo VST3 + Standalone on Windows; Universal AU/VST3/Standalone source build on macOS 11+.
 
@@ -7,9 +7,7 @@ Native audio cleanup plugin by Yuay Sound Records. Cream/cobalt Thai indie UI, c
 - No speech banner on startup. Five user-control captions appear for 3 seconds, including De-breath and both Auto Gain ON/OFF clicks.
 - Real IN/OUT/GR meters, automation/state recall, fixed 1024-sample latency and original-dry Bypass.
 
-[Windows 2.1.1 free ZIP](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230/artifacts/12721135234) · [Mac Universal test build](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230/artifacts/12721021342)
-
-Version **2.1.1 free** passed native Windows and Mac validation on [run 40474891230](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230). Mac builds have ad-hoc test signatures, not Developer ID notarization. For a local Mac build use the source kit and BUILD-MAC.command below.
+Version **2.1.2** adds the illustrated Ko-fi badge and a bilingual optional Mac AU/VST3 approval helper. Current platform packages must be rebuilt and verified before publication. Older binary download links have been removed to prevent version confusion.
 
 ## Free to use
 
@@ -17,7 +15,7 @@ All features are free, with no trial timer, activation key, account or payment r
 
 ## Mac installer
 
-[Download native Mac Setup (UNSIGNED TEST)](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230/artifacts/12721595164). Fresh installation, upgrade/backup, installed AU validation, bundle identities and **Yuay Sound Records** vendor checks passed. The installer is not Apple-notarized and **does not establish Gatekeeper approval** after a browser download. [Installer and notarization details](docs/MACOS-INSTALLER.md).
+The build creates an **UNSIGNED-TEST** native installer and a separate optional approval helper named **1.Mac กดอันนี้ก่อนครับ - Mac Start with This!.command**. Install first, close the DAW, then review the helper before confirming. It removes quarantine only from the exact listed Tatree AU/VST3 bundles; it does not notarize the software or disable Gatekeeper globally. Customer archives contain installation instructions and required notices, without internal reports. [Installer details](docs/MACOS-INSTALLER.md).
 
 ## Build and test
 
