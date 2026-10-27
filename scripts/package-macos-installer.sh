@@ -31,6 +31,9 @@ work=$(mktemp -d "${TMPDIR:-/tmp}/tatree-installer.XXXXXX")
 trap 'rm -rf "$work"' EXIT
 payload="$work/payload"
 mkdir -p "$payload/Library/Audio/Plug-Ins/Components" "$payload/Library/Audio/Plug-Ins/VST3" "$payload/Applications" "$work/scripts"
+notices="$payload/Library/Application Support/Yuay Sound Records/Tatree/Licenses"
+mkdir -p "$notices"
+cp "$ROOT/THIRD_PARTY.md" "$ROOT/assets/OFL-Anton.txt" "$ROOT/assets/OFL-NotoSansThai.txt" "$notices/"
 sources=('AU/Tatree Noise Remover 2.component' 'VST3/Tatree Noise Remover 2.vst3' 'Standalone/Tatree Noise Remover 2.app')
 destinations=('Library/Audio/Plug-Ins/Components/Tatree Noise Remover 2.component' 'Library/Audio/Plug-Ins/VST3/Tatree Noise Remover 2.vst3' 'Applications/Tatree Noise Remover 2.app')
 for i in 0 1 2; do

@@ -35,6 +35,10 @@ for relative in 'Library/Audio/Plug-Ins/Components/Tatree Noise Remover 2.compon
   test -f "$work/expanded/TatreePayload.pkg/Payload/$relative"
 done
 echo 'PASS installer contains AU, VST3 and Standalone at fixed system paths'
+for notice in THIRD_PARTY.md OFL-Anton.txt OFL-NotoSansThai.txt; do
+  test -f "$work/expanded/TatreePayload.pkg/Payload/Library/Application Support/Yuay Sound Records/Tatree/Licenses/$notice"
+done
+echo 'PASS installer includes third-party and embedded-font license notices'
 
 # The prior build validation installs its own AU fixture in the runner home.
 # Move only that exact fixture outside the scan path before installation.
