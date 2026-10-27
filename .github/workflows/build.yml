@@ -84,6 +84,6 @@ jobs:
           path: |
             build-macos/installer/*.pkg
             build-macos/installer/*.sha256
-            build-macos/installer/Approve-Tatree.command
-            build-macos/installer/MACOS-APPROVAL-TH-EN.txt
+            build-macos/installer/1.Mac กดอันนี้ก่อนครับ - Mac Start with This!.command
+            build-macos/installer/INSTALL-TH-EN.txt
           if-no-files-found: error

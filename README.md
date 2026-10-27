@@ -27,6 +27,6 @@ All features are free, with no trial timer, activation key, account or payment r
 
 [Current validation](VALIDATION.md) · [UI and captions](docs/UI.md) · [Measured DSP comparison and limits](docs/DSP-QUALITY.md) · [Component licences](THIRD_PARTY.md)
 
-Audio processing works offline, with no activation checks or model downloads. Clicking TIP / KO-FI opens the external donation page in your browser; nothing opens automatically. Test builds are unsigned on Windows / ad-hoc signed on Mac; the owner accepted 2.0.4 in their DAW; Developer ID/notarization remains separate. Numerical fixtures do not establish perceptual or commercial parity.
+Audio processing works offline, with no activation checks or model downloads. Clicking TIP / KO-FI opens the external donation page in your browser; nothing opens automatically. Test builds are unsigned on Windows / ad-hoc signed on Mac; Developer ID/notarization remains separate. Numerical fixtures do not establish perceptual or commercial parity.
 
 Original v1 distribution and old design evidence are preserved in Git history and a verified recovery archive outside the active project; they are not needed to build v2. This source uses new IDs (`Yuay` / `Ttr2`) and does not replace v1 sessions. Original product: https://benjilennon.gumroad.com/l/rsecg .

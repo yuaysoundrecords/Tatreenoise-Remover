@@ -63,26 +63,28 @@ if [[ "${CI:-}" == true && "${TATREE_TEST_SYSTEM_INSTALL:-}" != 1 ]]; then
     cat "$BUILD_DIR/validation/au-list.txt" "$BUILD_DIR/validation/auval.txt"; exit 1
   fi
 fi
-cp docs/MACOS.md "$STAGE/READ-ME-MACOS.md"
-cp scripts/Approve-Tatree.command "$STAGE/Approve-Tatree.command"
-chmod 755 "$STAGE/Approve-Tatree.command"
-cp docs/MACOS-APPROVAL-TH-EN.txt "$STAGE/INSTALL-APPROVAL-TH-EN.txt"
+cp "scripts/1.Mac กดอันนี้ก่อนครับ - Mac Start with This!.command" "$STAGE/1.Mac กดอันนี้ก่อนครับ - Mac Start with This!.command"
+chmod 755 "$STAGE/1.Mac กดอันนี้ก่อนครับ - Mac Start with This!.command"
+cp docs/MACOS-APPROVAL-TH-EN.txt "$STAGE/INSTALL-TH-EN.txt"
 cp THIRD_PARTY.md assets/OFL-*.txt "$STAGE/"
 FLAVOR=universal
 if [[ "$ARCHS" != 'arm64;x86_64' ]]; then FLAVOR="${ARCHS//;/_}"; fi
-mkdir -p "$STAGE/validation"
-cp "$BUILD_DIR/validation/native-ui.txt" "$STAGE/validation/"
-if [[ -f "$BUILD_DIR/validation/auval.txt" ]]; then cp "$BUILD_DIR/validation/auval.txt" "$STAGE/validation/"; fi
-# Include validation text in the checksum manifest as well.
+# Validation evidence is uploaded separately; keep customer downloads clean.
+# Hash the complete customer package.
 (cd "$STAGE" && find . -type f ! -name SHA256SUMS.txt -exec shasum -a 256 {} \; > SHA256SUMS.txt)
 ditto -c -k --sequesterRsrc --keepParent "$STAGE" "$BUILD_DIR/package/Tatree-2-macOS-$FLAVOR.zip"
 VERSION=$(sed -n 's/^CMAKE_PROJECT_VERSION:STATIC=//p' "$BUILD_DIR/CMakeCache.txt")
 bash scripts/package-macos-installer.sh --stage "$STAGE" --output "$BUILD_DIR/installer" --version "$VERSION" --test-unsigned
-cp scripts/Approve-Tatree.command docs/MACOS-APPROVAL-TH-EN.txt "$BUILD_DIR/installer/"
+cp "scripts/1.Mac กดอันนี้ก่อนครับ - Mac Start with This!.command" "$BUILD_DIR/installer/"
+cp docs/MACOS-APPROVAL-TH-EN.txt "$BUILD_DIR/installer/INSTALL-TH-EN.txt"
 if [[ "${CI:-}" == true && "${TATREE_TEST_SYSTEM_INSTALL:-}" == 1 ]]; then
   if ! bash tests/MacInstallerTests.sh "$BUILD_DIR/installer/Tatree-$VERSION-macOS-Setup-UNSIGNED-TEST.pkg" "$STAGE" "$BUILD_DIR/validation" > "$BUILD_DIR/validation/installer-tests.txt" 2>&1; then
     cat "$BUILD_DIR/validation/installer-tests.txt"; exit 1
   fi
+fi
+if [[ "${CI:-}" == true && "${TATREE_TEST_SYSTEM_INSTALL:-}" == 1 ]]; then
+  printf '\n\n' | bash "scripts/1.Mac กดอันนี้ก่อนครับ - Mac Start with This!.command" > "$BUILD_DIR/validation/approval-cancel.txt"
+  grep -q 'Cancelled. No files were changed.' "$BUILD_DIR/validation/approval-cancel.txt"
 fi
 printf '\nBuild, automated audio/UI tests and ad-hoc signature checks passed.\n%s/package\n' "$BUILD_DIR"
 echo 'Local test build; Developer ID notarization and real DAW listening are separate release checks.'

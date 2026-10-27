@@ -1,33 +1,57 @@
-Tatree Noise Remover 2 — ตัวช่วยสำหรับ Mac
+Tatree Noise Remover 2 — Yuay Sound Records
 
-ติดตั้งปลั๊กอินให้เรียบร้อย แล้วปิด DAW และตัวสแกนปลั๊กอินก่อน
-หาก macOS บล็อก Tatree VST3 และอนุญาตผ่าน Privacy & Security ไม่สำเร็จ
-คุณสามารถใช้ Approve-Tatree.command เมื่อเชื่อถือแหล่งดาวน์โหลดนี้เท่านั้น
+ติดตั้งบน Mac
+1. ปิด DAW และตัวสแกนปลั๊กอินก่อน
+2. หากดาวน์โหลดชุด Setup ให้เปิดไฟล์ .pkg เพื่อติดตั้ง
+   หากเป็นชุด ZIP ให้คัดลอก .vst3 ไป ~/Library/Audio/Plug-Ins/VST3
+   และ .component ไป ~/Library/Audio/Plug-Ins/Components
+   สร้างโฟลเดอร์หากยังไม่มี เลือกติดตั้งแบบเดียวเพื่อไม่ให้มีไฟล์ซ้ำ
+3. หาก macOS บล็อก ให้ลองอนุญาตใน System Settings > Privacy & Security
+4. หากยังเปิดไม่ได้ และเชื่อถือแหล่งดาวน์โหลดนี้ ให้ดับเบิลคลิก
+   1.Mac กดอันนี้ก่อนครับ - Mac Start with This!.command
+   ใช้ก่อนเปิด DAW แต่ต้องติดตั้งปลั๊กอินแล้วเท่านั้น
+5. อ่านเส้นทางเป้าหมาย พิมพ์ YES เพื่อยืนยัน หรือ Enter เพื่อยกเลิก
+   ใส่รหัสผ่าน Mac หากระบบถาม ขณะพิมพ์จะไม่แสดงตัวอักษร
+6. เมื่อขึ้น Done ให้เปิด DAW แล้วสแกน Tatree ใหม่
+   หากขึ้นข้อผิดพลาด ให้หยุดและติดต่อผู้พัฒนา อย่าถือว่าทำสำเร็จแล้ว
 
-ดับเบิลคลิกไฟล์ อ่านเส้นทางเป้าหมาย แล้วพิมพ์ YES เพื่อยืนยัน
-หากถาม Password ให้ใส่รหัสผ่าน Mac ขณะพิมพ์จะไม่แสดงตัวอักษร
-เมื่อขึ้น Done ให้เปิด DAW แล้วสแกน Tatree ใหม่
-หากไม่พบปลั๊กอินหรือมีข้อผิดพลาด ให้หยุดและติดต่อผู้พัฒนา
+ตัวช่วยถอด quarantine เฉพาะ Tatree AU/VST3 ที่แสดง ไม่เปลี่ยน Standalone
+ไม่ปิด Gatekeeper ทั้งเครื่อง ไม่ใช่ Developer ID หรือ notarization จาก Apple
+macOS อาจบล็อกตัวช่วยเองด้วย อนุญาตเฉพาะไฟล์ที่เชื่อถือใน Privacy & Security
+ลายเซ็น ad-hoc ที่ตรวจผ่านยืนยันความสมบูรณ์ ไม่ได้ยืนยันตัวตนผู้พัฒนา
+ความเข้ากันได้ขึ้นอยู่กับ macOS และ DAW ที่ใช้
 
-ตัวช่วยนี้ถอด quarantine เฉพาะ Tatree VST3 ไม่อนุมัติ AU หรือ Standalone
-ไม่ปิด Gatekeeper ทั้งเครื่อง ไม่ใช่การรับรองจาก Apple และไม่ได้ notarize
-macOS อาจบล็อกตัวช่วยนี้เองด้วย ใช้ Privacy & Security เพื่ออนุญาตเฉพาะไฟล์ที่เชื่อถือ
-การตรวจลายเซ็นผ่านยืนยันความสมบูรณ์ของไฟล์ แต่ไม่ได้ยืนยันตัวตนผู้พัฒนา
+ใช้งานคร่าว ๆ
+วาง Tatree บนแทร็กเสียงร้อง เริ่มฟังเบา ๆ แล้วปรับ Noise, De-esser และ Breath
+ใช้ LISTEN ฟังสิ่งที่ตัดออก ถ้าได้ยินคำร้องมากไปให้ลดการประมวลผล
+Auto Gain ช่วยตั้งระดับเสียงร้องก่อนเข้า cleanup แต่ไม่ใช่ limiter
+ใช้ Input/Output ตั้งระดับ และ BYPASS เปรียบเทียบกับต้นฉบับ
+ใช้ฟรี ไม่จำกัดเวลา ไม่ต้องใช้คีย์ สนับสนุนได้ที่ https://ko-fi.com/yuaylooper
 
-Yuay Sound Records
+Mac installation
+1. Close your DAW and plug-in scanners.
+2. For the Setup download, open the .pkg installer.
+   For the ZIP download, copy .vst3 to ~/Library/Audio/Plug-Ins/VST3
+   and .component to ~/Library/Audio/Plug-Ins/Components.
+   Create missing folders. Choose one method to avoid duplicate installations.
+3. If macOS blocks the plug-in, try System Settings > Privacy & Security approval.
+4. If it still will not open and you trust the download source, double-click
+   1.Mac กดอันนี้ก่อนครับ - Mac Start with This!.command
+   Use it before opening the DAW, but only AFTER installing the plug-in.
+5. Review the target paths. Type YES to confirm, or Enter to cancel.
+   Enter your Mac password if prompted; typing is hidden.
+6. After Done, open your DAW and rescan Tatree.
+   If an error appears, stop and contact the developer; success is not confirmed.
 
-Tatree Noise Remover 2 — Mac helper
+The helper removes quarantine only from the listed Tatree AU/VST3 bundles, not Standalone.
+It does not disable Gatekeeper globally and is not Developer ID signing or Apple notarization.
+macOS may block the helper itself. Approve only trusted files in Privacy & Security.
+A valid ad-hoc signature checks file integrity, not publisher identity.
+Compatibility depends on your macOS version and DAW.
 
-Install the plug-in first. Close your DAW and plug-in scanners.
-If macOS blocks Tatree VST3 and Privacy & Security approval does not work,
-you may use Approve-Tatree.command only if you trust this download source.
-
-Double-click the helper, review the target paths, and type YES to confirm.
-Enter your Mac password if prompted; typing is hidden.
-After Done, open your DAW and rescan Tatree.
-If the plug-in is missing or an error occurs, stop and contact the developer.
-
-This removes quarantine only from Tatree VST3, not AU or Standalone.
-It does not disable Gatekeeper globally and is not Apple notarization.
-macOS may block the helper itself. Use Privacy & Security to approve only files you trust.
-Signature verification checks file integrity, not publisher identity.
+Quick use
+Insert Tatree on a vocal track. Listen at a low level and adjust Noise, De-esser and Breath.
+LISTEN auditions the removed signal; reduce processing if it removes too much of the vocal.
+Auto Gain helps stage vocal levels before cleanup; it is not a limiter.
+Set Input/Output levels and compare with BYPASS.
+Free, with no time limit or activation key. Optional tips: https://ko-fi.com/yuaylooper

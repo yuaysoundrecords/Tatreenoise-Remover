@@ -1,4 +1,4 @@
-# Tatree 2.1.0 — Windows x64 (free)
+# Tatree 2.1.2 — Windows x64 (free)
 
 ใช้ฟรีทุกฟังก์ชัน ไม่จำกัดเวลา ไม่ต้องใส่คีย์ ปุ่ม TIP / KO-FI มุมขวาบนเปิด https://ko-fi.com/yuaylooper เมื่อกดเท่านั้น การให้ทิปเป็นทางเลือกและไม่มีผลต่อการใช้งาน
 
@@ -27,15 +27,3 @@ LISTEN ฟังเสียงที่ cleanup ตัดออก (หลั�
 ไม่มีคำพูดตอนเปิดโปรแกรม ขยับ Input/Output, Noise, De-esser, Breath จะขึ้นประโยคของปุ่มนั้นประมาณ 3 วินาที Auto Gain ขึ้นทั้ง ON และ OFF ดูข้อความครบใน [UI.md](https://github.com/yuaysoundrecords/Tatreenoise-Remover/blob/codex/windows-first-tatree2/docs/UI.md)
 
 Motion FX ปิดได้โดยไม่ปิดมิเตอร์/ข้อความ และการเปลี่ยนข้อความไม่สร้าง detector activity ขึ้นมาเอง
-
-## หลักฐานและตัวอย่างเสียง
-
-แพ็กเกจมี `validation/`, `checksums.json`, [รายงาน DSP](DSP-QUALITY.md), ตัวอย่าง [Auto Gain ก่อน](audio/vocal-gain-before.wav)/[หลัง](audio/vocal-gain-after.wav) และ [Noise ก่อน](audio/quality-speech-before.wav)/[หลัง](audio/quality-speech-after.wav) ตัวอย่างเป็นผู้พูดภาษาอังกฤษหนึ่งคน ไม่ใช่หลักฐานว่าเทียบเท่าทุกปลั๊กอินหรือรักษาพยัญชนะไทยได้ทุกกรณี
-
-## บิลด์จาก source
-
-ติดตั้ง Visual Studio 2022 Desktop C++, Windows SDK, Git และ CMake ≥3.22 จากนั้นเปิด PowerShell ใน source folder แล้วรัน `./scripts/build-windows.ps1`
-
-สคริปต์รัน CTest, native UI integration และ pluginval strictness 5 แล้วตรวจ hash ก่อนแพ็ก ZIP ขั้นใดผิดพลาดจะไม่แพ็กเป็นชุดที่ผ่าน ผลอยู่ `build-windows-msvc/package/`
-
-ก่อนใช้งานจริงให้ทดสอบเสียงของคุณ, automation, save/reopen, resize, เปิด/ปิด editor ระหว่างเล่น, 44.1/48/96 kHz และเปรียบเทียบ Bypass โดยคุมระดับความดัง
