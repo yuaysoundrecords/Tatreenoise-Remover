@@ -92,15 +92,18 @@ cp "$BUILD_DIR/installer/Tatree-$VERSION-macOS-Setup-UNSIGNED-TEST.pkg" "$CUSTOM
 cp "scripts/1.Mac กดอันนี้ก่อนครับ - Mac Start with This!.command" "$CUSTOMER_STAGE/"
 cp docs/MACOS-APPROVAL-TH-EN.txt "$CUSTOMER_STAGE/INSTALL-TH-EN.txt"
 (cd "$CUSTOMER_STAGE" && shasum -a 256 * > SHA256SUMS.txt)
-ditto -c -k --sequesterRsrc "$CUSTOMER_STAGE" "$BUILD_DIR/installer/Tatree-$VERSION-macOS-Setup.zip"
 python3 - "$BUILD_DIR/installer/Tatree-$VERSION-macOS-Setup.zip" "$CUSTOMER_STAGE" <<'PYZIP'
 import hashlib,pathlib,sys,zipfile
 stage=pathlib.Path(sys.argv[2])
+# Explicit root entries and UTF-8 filename flags; preserve POSIX executable mode.
+with zipfile.ZipFile(sys.argv[1], 'w', zipfile.ZIP_DEFLATED) as z:
+    for path in sorted(stage.iterdir()):
+        if path.is_file(): z.write(path, path.name)
 with zipfile.ZipFile(sys.argv[1]) as z:
     assert z.testzip() is None
     entries={i.filename:i for i in z.infolist() if not i.is_dir() and not i.filename.startswith('__MACOSX/')}
     expected={p.name for p in stage.iterdir() if p.is_file()}
-    assert set(entries)==expected, 'Unexpected customer ZIP entries'
+    assert set(entries)==expected, ('Unexpected customer ZIP entries', sorted(entries), sorted(expected))
     for name,entry in entries.items():
         assert hashlib.sha256(z.read(name)).digest()==hashlib.sha256((stage/name).read_bytes()).digest(), name
     helper='1.Mac กดอันนี้ก่อนครับ - Mac Start with This!.command'

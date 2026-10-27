@@ -2,8 +2,12 @@ name: Build and validate Windows and macOS
 on:
   workflow_dispatch:
     inputs:
+      build_windows:
+        description: 'Build and validate Windows Setup'
+        type: boolean
+        default: true
       build_macos:
-        description: 'Also build macOS after Windows validation passes'
+        description: 'Build and validate Mac Universal Setup'
         type: boolean
         default: false
   push:
@@ -13,6 +17,7 @@ permissions:
   contents: read
 jobs:
   windows:
+    if: github.event_name != 'workflow_dispatch' || inputs.build_windows
     runs-on: windows-2022
     timeout-minutes: 35
     steps:
