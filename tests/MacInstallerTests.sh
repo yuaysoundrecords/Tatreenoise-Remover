@@ -108,7 +108,13 @@ except subprocess.TimeoutExpired as e:
     output=(e.stdout or b'').decode(errors='replace')+'\nAU validation timed out after 45 seconds.'; code=124
 with open(sys.argv[4],'w') as f: f.write(output)
 if code:
-    message=output[-2400:].replace('%','%25').replace('\r','%0D').replace('\n','%0A')
+    # Registration failures need the registrar reason, not only auval's -50.
+    try:
+        logs=subprocess.run(['/usr/bin/log','show','--last','3m','--style','compact','--predicate','process == "AudioComponentRegistrar"'],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=10).stdout.decode(errors='replace')
+        relevant=[line for line in logs.splitlines() if any(word in line.lower() for word in ['tatree','yuay','ttr2'])]
+        if relevant: output+='\nRegistrar diagnostics:\n'+'\n'.join(relevant[-12:])
+    except subprocess.TimeoutExpired: output+='\nRegistrar diagnostics timed out.'
+    message=output[-3500:].replace('%','%25').replace('\r','%0D').replace('\n','%0A')
     print('::error title=Installed system AU validation failed::'+message)
     print(output)
 raise SystemExit(code)
