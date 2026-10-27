@@ -27,6 +27,21 @@ juce_add_plugin(Tatree
   IS_SYNTH FALSE NEEDS_MIDI_INPUT FALSE NEEDS_MIDI_OUTPUT FALSE
   IS_MIDI_EFFECT FALSE EDITOR_WANTS_KEYBOARD_FOCUS FALSE
   COPY_PLUGIN_AFTER_BUILD FALSE VST3_CATEGORIES Fx Restoration)
+if(APPLE)
+  # AU keeps its original identity for existing sessions. Separate the app and
+  # VST3 identities so LaunchServices cannot substitute a non-AU bundle for it.
+  foreach(format IN ITEMS Standalone VST3)
+    if(format STREQUAL "Standalone")
+      set(tatree_bundle_suffix standalone)
+    else()
+      set(tatree_bundle_suffix vst3)
+    endif()
+    add_custom_command(TARGET Tatree_${format} POST_BUILD
+      COMMAND /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier net.yuaysoundrecords.tatree2.${tatree_bundle_suffix}" "$<TARGET_BUNDLE_DIR:Tatree_${format}>/Contents/Info.plist"
+      COMMAND /usr/bin/codesign --force --sign - "$<TARGET_BUNDLE_DIR:Tatree_${format}>"
+      VERBATIM)
+  endforeach()
+endif()
 target_sources(Tatree PRIVATE Source/PluginProcessor.cpp Source/PluginEditor.cpp)
 target_compile_options(Tatree PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/utf-8>)
 target_compile_definitions(Tatree PUBLIC JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_VST3_CAN_REPLACE_VST2=0)

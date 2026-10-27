@@ -68,6 +68,14 @@ for i in 0 1 2; do
   lipo "${destinations[$i]}/Contents/MacOS/Tatree Noise Remover 2" -verify_arch arm64 x86_64
 done
 echo 'PASS installed binaries match tested stage and remain signed Universal bundles'
+python3 - "${destinations[@]}" <<'PY'
+import plistlib,sys
+ids=[]
+for bundle in sys.argv[1:]:
+    with open(bundle+'/Contents/Info.plist','rb') as f: ids.append(plistlib.load(f)['CFBundleIdentifier'])
+assert ids==['net.yuaysoundrecords.tatree2','net.yuaysoundrecords.tatree2.vst3','net.yuaysoundrecords.tatree2.standalone'],ids
+print('PASS distinct AU/VST3/App bundle IDs; original AU identity retained:',', '.join(ids))
+PY
 
 INFO="$global_au/Contents/Info.plist"
 TYPE=$(/usr/libexec/PlistBuddy -c 'Print :AudioComponents:0:type' "$INFO")
