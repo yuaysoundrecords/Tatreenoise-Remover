@@ -9,7 +9,7 @@ while IFS= read -r process; do
     *'/Logic Pro.app/'*|*'/GarageBand.app/'*|*'/Ableton Live '*|*'/REAPER.app/'*|*'/Cubase '*|*'/Nuendo '*|*'/Studio One '*|*'/Pro Tools.app/'*|*'/Bitwig Studio.app/'*|*'/FL Studio.app/'*|*'/Tatree Noise Remover 2.app/'*|*'/AUHostingService'*|*'/AUHostingCompatibilityService'*)
       fail "Close your DAW and Tatree before installing, then try again. Running: $process" ;;
   esac
-done < <(/bin/ps -axo comm=)
+done < <(/bin/ps -axww -o comm=)
 
 # Old manually installed per-user copies take precedence in some hosts. Leave
 # them untouched and ask the owner to move them outside the scan paths first.

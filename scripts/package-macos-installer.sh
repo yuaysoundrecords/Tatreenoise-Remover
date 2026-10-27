@@ -84,18 +84,20 @@ if [[ "$test_unsigned" == true ]]; then
   echo 'UNSIGNED TEST ONLY: not Apple-notarized. Installing this does not guarantee Gatekeeper approval of the plug-ins.' >&2
 else
   filename="Tatree-$version-macOS-Setup.pkg"
+  pending_pkg="$work/Tatree-pending-notarization.pkg"
   productbuild --sign "$installer_identity" --timestamp --distribution "$work/Distribution.xml" \
-    --resources "$ROOT/macos/installer" --package-path "$work" "$output/$filename"
-  xcrun notarytool submit "$output/$filename" --keychain-profile "$profile" --wait --timeout 25m --output-format json > "$output/notary-result.json"
+    --resources "$ROOT/macos/installer" --package-path "$work" "$pending_pkg"
+  xcrun notarytool submit "$pending_pkg" --keychain-profile "$profile" --wait --timeout 25m --output-format json > "$output/notary-result.json"
   python3 - "$output/notary-result.json" <<'PY'
 import json,sys
 with open(sys.argv[1]) as f: r=json.load(f)
 if r.get('status')!='Accepted': raise SystemExit('Apple notarization was not accepted. Do not publish this package.')
 PY
-  xcrun stapler staple "$output/$filename"
-  xcrun stapler validate "$output/$filename"
-  pkgutil --check-signature "$output/$filename"
-  spctl --assess --type install --verbose=2 "$output/$filename"
+  xcrun stapler staple "$pending_pkg"
+  xcrun stapler validate "$pending_pkg"
+  pkgutil --check-signature "$pending_pkg"
+  spctl --assess --type install --verbose=2 "$pending_pkg"
+  mv "$pending_pkg" "$output/$filename"
 fi
 shasum -a 256 "$output/$filename" > "$output/$filename.sha256"
 echo "Installer: $output/$filename"
