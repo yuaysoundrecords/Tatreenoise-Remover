@@ -53,13 +53,14 @@ global_au='/Library/Audio/Plug-Ins/Components/Tatree Noise Remover 2.component'
 sudo mkdir -p '/Library/Audio/Plug-Ins/Components'
 sudo ditto "$stage/AU/Tatree Noise Remover 2.component" "$global_au"
 marker="tatree-ci-backup-$$.txt"
-echo 'Installer backup fixture' | sudo tee "$global_au/$marker" >/dev/null
+sudo mkdir -p "$global_au/Contents/Resources"
+echo 'Installer backup fixture' | sudo tee "$global_au/Contents/Resources/$marker" >/dev/null
 # A prior installed bundle must remain valid; an unsealed marker would poison
 # the registrar's negative cache before the replacement is installed.
 sudo codesign --force --sign - "$global_au"
 codesign --verify --deep --strict "$global_au"
 sudo /usr/sbin/installer -pkg "$pkg" -target / > "$evidence/installer-install.txt" 2>&1 || { cat "$evidence/installer-install.txt"; exit 1; }
-test ! -e "$global_au/$marker"
+test ! -e "$global_au/Contents/Resources/$marker"
 sudo find '/Library/Application Support/Yuay Sound Records/Tatree/Backups' -name "$marker" -print > "$evidence/installer-backup.txt"
 test -s "$evidence/installer-backup.txt"
 echo 'PASS native Installer replaces old copy and preserves backup'

@@ -64,7 +64,7 @@ jobs:
           mkdir -p build-macos/validation
           cp macos-build.log build-macos/validation/build-log.txt
           if [ "$result" -ne 0 ]; then
-            python3 -c 'from pathlib import Path; s="\n".join(Path("macos-build.log").read_text(errors="replace").splitlines()[-65:]); print("::error title=macOS validation failed::"+s.replace("%","%25").replace("\r","%0D").replace("\n","%0A"))'
+            python3 -c 'from pathlib import Path; s="\n".join(Path("macos-build.log").read_text(errors="replace").splitlines()[-25:])[-3500:]; print("::error title=macOS validation failed::"+s.replace("%","%25").replace("\r","%0D").replace("\n","%0A"))'
           fi
           exit "$result"
       - uses: actions/upload-artifact@v4
