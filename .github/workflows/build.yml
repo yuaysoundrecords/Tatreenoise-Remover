@@ -7,7 +7,7 @@ on:
         type: boolean
         default: false
   push:
-    paths: ['Source/**', 'assets/**', 'tests/**', 'scripts/**', 'macos/**', 'CMakeLists.txt', '.github/workflows/build.yml']
+    paths: ['Source/**', 'assets/**', 'tests/**', 'scripts/**', 'macos/**', 'windows/**', 'docs/*INSTALL*', 'docs/MACOS-APPROVAL-TH-EN.txt', 'CMakeLists.txt', '.github/workflows/build.yml']
   pull_request:
 permissions:
   contents: read
@@ -38,6 +38,15 @@ jobs:
             New-Item -ItemType Directory -Force 'build-windows-msvc/validation' | Out-Null
             if (Test-Path $Log) { Copy-Item $Log 'build-windows-msvc/validation/build-log.txt' }
           }
+      - name: Build and test Windows Setup
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "${env:ProgramFiles(x86)}/Inno Setup 6/ISCC.exe")) {
+            choco install innosetup --version=6.4.3 --yes --no-progress
+            if ($LASTEXITCODE -ne 0) { throw 'Inno Setup installation failed.' }
+          }
+          ./scripts/package-windows-setup.ps1 -BuildDirectory build-windows-msvc
+          ./tests/WindowsInstaller.Tests.ps1 -BuildDirectory build-windows-msvc
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -46,8 +55,8 @@ jobs:
           if-no-files-found: warn
       - uses: actions/upload-artifact@v4
         with:
-          name: Tatree-2-Windows-x64-tested
-          path: build-windows-msvc/package/*.zip
+          name: Tatree-2-Windows-Setup-tested
+          path: build-windows-msvc/installer/*.zip
           if-no-files-found: error
   macos:
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.build_macos)
@@ -75,15 +84,6 @@ jobs:
           if-no-files-found: warn
       - uses: actions/upload-artifact@v4
         with:
-          name: Tatree-2-macOS-universal-tested
-          path: build-macos/package/*.zip
-          if-no-files-found: error
-      - uses: actions/upload-artifact@v4
-        with:
           name: Tatree-2-macOS-Setup-UNSIGNED-TEST
-          path: |
-            build-macos/installer/*.pkg
-            build-macos/installer/*.sha256
-            build-macos/installer/1.Mac กดอันนี้ก่อนครับ - Mac Start with This!.command
-            build-macos/installer/INSTALL-TH-EN.txt
+          path: build-macos/installer/*.zip
           if-no-files-found: error

@@ -1,0 +1,53 @@
+﻿Tatree Noise Remover 2 — Yuay Sound Records
+
+ติดตั้งบน Windows 10/11 (64-bit)
+1. ปิด DAW และ Tatree ที่เปิดอยู่ก่อน แล้วแตก ZIP ทั้งหมด
+2. ดับเบิลคลิก Tatree-2.1.3-Windows-x64-Setup.exe แล้วอนุญาตสิทธิ์ผู้ดูแลระบบ
+3. ติดตั้งตามหน้าจอ ตัว Setup จะลง VST3 ใน C:\Program Files\Common Files\VST3
+   และ Standalone ในโฟลเดอร์ Yuay Sound Records ภายใน Program Files
+4. เปิด DAW แล้วสแกน VST3 ใหม่ ค้นหา Tatree Noise Remover 2
+   ผู้ผลิตคือ Yuay Sound Records
+
+ถ้าเคยลงแบบรายผู้ใช้ใน %LOCALAPPDATA%\Programs\Common\VST3
+ให้ย้ายเฉพาะ Tatree Noise Remover 2.vst3 ไปสำรองนอกโฟลเดอร์สแกนก่อน
+ไม่ต้องลบปลั๊กอินอื่นหรือโปรเจกต์ใน DAW
+Setup สำรอง Tatree VST3 เดิมที่ติดตั้งในตำแหน่งระบบไว้ที่
+C:\ProgramData\Yuay Sound Records\Tatree\Backups
+หากติดตั้งไม่ผ่าน ให้หยุดและเก็บโฟลเดอร์สำรองไว้
+ถอนการติดตั้งได้จาก Settings > Apps โดยไฟล์สำรองยังอยู่
+ตัวติดตั้งยังไม่มีลายเซ็น Authenticode จึงอาจมีคำเตือนจาก Windows
+ตรวจแหล่งดาวน์โหลดก่อนอนุญาต อย่าปิดระบบป้องกันทั้งเครื่อง
+
+ใช้งานคร่าว ๆ
+วาง Tatree บนแทร็กเสียงร้อง เริ่มฟังเบา ๆ แล้วค่อยเพิ่ม Noise, De-esser และ Breath
+กด LISTEN เพื่อฟังสิ่งที่ตัดออก ถ้าได้ยินคำร้องมากไป ให้ลดปุ่มที่เกี่ยวข้อง
+Auto Gain ช่วยตั้งระดับเสียงร้องก่อนเข้า cleanup แต่ไม่ใช่ limiter
+ปรับ Input/Output ตามต้องการ และกด BYPASS เพื่อเทียบกับเสียงต้นฉบับ
+ใช้ฟรีทุกฟังก์ชัน ไม่จำกัดเวลา ไม่ต้องใช้คีย์
+อยากสนับสนุน กด TIP / KO-FI หรือเข้า https://ko-fi.com/yuaylooper
+
+Windows 10/11 installation (64-bit)
+1. Close your DAW and Tatree, then extract the entire ZIP.
+2. Double-click Tatree-2.1.3-Windows-x64-Setup.exe and approve administrator access.
+3. Follow Setup. VST3 installs to C:\Program Files\Common Files\VST3.
+   Standalone installs under Yuay Sound Records in Program Files.
+4. Open your DAW and rescan VST3. Look for Tatree Noise Remover 2
+   by Yuay Sound Records.
+
+If you previously installed to %LOCALAPPDATA%\Programs\Common\VST3,
+move only Tatree Noise Remover 2.vst3 to a backup outside scan folders first.
+Do not remove unrelated plug-ins or DAW projects.
+Setup backs up an existing system Tatree VST3 bundle to
+C:\ProgramData\Yuay Sound Records\Tatree\Backups.
+If installation fails, stop and keep the backup.
+Uninstall through Settings > Apps. Recovery backups are retained.
+Setup is not Authenticode-signed, so Windows may display a warning.
+Verify the download source before approving; do not disable system protection globally.
+
+Quick use
+Insert Tatree on a vocal track. Start at a low listening level and gradually adjust Noise,
+De-esser and Breath. LISTEN auditions what is removed; reduce processing if too much vocal
+is removed. Auto Gain stages vocal levels before cleanup; it is not a limiter.
+Adjust Input/Output and compare with BYPASS.
+All features are free, with no time limit or activation key.
+Optional support: TIP / KO-FI or https://ko-fi.com/yuaylooper

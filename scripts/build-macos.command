@@ -29,7 +29,8 @@ fi
 for name in startup quote-peak quote-de-esser quote-noise quote-breath quote-auto-on quote-auto-off quote-expired; do
   test -f "$BUILD_DIR/validation/ui/$name.png" || { echo "Missing UI evidence: $name" >&2; exit 1; }
 done
-STAGE="$BUILD_DIR/package/Tatree-2-macOS"
+mkdir -p "$BUILD_DIR/package"
+STAGE="$(mktemp -d "$BUILD_DIR/package/Tatree-2-macOS.XXXXXX")"
 mkdir -p "$STAGE/VST3" "$STAGE/AU" "$STAGE/Standalone"
 for format in VST3 AU Standalone; do
   ditto "$BUILD_DIR/Tatree_artefacts/Release/$format" "$STAGE/$format"
@@ -86,6 +87,13 @@ if [[ "${CI:-}" == true && "${TATREE_TEST_SYSTEM_INSTALL:-}" == 1 ]]; then
   printf '\n\n' | bash "scripts/1.Mac กดอันนี้ก่อนครับ - Mac Start with This!.command" > "$BUILD_DIR/validation/approval-cancel.txt"
   grep -q 'Cancelled. No files were changed.' "$BUILD_DIR/validation/approval-cancel.txt"
 fi
+CUSTOMER_STAGE="$(mktemp -d "$BUILD_DIR/installer/.customer-setup.XXXXXX")"
+cp "$BUILD_DIR/installer/Tatree-$VERSION-macOS-Setup-UNSIGNED-TEST.pkg" "$CUSTOMER_STAGE/"
+cp "scripts/1.Mac กดอันนี้ก่อนครับ - Mac Start with This!.command" "$CUSTOMER_STAGE/"
+cp docs/MACOS-APPROVAL-TH-EN.txt "$CUSTOMER_STAGE/INSTALL-TH-EN.txt"
+(cd "$CUSTOMER_STAGE" && shasum -a 256 * > SHA256SUMS.txt)
+ditto -c -k --sequesterRsrc "$CUSTOMER_STAGE" "$BUILD_DIR/installer/Tatree-$VERSION-macOS-Setup.zip"
+rm -rf "$CUSTOMER_STAGE"
 printf '\nBuild, automated audio/UI tests and ad-hoc signature checks passed.\n%s/package\n' "$BUILD_DIR"
 echo 'Local test build; Developer ID notarization and real DAW listening are separate release checks.'
 if [[ "${CI:-}" != true ]]; then open "$BUILD_DIR/package"; fi
