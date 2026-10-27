@@ -32,6 +32,39 @@ void TatreeLook::drawRotarySlider(juce::Graphics& g,int x,int y,int width,int he
     if(s.hasKeyboardFocus(false)){g.setColour(blue);g.drawEllipse(cx-radius-19,cy-radius-19,2*radius+38,2*radius+38,2);}
 }
 void TatreeLook::drawButtonBackground(juce::Graphics& g,juce::Button& b,const juce::Colour&,bool over,bool down){
+    if(b.getName()=="kofi-tip") {
+        juce::Graphics::ScopedSaveState saved(g);
+        g.addTransform(juce::AffineTransform::scale(float(b.getWidth())/300.0f,float(b.getHeight())/64.0f));
+        if(down)g.addTransform(juce::AffineTransform::translation(0,1));
+        const auto navy=juce::Colour(0xff07375a);
+        g.setColour(cream.withAlpha(over?.96f:.88f));g.fillRoundedRectangle(2,3,296,57,11);
+        g.setColour(navy);g.drawRoundedRectangle(2,3,296,57,11,2.5f);
+        // Hand-drawn snail mark, kept as vectors for small and HiDPI editors.
+        juce::Path shell;
+        shell.startNewSubPath(57,40);shell.cubicTo(31,48,26,25,38,17);
+        shell.cubicTo(52,7,76,14,75,29);shell.cubicTo(74,42,48,43,45,30);
+        shell.cubicTo(42,21,62,20,63,28);shell.cubicTo(64,33,55,34,53,29);
+        g.strokePath(shell,juce::PathStrokeType(4,juce::PathStrokeType::curved,juce::PathStrokeType::rounded));
+        juce::Path snail;snail.startNewSubPath(58,42);snail.cubicTo(35,49,23,43,19,32);
+        snail.lineTo(17,25);snail.lineTo(26,32);snail.lineTo(26,24);snail.lineTo(32,36);
+        snail.cubicTo(39,42,50,40,58,42);snail.closeSubPath();g.fillPath(snail);
+        g.fillEllipse(14,21,5,5);g.fillEllipse(24,19,5,5);
+        g.setFont(body(8.3f).boldened());g.drawText("Yuay Sound Records",10,47,90,11,juce::Justification::centred);
+        g.drawLine(106,14,106,51,1.2f);
+        g.setFont(headline(29));g.drawText("TIP / KO-FI",115,14,130,35,juce::Justification::centred);
+        // Cup, handle, orange heart and three short rays.
+        juce::Path cup;cup.startNewSubPath(254,27);cup.lineTo(254,36);
+        cup.cubicTo(254,54,281,54,281,36);cup.lineTo(281,27);cup.closeSubPath();
+        g.strokePath(cup,juce::PathStrokeType(3.3f,juce::PathStrokeType::curved,juce::PathStrokeType::rounded));
+        juce::Path handle;handle.startNewSubPath(282,29);handle.cubicTo(297,27,296,43,281,42);
+        g.strokePath(handle,juce::PathStrokeType(3));
+        juce::Path heart;heart.startNewSubPath(268,43);heart.cubicTo(246,30,263,28,268,34);
+        heart.cubicTo(274,27,289,32,268,43);heart.closeSubPath();
+        g.setColour(juce::Colour(0xffed4b22));g.fillPath(heart);
+        g.setColour(navy);g.drawLine(260,20,257,15,3);g.drawLine(268,18,269,12,3);g.drawLine(277,20,281,15,3);
+        if(b.hasKeyboardFocus(false)){g.setColour(blue);g.drawRoundedRectangle(0.8f,1,298,61,12,1.5f);}
+        return;
+    }
     auto r=b.getLocalBounds().toFloat().reduced(2);
     auto active=b.getToggleState();
     auto color=active?blue:cream;
@@ -44,6 +77,7 @@ void TatreeLook::drawButtonBackground(juce::Graphics& g,juce::Button& b,const ju
     if(b.hasKeyboardFocus(false)){g.setColour(blue);g.drawRect(b.getLocalBounds(),1);}
 }
 void TatreeLook::drawButtonText(juce::Graphics& g,juce::TextButton& b,bool,bool){
+    if(b.getName()=="kofi-tip")return;
     g.setColour(b.getToggleState()?cream:ink);g.setFont(headline(float(b.getHeight())*(b.getButtonText()=="MOTION FX"?20.0f/26:32.0f/52)));
     g.drawText(b.getButtonText(),b.getLocalBounds(),juce::Justification::centred);
 }
@@ -122,7 +156,7 @@ void TatreeEditor::resized(){
     gainSliders[1].setBounds(juce::Rectangle<int>(738,691,286,37)*scale);
     autoButton.setBounds(juce::Rectangle<int>(427,667,220,42)*scale);
     motionButton.setBounds(juce::Rectangle<int>(900,787,128,26)*scale);
-    tipButton.setBounds(juce::Rectangle<int>(918,100,126,30)*scale);
+    tipButton.setBounds(juce::Rectangle<int>(824,96,220,47)*scale);
 }
 void TatreeEditor::timerCallback(){
     const auto block = processor.meters.blocks.load(std::memory_order_relaxed);

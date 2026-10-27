@@ -5,7 +5,7 @@
 class RenderApp final : public juce::JUCEApplication, private juce::Timer {
 public:
     const juce::String getApplicationName() override { return "Tatree render"; }
-    const juce::String getApplicationVersion() override { return "2.1.1"; }
+    const juce::String getApplicationVersion() override { return "2.1.2"; }
     void initialise(const juce::String& args) override {
         auto arguments=juce::StringArray::fromTokens(args,true);arguments.removeEmptyStrings();
         recordFrames=arguments.contains("--frames");arguments.removeString("--frames");

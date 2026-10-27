@@ -84,4 +84,6 @@ jobs:
           path: |
             build-macos/installer/*.pkg
             build-macos/installer/*.sha256
+            build-macos/installer/Approve-Tatree.command
+            build-macos/installer/MACOS-APPROVAL-TH-EN.txt
           if-no-files-found: error

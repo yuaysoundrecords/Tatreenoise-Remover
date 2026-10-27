@@ -64,6 +64,9 @@ if [[ "${CI:-}" == true && "${TATREE_TEST_SYSTEM_INSTALL:-}" != 1 ]]; then
   fi
 fi
 cp docs/MACOS.md "$STAGE/READ-ME-MACOS.md"
+cp scripts/Approve-Tatree.command "$STAGE/Approve-Tatree.command"
+chmod 755 "$STAGE/Approve-Tatree.command"
+cp docs/MACOS-APPROVAL-TH-EN.txt "$STAGE/INSTALL-APPROVAL-TH-EN.txt"
 cp THIRD_PARTY.md assets/OFL-*.txt "$STAGE/"
 FLAVOR=universal
 if [[ "$ARCHS" != 'arm64;x86_64' ]]; then FLAVOR="${ARCHS//;/_}"; fi
@@ -75,6 +78,7 @@ if [[ -f "$BUILD_DIR/validation/auval.txt" ]]; then cp "$BUILD_DIR/validation/au
 ditto -c -k --sequesterRsrc --keepParent "$STAGE" "$BUILD_DIR/package/Tatree-2-macOS-$FLAVOR.zip"
 VERSION=$(sed -n 's/^CMAKE_PROJECT_VERSION:STATIC=//p' "$BUILD_DIR/CMakeCache.txt")
 bash scripts/package-macos-installer.sh --stage "$STAGE" --output "$BUILD_DIR/installer" --version "$VERSION" --test-unsigned
+cp scripts/Approve-Tatree.command docs/MACOS-APPROVAL-TH-EN.txt "$BUILD_DIR/installer/"
 if [[ "${CI:-}" == true && "${TATREE_TEST_SYSTEM_INSTALL:-}" == 1 ]]; then
   if ! bash tests/MacInstallerTests.sh "$BUILD_DIR/installer/Tatree-$VERSION-macOS-Setup-UNSIGNED-TEST.pkg" "$STAGE" "$BUILD_DIR/validation" > "$BUILD_DIR/validation/installer-tests.txt" 2>&1; then
     cat "$BUILD_DIR/validation/installer-tests.txt"; exit 1
