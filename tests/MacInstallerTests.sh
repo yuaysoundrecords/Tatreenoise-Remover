@@ -100,6 +100,7 @@ codesign --force --sign - "$old_au"
 codesign --verify --deep --strict "$old_au"
 sudo chown -R root:wheel "$old_au"
 sudo mv "$global_au" "$work/freshly-installed.component"
+sudo chown -R "$(id -u):$(id -g)" "$work/freshly-installed.component"
 sudo mv "$old_au" "$global_au"
 sudo /usr/sbin/installer -pkg "$pkg" -target / > "$evidence/installer-install.txt" 2>&1 || { cat "$evidence/installer-install.txt"; exit 1; }
 test ! -e "$global_au/Contents/Resources/$marker"
