@@ -18,7 +18,7 @@ Company shown to the host: **Yuay Sound Records**. AU manufacturer and VST3 vend
 
 The original ZIP contains ad-hoc signed binaries. A `.pkg` makes installation consistent and keeps the install/approval step outside the DAW, but it **does not itself notarize software or grant Gatekeeper exceptions to every plug-in**. A successful CI installation on a non-quarantined runner is not proof that a browser-downloaded package will be approved on a customer's Mac.
 
-The owner currently has no Apple Developer membership. Therefore the available setup is explicitly named **UNSIGNED-TEST**. If macOS blocks it, review only that trusted package in **System Settings → Privacy & Security**. Do not disable Gatekeeper globally. Even after allowing that installer, macOS may still block a bundled binary; use a properly notarized release or build from source locally if that happens. No script removes quarantine or changes Gatekeeper policy.
+The current setup is not signed with Developer ID or Apple-notarized and is explicitly named **UNSIGNED-TEST**. If macOS blocks it, review only that trusted package in **System Settings → Privacy & Security**. Do not disable Gatekeeper globally. Even after allowing that installer, macOS may still block a bundled binary; use a properly notarized release or build from source locally if that happens. No script removes quarantine or changes Gatekeeper policy.
 
 If the DAW has already frozen, close it safely before installation. Changing the installer cannot diagnose every DAW hang; a new crash report/scan log is needed if a notarized build still hangs.
 
@@ -46,3 +46,11 @@ bash scripts/package-macos-installer.sh \
 Configure `tatree-notary` using Apple's `xcrun notarytool store-credentials` locally. The release script signs the payload with hardened runtime, signs the installer, submits to Apple, requires **Accepted**, staples and validates the ticket, then runs `pkgutil --check-signature` and `spctl --assess --type install`. It fails if credentials are missing; there is no silent unsigned fallback. If notarization fails, do not upload the intermediate package. Apple determines the verified publisher name from the certificate, so an individual account may show a legal personal name even though the plug-in vendor remains Yuay Sound Records.
 
 Test the final notarized `.pkg` after an actual browser download on a separate Mac and open it in supported DAWs before describing the Gatekeeper issue as fixed. That final browser/Gatekeeper test and Apple notarization remain pending.
+
+## Validated setup
+
+[Download Mac Setup — UNSIGNED TEST](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230/artifacts/12721595164). Extract the GitHub artifact ZIP, then open `Tatree-2.1.1-macOS-Setup-UNSIGNED-TEST.pkg` after quitting your DAW.
+
+Native run [40474891230](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230) passed fresh system installation, upgrade/backup, refusal with an open host, matching installed binaries, signatures, Universal architectures, notices, vendor metadata and AU validation after both fresh installation and upgrade. Browser-download Gatekeeper approval and notarization were not tested.
+
+Mac bundle identities are distinct: AU retains `net.yuaysoundrecords.tatree2`, VST3 uses `.vst3` and Standalone uses `.standalone`. The AU component tuple and VST3 class IDs are unchanged; the standalone app may ask for microphone permission again under its new app identity. Setup refreshes AU registration after installation without changing Gatekeeper policy.

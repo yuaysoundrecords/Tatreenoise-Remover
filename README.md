@@ -7,9 +7,9 @@ Native audio cleanup plugin by Yuay Sound Records. Cream/cobalt Thai indie UI, c
 - No speech banner on startup. Five user-control captions appear for 3 seconds, including De-breath and both Auto Gain ON/OFF clicks.
 - Real IN/OUT/GR meters, automation/state recall, fixed 1024-sample latency and original-dry Bypass.
 
-[Windows 2.1.0 free ZIP](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40320381346/artifacts/12648308649) · [Mac Universal test build](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40320381346/artifacts/12648702859)
+[Windows 2.1.1 free ZIP](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230/artifacts/12721135234) · [Mac Universal test build](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230/artifacts/12721021342)
 
-Version **2.1.0 free** passed native Windows and Mac validation on [run 40320381346](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40320381346). Mac builds have ad-hoc test signatures, not Developer ID notarization. For a local Mac build use the source kit and BUILD-MAC.command below.
+Version **2.1.1 free** passed native Windows and Mac validation on [run 40474891230](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230). Mac builds have ad-hoc test signatures, not Developer ID notarization. For a local Mac build use the source kit and BUILD-MAC.command below.
 
 ## Free to use
 
@@ -17,7 +17,7 @@ All features are free, with no trial timer, activation key, account or payment r
 
 ## Mac installer
 
-Native `.pkg` setup is being added with host-close checks, backups, fixed AU/VST3/App paths and vendor verification. The owner has no Apple Developer membership, so the test installer is unsigned and **does not establish Gatekeeper approval**. [Installer and notarization details](docs/MACOS-INSTALLER.md).
+[Download native Mac Setup (UNSIGNED TEST)](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230/artifacts/12721595164). Fresh installation, upgrade/backup, installed AU validation, bundle identities and **Yuay Sound Records** vendor checks passed. The installer is not Apple-notarized and **does not establish Gatekeeper approval** after a browser download. [Installer and notarization details](docs/MACOS-INSTALLER.md).
 
 ## Build and test
 

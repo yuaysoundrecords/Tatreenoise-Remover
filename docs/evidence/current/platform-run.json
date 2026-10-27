@@ -1,54 +1,64 @@
 {
-  "version": "2.1.0",
+  "version": "2.1.1",
   "edition": "free",
-  "run_id": 40320381346,
-  "url": "https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40320381346",
-  "source_commit": "b3ab9d57b4c0fffb4e853e345d8a3ce8fdfd4b6a",
+  "run_id": 40474891230,
+  "source_commit": "c1d4e81d4f0bdc8b2b91cf886616b156b47fea5a",
+  "url": "https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230",
   "conclusion": "success",
+  "installer": "unsigned-test; not Apple-notarized",
+  "gatekeeper_browser_download_test": "not performed",
+  "vendor": "Yuay Sound Records",
   "jobs": [
     {
-      "id": 121563511177,
-      "name": "windows",
-      "conclusion": "success",
-      "started_at": "2026-10-26T12:09:35Z",
-      "completed_at": "2026-10-26T12:15:06Z"
-    },
-    {
-      "id": 121563511366,
+      "id": 122090574727,
       "name": "macos",
       "conclusion": "success",
-      "started_at": "2026-10-26T12:09:35Z",
-      "completed_at": "2026-10-26T12:14:57Z"
+      "started_at": "2026-10-27T08:38:18Z",
+      "completed_at": "2026-10-27T08:46:16Z"
+    },
+    {
+      "id": 122090575169,
+      "name": "windows",
+      "conclusion": "success",
+      "started_at": "2026-10-27T08:38:17Z",
+      "completed_at": "2026-10-27T08:43:53Z"
     }
   ],
   "artifacts": [
     {
-      "id": 12649081557,
-      "name": "Windows-validation-evidence",
-      "size_in_bytes": 29753674,
-      "digest": "sha256:c734b4d40ca941f8c42a08541a12a276194c54476f234c552eee3460b46baa45",
-      "url": "https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40320381346/artifacts/12649081557"
+      "id": 12721595164,
+      "name": "Tatree-2-macOS-Setup-UNSIGNED-TEST",
+      "size_in_bytes": 66536707,
+      "digest": "sha256:ff00ab986c67ceadcad898dcca1839a3b131dac95ec705e0af68dd0ccbdc1ad9",
+      "url": "https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230/artifacts/12721595164"
     },
     {
-      "id": 12648702859,
-      "name": "Tatree-2-macOS-universal-tested",
-      "size_in_bytes": 66538620,
-      "digest": "sha256:94b31825bf3c3e40302134acef99ab2b1e71ae91708c5b79cb14dd5b45275a5d",
-      "url": "https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40320381346/artifacts/12648702859"
-    },
-    {
-      "id": 12648308649,
-      "name": "Tatree-2-Windows-x64-tested",
-      "size_in_bytes": 53004393,
-      "digest": "sha256:b4aa6067e06943b1ae9226823491bb7ca2e6762b51a6d16260a718c74e589fe9",
-      "url": "https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40320381346/artifacts/12648308649"
-    },
-    {
-      "id": 12647944349,
+      "id": 12721590127,
       "name": "macOS-validation-evidence",
-      "size_in_bytes": 30084590,
-      "digest": "sha256:61635715b94dcb33c986275ab5ad3333239c14de1bd75f8d157178011355bc97",
-      "url": "https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40320381346/artifacts/12647944349"
+      "size_in_bytes": 30088955,
+      "digest": "sha256:7a7d52b3a8e52866b5cffd50f3c97307b8284ac50e296d9903f6da0c310fb1b8",
+      "url": "https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230/artifacts/12721590127"
+    },
+    {
+      "id": 12721135234,
+      "name": "Tatree-2-Windows-x64-tested",
+      "size_in_bytes": 53004360,
+      "digest": "sha256:ab62a12cff050485f668c9be341a2e6539ce0dbc75c080a58b6feeabe2ab2a99",
+      "url": "https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230/artifacts/12721135234"
+    },
+    {
+      "id": 12721021342,
+      "name": "Tatree-2-macOS-universal-tested",
+      "size_in_bytes": 66537356,
+      "digest": "sha256:3d23ff2f50cd8b646204221657a30c9131598c32b48a4668ec0e2d878b67668c",
+      "url": "https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230/artifacts/12721021342"
+    },
+    {
+      "id": 12720925418,
+      "name": "Windows-validation-evidence",
+      "size_in_bytes": 29753677,
+      "digest": "sha256:723e872ef62e27803b93e1d490b21f801b7fa8654b46a1dd722f72ce387c3873",
+      "url": "https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230/artifacts/12720925418"
     }
   ]
 }

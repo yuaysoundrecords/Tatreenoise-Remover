@@ -1,4 +1,14 @@
-# Current validation — 2.1.0 free
+# Current validation — 2.1.1 free / Mac setup
+
+Windows and Mac native validation **passed** on [run 40474891230](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230), source `c1d4e81d4f0bdc8b2b91cf886616b156b47fea5a`.
+
+- Native Mac `.pkg` tests passed fresh installation and upgrade/backup, open-host refusal, installed binary matching, signatures/architectures, font/component notices, distinct bundle identities and AU validation as the normal user after both installs.
+- AU manufacturer and VST3 factory vendor checked as **Yuay Sound Records**. The original AU component tuple and AU bundle ID are preserved; App/VST3 bundle identifiers are separate to avoid registration collisions.
+- Audio/speech suites, native UI/caption/resize tests, Windows packaging guards and Windows pluginval passed. No audio-processing source changed from the accepted free version.
+- [Mac Setup — UNSIGNED TEST](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230/artifacts/12721595164). This is **not Developer ID signed or Apple-notarized**. CLI installation on a fresh CI machine does not prove Gatekeeper approval after a browser download. No claim that every customer DAW/Gatekeeper hang is resolved.
+- Complete artifact IDs, sizes and outer ZIP digests: `docs/evidence/current/platform-run.json`. Final platform archives have not been downloaded and reverified in this cloud; validated binary binding is checked in CI.
+
+## Prior 2.1.0 free validation
 
 Native Windows and Mac validation **passed** on [run 40320381346](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40320381346), source commit `b3ab9d57b4c0fffb4e853e345d8a3ce8fdfd4b6a`.
 
