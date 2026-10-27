@@ -43,7 +43,7 @@ for bundle in "$STAGE/VST3/Tatree Noise Remover 2.vst3" "$STAGE/AU/Tatree Noise 
   fi
 done
 plutil -extract NSMicrophoneUsageDescription raw -o - "$STAGE/Standalone/Tatree Noise Remover 2.app/Contents/Info.plist"
-if [[ "${CI:-}" == true ]]; then
+if [[ "${CI:-}" == true && "${TATREE_TEST_SYSTEM_INSTALL:-}" != 1 ]]; then
   mkdir -p "$HOME/Library/Audio/Plug-Ins/Components"
   ditto "$STAGE/AU/Tatree Noise Remover 2.component" "$HOME/Library/Audio/Plug-Ins/Components/Tatree Noise Remover 2.component"
   # A fresh hosted Mac may have started its registrar before this folder existed.

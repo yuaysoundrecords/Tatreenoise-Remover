@@ -91,6 +91,19 @@ for attempt in 1 2 3 4 5; do
   if grep -q "$SUBTYPE.*$MAKER" "$evidence/installer-au-list.txt"; then break; fi
   sleep 2
 done
-auval -v "$TYPE" "$SUBTYPE" "$MAKER" > "$evidence/installer-auval.txt" 2>&1 || { cat "$evidence/installer-auval.txt"; exit 1; }
+python3 - "$TYPE" "$SUBTYPE" "$MAKER" "$evidence/installer-auval.txt" <<'PY'
+import subprocess,sys
+try:
+    result=subprocess.run(['auval','-v',*sys.argv[1:4]],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=45)
+    output=result.stdout.decode(errors='replace'); code=result.returncode
+except subprocess.TimeoutExpired as e:
+    output=(e.stdout or b'').decode(errors='replace')+'\nAU validation timed out after 45 seconds.'; code=124
+with open(sys.argv[4],'w') as f: f.write(output)
+if code:
+    message=output[-2400:].replace('%','%25').replace('\r','%0D').replace('\n','%0A')
+    print('::error title=Installed system AU validation failed::'+message)
+    print(output)
+raise SystemExit(code)
+PY
 echo 'PASS installed system AU passes auval as normal user'
 echo 'NOTE: unsigned CI installation is not proof of Gatekeeper approval on a quarantined customer download.'
