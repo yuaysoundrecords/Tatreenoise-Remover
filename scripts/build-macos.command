@@ -75,7 +75,7 @@ if [[ -f "$BUILD_DIR/validation/auval.txt" ]]; then cp "$BUILD_DIR/validation/au
 ditto -c -k --sequesterRsrc --keepParent "$STAGE" "$BUILD_DIR/package/Tatree-2-macOS-$FLAVOR.zip"
 VERSION=$(sed -n 's/^CMAKE_PROJECT_VERSION:STATIC=//p' "$BUILD_DIR/CMakeCache.txt")
 bash scripts/package-macos-installer.sh --stage "$STAGE" --output "$BUILD_DIR/installer" --version "$VERSION" --test-unsigned
-if [[ "${CI:-}" == true ]]; then
+if [[ "${CI:-}" == true && "${TATREE_TEST_SYSTEM_INSTALL:-}" == 1 ]]; then
   if ! bash tests/MacInstallerTests.sh "$BUILD_DIR/installer/Tatree-$VERSION-macOS-Setup-UNSIGNED-TEST.pkg" "$STAGE" "$BUILD_DIR/validation" > "$BUILD_DIR/validation/installer-tests.txt" 2>&1; then
     cat "$BUILD_DIR/validation/installer-tests.txt"; exit 1
   fi

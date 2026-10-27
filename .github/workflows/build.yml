@@ -52,6 +52,8 @@ jobs:
   macos:
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.build_macos)
     runs-on: macos-14
+    env:
+      TATREE_TEST_SYSTEM_INSTALL: '1'
     steps:
       - uses: actions/checkout@v4
       - name: Build universal AU, VST3 and Standalone; test and package

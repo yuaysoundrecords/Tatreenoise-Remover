@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
-[[ "$(uname -s)" == Darwin && "${CI:-}" == true ]] || { echo 'Run on a disposable Mac CI runner only.' >&2; exit 1; }
+[[ "$(uname -s)" == Darwin && "${CI:-}" == true && "${TATREE_TEST_SYSTEM_INSTALL:-}" == 1 && "${RUNNER_ENVIRONMENT:-}" == github-hosted ]] || {
+  echo 'System installation tests require explicit opt-in on a disposable GitHub-hosted Mac runner.' >&2; exit 1;
+}
 pkg="$1"; stage="$2"; evidence="$3"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 mkdir -p "$evidence"

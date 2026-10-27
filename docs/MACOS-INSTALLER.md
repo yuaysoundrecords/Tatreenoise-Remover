@@ -26,7 +26,7 @@ If the DAW has already frozen, close it safely before installation. Changing the
 
 `BUILD-MAC.command` builds and validates the Universal bundles and creates both the ZIP and a native installer in `build-macos/installer/`. The installer is tested on a fresh Mac CI runner: payload paths, refusal with a running host, backup/upgrade, matching installed binaries, code signatures, architectures, AU validation and vendor metadata.
 
-No permission change or automatic installation occurs on a developer's Mac when running the build script. System installation tests run only on a disposable `CI=true` Mac runner.
+No automatic system installation occurs on a developer's Mac when running the build script. System installation tests require `CI=true`, explicit `TATREE_TEST_SYSTEM_INSTALL=1` and a disposable `RUNNER_ENVIRONMENT=github-hosted` Mac runner. The provided Mac workflow supplies this opt-in; merely setting `CI=true` on a developer or self-hosted machine does not run the system installer test.
 
 ## Developer ID release (when membership/certificates are available)
 
