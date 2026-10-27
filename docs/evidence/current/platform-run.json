@@ -1,64 +1,118 @@
 {
-  "version": "2.1.1",
-  "edition": "free",
-  "run_id": 40474891230,
-  "source_commit": "c1d4e81d4f0bdc8b2b91cf886616b156b47fea5a",
-  "url": "https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230",
+  "version": "2.1.2",
+  "run_id": 40507885353,
+  "source_commit": "8a7deb1c85ba8cfb038a5cb0bdc8e320cf6c408f",
   "conclusion": "success",
-  "installer": "unsigned-test; not Apple-notarized",
-  "gatekeeper_browser_download_test": "not performed",
-  "vendor": "Yuay Sound Records",
   "jobs": [
     {
-      "id": 122090574727,
-      "name": "macos",
-      "conclusion": "success",
-      "started_at": "2026-10-27T08:38:18Z",
-      "completed_at": "2026-10-27T08:46:16Z"
+      "name": "windows",
+      "conclusion": "success"
     },
     {
-      "id": 122090575169,
-      "name": "windows",
-      "conclusion": "success",
-      "started_at": "2026-10-27T08:38:17Z",
-      "completed_at": "2026-10-27T08:43:53Z"
+      "name": "macos",
+      "conclusion": "success"
     }
   ],
   "artifacts": [
     {
-      "id": 12721595164,
+      "id": 12736760394,
+      "node_id": "MDg6QXJ0aWZhY3QxMjczNjc2MDM5NA==",
       "name": "Tatree-2-macOS-Setup-UNSIGNED-TEST",
-      "size_in_bytes": 66536707,
-      "digest": "sha256:ff00ab986c67ceadcad898dcca1839a3b131dac95ec705e0af68dd0ccbdc1ad9",
-      "url": "https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230/artifacts/12721595164"
+      "size_in_bytes": 66547121,
+      "url": "https://api.github.com/repos/yuaysoundrecords/Tatreenoise-Remover/actions/artifacts/12736760394",
+      "archive_download_url": "https://api.github.com/repos/yuaysoundrecords/Tatreenoise-Remover/actions/artifacts/12736760394/zip",
+      "expired": false,
+      "digest": "sha256:7008068e799d044fe75eb57ab4a8a04059d9e91258b7b69973e740e62eb83011",
+      "created_at": "2026-10-27T13:03:05Z",
+      "updated_at": "2026-10-27T13:03:05Z",
+      "expires_at": "2027-01-25T12:57:18Z",
+      "workflow_run": {
+        "id": 40507885353,
+        "repository_id": 1174061198,
+        "head_repository_id": 1174061198,
+        "head_branch": "codex/windows-first-tatree2",
+        "head_sha": "8a7deb1c85ba8cfb038a5cb0bdc8e320cf6c408f"
+      }
     },
     {
-      "id": 12721590127,
-      "name": "macOS-validation-evidence",
-      "size_in_bytes": 30088955,
-      "digest": "sha256:7a7d52b3a8e52866b5cffd50f3c97307b8284ac50e296d9903f6da0c310fb1b8",
-      "url": "https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230/artifacts/12721590127"
-    },
-    {
-      "id": 12721135234,
-      "name": "Tatree-2-Windows-x64-tested",
-      "size_in_bytes": 53004360,
-      "digest": "sha256:ab62a12cff050485f668c9be341a2e6539ce0dbc75c080a58b6feeabe2ab2a99",
-      "url": "https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230/artifacts/12721135234"
-    },
-    {
-      "id": 12721021342,
+      "id": 12736665701,
+      "node_id": "MDg6QXJ0aWZhY3QxMjczNjY2NTcwMQ==",
       "name": "Tatree-2-macOS-universal-tested",
-      "size_in_bytes": 66537356,
-      "digest": "sha256:3d23ff2f50cd8b646204221657a30c9131598c32b48a4668ec0e2d878b67668c",
-      "url": "https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230/artifacts/12721021342"
+      "size_in_bytes": 66546109,
+      "url": "https://api.github.com/repos/yuaysoundrecords/Tatreenoise-Remover/actions/artifacts/12736665701",
+      "archive_download_url": "https://api.github.com/repos/yuaysoundrecords/Tatreenoise-Remover/actions/artifacts/12736665701/zip",
+      "expired": false,
+      "digest": "sha256:230d46badd0ef22ebfd2b4095ee30068072507100c9ae1fc1d1f1c73e6a79ed0",
+      "created_at": "2026-10-27T13:03:01Z",
+      "updated_at": "2026-10-27T13:03:01Z",
+      "expires_at": "2027-01-25T12:57:18Z",
+      "workflow_run": {
+        "id": 40507885353,
+        "repository_id": 1174061198,
+        "head_repository_id": 1174061198,
+        "head_branch": "codex/windows-first-tatree2",
+        "head_sha": "8a7deb1c85ba8cfb038a5cb0bdc8e320cf6c408f"
+      }
     },
     {
-      "id": 12720925418,
+      "id": 12736511036,
+      "node_id": "MDg6QXJ0aWZhY3QxMjczNjUxMTAzNg==",
+      "name": "macOS-validation-evidence",
+      "size_in_bytes": 30196444,
+      "url": "https://api.github.com/repos/yuaysoundrecords/Tatreenoise-Remover/actions/artifacts/12736511036",
+      "archive_download_url": "https://api.github.com/repos/yuaysoundrecords/Tatreenoise-Remover/actions/artifacts/12736511036/zip",
+      "expired": false,
+      "digest": "sha256:b7b0f50abe28b95249a35055560f423e204c3829fde637c9892fa08a88ed20bb",
+      "created_at": "2026-10-27T13:02:58Z",
+      "updated_at": "2026-10-27T13:02:58Z",
+      "expires_at": "2027-01-25T12:57:18Z",
+      "workflow_run": {
+        "id": 40507885353,
+        "repository_id": 1174061198,
+        "head_repository_id": 1174061198,
+        "head_branch": "codex/windows-first-tatree2",
+        "head_sha": "8a7deb1c85ba8cfb038a5cb0bdc8e320cf6c408f"
+      }
+    },
+    {
+      "id": 12735403836,
+      "node_id": "MDg6QXJ0aWZhY3QxMjczNTQwMzgzNg==",
       "name": "Windows-validation-evidence",
-      "size_in_bytes": 29753677,
-      "digest": "sha256:723e872ef62e27803b93e1d490b21f801b7fa8654b46a1dd722f72ce387c3873",
-      "url": "https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40474891230/artifacts/12720925418"
+      "size_in_bytes": 29847790,
+      "url": "https://api.github.com/repos/yuaysoundrecords/Tatreenoise-Remover/actions/artifacts/12735403836",
+      "archive_download_url": "https://api.github.com/repos/yuaysoundrecords/Tatreenoise-Remover/actions/artifacts/12735403836/zip",
+      "expired": false,
+      "digest": "sha256:a3bb2b3dbca53639606fd599b669b05a0f12bd7f41376401e516e4b84ff5a357",
+      "created_at": "2026-10-27T13:02:47Z",
+      "updated_at": "2026-10-27T13:02:47Z",
+      "expires_at": "2027-01-25T12:57:18Z",
+      "workflow_run": {
+        "id": 40507885353,
+        "repository_id": 1174061198,
+        "head_repository_id": 1174061198,
+        "head_branch": "codex/windows-first-tatree2",
+        "head_sha": "8a7deb1c85ba8cfb038a5cb0bdc8e320cf6c408f"
+      }
+    },
+    {
+      "id": 12735309054,
+      "node_id": "MDg6QXJ0aWZhY3QxMjczNTMwOTA1NA==",
+      "name": "Tatree-2-Windows-x64-tested",
+      "size_in_bytes": 21573614,
+      "url": "https://api.github.com/repos/yuaysoundrecords/Tatreenoise-Remover/actions/artifacts/12735309054",
+      "archive_download_url": "https://api.github.com/repos/yuaysoundrecords/Tatreenoise-Remover/actions/artifacts/12735309054/zip",
+      "expired": false,
+      "digest": "sha256:30c36fa873d311715e7e50a9ecb1cb4b185debc629b972a273a3097f034f38a0",
+      "created_at": "2026-10-27T13:02:50Z",
+      "updated_at": "2026-10-27T13:02:50Z",
+      "expires_at": "2027-01-25T12:57:18Z",
+      "workflow_run": {
+        "id": 40507885353,
+        "repository_id": 1174061198,
+        "head_repository_id": 1174061198,
+        "head_branch": "codex/windows-first-tatree2",
+        "head_sha": "8a7deb1c85ba8cfb038a5cb0bdc8e320cf6c408f"
+      }
     }
   ]
 }

@@ -14,4 +14,4 @@ All five captions use one fitted bold Noto Sans Thai size, semantic two-line wra
 
 Native UI tests exercise startup silence, all five mappings, both Auto Gain states, expiry, 80/150% resizing and independent DSP states. Current checked-in captures are Linux; native platform evidence is attached to CI runs.
 
-[Startup](evidence/current/startup.png) · [Breath](evidence/current/quote-breath.png) · [Peak](evidence/current/quote-peak.png) · [Auto OFF](evidence/current/quote-auto-off.png) · [Expiry](evidence/current/quote-expired.png)
+[Current native UI captures](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40507885353/artifacts/12736511036) are in the separate validation artifact. Older screenshots have been removed from the active source tree.

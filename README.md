@@ -7,7 +7,9 @@ Native audio cleanup plugin by Yuay Sound Records. Cream/cobalt Thai indie UI, c
 - No speech banner on startup. Five user-control captions appear for 3 seconds, including De-breath and both Auto Gain ON/OFF clicks.
 - Real IN/OUT/GR meters, automation/state recall, fixed 1024-sample latency and original-dry Bypass.
 
-Version **2.1.2** adds the illustrated Ko-fi badge and a bilingual optional Mac AU/VST3 approval helper. Current platform packages must be rebuilt and verified before publication. Older binary download links have been removed to prevent version confusion.
+Version **2.1.2** adds the illustrated Ko-fi badge and a bilingual optional Mac AU/VST3 approval helper. Native Windows and Mac builds passed on [run 40507885353](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40507885353). Older downloadable GitHub platform packages have been removed.
+
+[Windows 2.1.2](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40507885353/artifacts/12735309054) · [Mac Universal 2.1.2](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40507885353/artifacts/12736665701) · [Mac Setup 2.1.2 — UNSIGNED TEST](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40507885353/artifacts/12736760394)
 
 ## Free to use
 
