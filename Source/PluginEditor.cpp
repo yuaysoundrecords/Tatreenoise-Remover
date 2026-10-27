@@ -156,7 +156,7 @@ void TatreeEditor::resized(){
     gainSliders[1].setBounds(juce::Rectangle<int>(738,691,286,37)*scale);
     autoButton.setBounds(juce::Rectangle<int>(427,667,220,42)*scale);
     motionButton.setBounds(juce::Rectangle<int>(900,787,128,26)*scale);
-    tipButton.setBounds(juce::Rectangle<int>(824,96,220,47)*scale);
+    tipButton.setBounds(juce::Rectangle<int>(872,96,172,37)*scale);
 }
 void TatreeEditor::timerCallback(){
     const auto block = processor.meters.blocks.load(std::memory_order_relaxed);
