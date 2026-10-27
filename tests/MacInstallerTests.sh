@@ -71,9 +71,12 @@ NAME=$(/usr/libexec/PlistBuddy -c 'Print :AudioComponents:0:name' "$INFO")
 [[ "$NAME" == 'Yuay Sound Records:'* ]]
 VENDOR="$stage/VST3/Tatree Noise Remover 2.vst3/Contents/Resources/moduleinfo.json"
 python3 - "$VENDOR" <<'PY'
-import json,sys
-with open(sys.argv[1]) as f: m=json.load(f)
-assert m['Factory Info']['Vendor']=='Yuay Sound Records',m['Factory Info']
+import re,sys
+# Steinberg's pinned moduleinfo writer emits JSON5 (with trailing commas).
+# Read the factory Vendor field without treating the entire file as strict JSON.
+with open(sys.argv[1]) as f: text=f.read()
+factory=re.search(r'"Factory Info"\s*:\s*\{\s*"Vendor"\s*:\s*"([^"]*)"',text)
+assert factory and factory.group(1)=='Yuay Sound Records', 'Incorrect or missing VST3 factory vendor'
 PY
 echo 'PASS AU manufacturer name and VST3 vendor are Yuay Sound Records'
 killall AudioComponentRegistrar 2>/dev/null || true
