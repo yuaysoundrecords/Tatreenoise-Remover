@@ -10,6 +10,11 @@ on:
         description: 'Build and validate Mac Universal Setup'
         type: boolean
         default: false
+      macos_runner:
+        description: 'Standard macOS runner (no large/paid runner)'
+        type: choice
+        options: [macos-15, macos-15-intel]
+        default: macos-15
   push:
     paths: ['Source/**', 'assets/**', 'tests/**', 'scripts/**', 'macos/**', 'windows/**', 'docs/*INSTALL*', 'docs/MACOS-APPROVAL-TH-EN.txt', 'CMakeLists.txt', '.github/workflows/build.yml']
   pull_request:
@@ -65,7 +70,7 @@ jobs:
           if-no-files-found: error
   macos:
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.build_macos)
-    runs-on: macos-14
+    runs-on: ${{ inputs.macos_runner || 'macos-15' }}
     env:
       TATREE_TEST_SYSTEM_INSTALL: '1'
     steps:
