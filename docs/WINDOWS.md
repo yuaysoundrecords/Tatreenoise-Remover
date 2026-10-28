@@ -1,10 +1,14 @@
-# Tatree 2.1.2 — Windows x64 (free)
+# Tatree 2.1.3 — Windows x64 (free)
 
 ใช้ฟรีทุกฟังก์ชัน ไม่จำกัดเวลา ไม่ต้องใส่คีย์ ปุ่ม TIP / KO-FI มุมขวาบนเปิด https://ko-fi.com/yuaylooper เมื่อกดเท่านั้น การให้ทิปเป็นทางเลือกและไม่มีผลต่อการใช้งาน
 
 Free, with all features available and no time limit or activation key. The optional TIP / KO-FI button opens Yuaylooper’s donation page only when clicked.
 
-## ติดตั้งและทดลอง
+## ติดตั้งผ่าน Setup
+
+ชุดดาวน์โหลดล่าสุดมี Setup.exe และ INSTALL-TH-EN.txt ปิด DAW ก่อนแล้วเปิด Setup เพื่อลง VST3 ในตำแหน่งระบบมาตรฐานและ Standalone ต้องใช้สิทธิ์ผู้ดูแลระบบ รุ่นเดิมถูกสำรองนอกโฟลเดอร์สแกน
+
+## ติดตั้งจากชุด portable ที่บิลด์เอง
 
 1. แตก ZIP ทั้งหมดก่อน เปิด `Standalone/Tatree Noise Remover 2.exe` เลือกอุปกรณ์เสียงและใช้หูฟัง เริ่มฟังเบา ๆ
 2. รัน `Install-VST3.cmd` เพื่อติดตั้งใน `%LOCALAPPDATA%\Programs\Common\VST3` ไม่ต้อง administrator

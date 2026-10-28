@@ -1,13 +1,12 @@
-# Current validation — 2.1.2
+# Current validation — 2.1.3
 
-Native Windows and Mac builds passed on [run 40507885353](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40507885353), source `8a7deb1c85ba8cfb038a5cb0bdc8e320cf6c408f`.
+Windows job [122348352586](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40549297617/job/122348352586) passed. Mac job on [run 40552716233](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40552716233) passed. The Windows code and payload inputs are identical across the two source commits; the subsequent changes only corrected Mac ZIP packaging and selected a supported Sequoia CI runner.
 
-- Windows: packaging guards, audio/speech tests, native UI/control/caption/resize checks and pluginval passed.
-- Mac: Universal AU/VST3/Standalone, audio/speech and native UI checks, signatures/architectures, fresh and upgrade installer tests, vendor metadata and installed AU validation passed.
-- The bilingual helper was run against installed Mac bundles with cancellation input. It discovered/verified the targets and cancelled without modifying them. Its approval/quarantine-removal path on browser-downloaded current bundles has not been tested by this environment.
-- Local checks: shell syntax, UTF-8 archive filenames, executable permissions and ZIP integrity passed. Customer platform packages exclude development logs and internal reports.
-- DSP/processor code remains unchanged from the previous release. The UI change is the illustrated optional Ko-fi badge; the remaining changes are packaging/instructions.
-- GitHub reported successful evidence/package uploads. This environment could not download the final evidence ZIPs because their Azure storage hostname is denied by network policy. Final screenshots and platform archive contents have not been visually/re-extraction checked locally here. Artifact metadata and outer digests are recorded in `docs/evidence/current/platform-run.json`.
-- Mac binaries are ad-hoc signed, not Developer ID signed or notarized. A runner installation/cancellation test is not a customer Gatekeeper or full DAW compatibility test.
-- Older GitHub platform binary artifacts have been removed; test evidence is separate. Superseded local distribution files and old screenshots were removed from active folders after verified recovery archiving.
-- Gumroad/KVR files and screenshots have not been updated by this environment; no authenticated editing tool is available.
+- Windows: audio/speech, native UI and pluginval checks passed. The customer ZIP was extracted and its Setup bytes verified before testing fresh installation, upgrade/backup, installed binary hashes, required notices and uninstallation. Backups survived uninstall.
+- Mac Sequoia: Universal AU/VST3/Standalone, audio/speech/UI, signatures/architectures, fresh and upgrade installer tests, vendor metadata, installed AU validation and helper cancellation passed. Customer ZIP root entries, payload hashes, UTF-8 helper filename and executable permissions passed.
+- Local shell/PowerShell syntax and archive-format fixture checks passed. The fixture was labelled as non-native test data and was not distributed.
+- No DSP, plug-in UI or activation changes were made for this packaging update. Customer archives exclude development logs, internal reports and personal notes.
+- Mac binaries remain ad-hoc signed and not Apple-notarized; Windows Setup is not Authenticode-signed. CI installation and helper cancellation do not establish browser Gatekeeper approval, quarantine removal or full DAW compatibility on customer Macs.
+- Platform artifact metadata and outer ZIP digests are in docs/evidence/current/platform-run.json. Final packages could not be downloaded back into this cloud due to denied Azure storage domains; native CI checked the actual customer ZIPs before upload.
+- Only the current Windows/Mac Setup artifacts remain in the downloadable platform set. Recovery archives and test evidence are separate.
+- Gumroad content/files are not updated by this environment. The Gumroad domains are denied by network policy and no authenticated editing tool is available. No claim of inspecting the live Prued FX layout is made.

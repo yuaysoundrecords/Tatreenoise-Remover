@@ -1,4 +1,4 @@
-# Tatree Noise Remover 2.1.2 — free
+# Tatree Noise Remover 2.1.3 — free
 
 Native audio cleanup plugin by Yuay Sound Records. Cream/cobalt Thai indie UI, colour lawyer and audio-driven Motion FX. Mono/stereo VST3 + Standalone on Windows; Universal AU/VST3/Standalone source build on macOS 11+.
 
@@ -7,9 +7,11 @@ Native audio cleanup plugin by Yuay Sound Records. Cream/cobalt Thai indie UI, c
 - No speech banner on startup. Five user-control captions appear for 3 seconds, including De-breath and both Auto Gain ON/OFF clicks.
 - Real IN/OUT/GR meters, automation/state recall, fixed 1024-sample latency and original-dry Bypass.
 
-Version **2.1.2** adds the illustrated Ko-fi badge and a bilingual optional Mac AU/VST3 approval helper. Native Windows and Mac builds passed on [run 40507885353](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40507885353). Older downloadable GitHub platform packages have been removed.
+Version **2.1.3** adds native Windows Setup and clean bilingual customer installer archives. Windows fresh/upgrade/uninstall tests and Mac Universal installer/ZIP checks passed. The cream/cobalt UI, optional Ko-fi badge and audio processing are unchanged.
 
-[Windows 2.1.2](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40507885353/artifacts/12735309054) · [Mac Universal 2.1.2](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40507885353/artifacts/12736665701) · [Mac Setup 2.1.2 — UNSIGNED TEST](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40507885353/artifacts/12736760394)
+[Windows Setup 2.1.3](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40549297617/artifacts/12754847070) · [Mac Universal Setup 2.1.3 — UNSIGNED TEST](https://github.com/yuaysoundrecords/Tatreenoise-Remover/actions/runs/40552716233/artifacts/12756685564)
+
+These are GitHub artifact wrappers: extract once to obtain the platform ZIP for Gumroad. Each platform ZIP includes its Thai-first/English installation guide. Older downloadable platform artifacts have been removed.
 
 ## Free to use
 
@@ -21,7 +23,7 @@ The build creates an **UNSIGNED-TEST** native installer and a separate optional 
 
 ## Build and test
 
-**Windows:** Visual Studio 2022 Desktop C++, Windows SDK, Git and CMake ≥3.22; run `./scripts/build-windows.ps1` in PowerShell. It builds, tests audio/UI, validates VST3 and packages only matching validated binaries. [Windows guide](docs/WINDOWS.md).
+**Windows:** Visual Studio 2022 Desktop C++, Windows SDK, Git and CMake ≥3.22; run `./scripts/build-windows.ps1` in PowerShell. It builds, tests audio/UI, validates VST3 and packages only matching validated binaries. For native Setup, install Inno Setup 6 and run `./scripts/package-windows-setup.ps1` after the build. [Windows guide](docs/WINDOWS.md).
 
 **Mac:** install Apple Command Line Tools and CMake once, then double-click **BUILD-MAC.command**. Default builds Universal Apple Silicon + Intel with AU/VST3/Standalone. [Mac guide](docs/MACOS.md).
 
