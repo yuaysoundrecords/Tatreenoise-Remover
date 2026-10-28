@@ -24,6 +24,11 @@ if ($LASTEXITCODE -ne 0) { throw 'Windows Setup compilation failed.' }
 $Setup = Join-Path $Output "Tatree-$Version-Windows-x64-Setup.exe"
 if (-not (Test-Path $Setup)) { throw 'Windows Setup executable was not produced.' }
 $Stage = Join-Path $Output "Tatree-$Version-Windows-Setup"
+if (Test-Path $Stage) {
+    $ResolvedStage = [IO.Path]::GetFullPath($Stage)
+    if ((Split-Path $ResolvedStage -Parent) -ne [IO.Path]::GetFullPath($Output)) { throw 'Unsafe staging path.' }
+    Remove-Item -LiteralPath $ResolvedStage -Recurse -Force
+}
 New-Item -ItemType Directory -Force $Stage | Out-Null
 Copy-Item $Setup $Stage
 Copy-Item (Join-Path $Root 'docs/WINDOWS-INSTALL-TH-EN.txt') (Join-Path $Stage 'INSTALL-TH-EN.txt')

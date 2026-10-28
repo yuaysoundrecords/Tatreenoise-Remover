@@ -1,4 +1,4 @@
-﻿Tatree Noise Remover 2 — Yuay Sound Records
+Tatree Noise Remover 2 — Yuay Sound Records
 
 ติดตั้งบน Windows 10/11 (64-bit)
 1. ปิด DAW และ Tatree ที่เปิดอยู่ก่อน แล้วแตก ZIP ทั้งหมด
@@ -11,7 +11,7 @@
 ถ้าเคยลงแบบรายผู้ใช้ใน %LOCALAPPDATA%\Programs\Common\VST3
 ให้ย้ายเฉพาะ Tatree Noise Remover 2.vst3 ไปสำรองนอกโฟลเดอร์สแกนก่อน
 ไม่ต้องลบปลั๊กอินอื่นหรือโปรเจกต์ใน DAW
-Setup สำรอง Tatree VST3 เดิมที่ติดตั้งในตำแหน่งระบบไว้ที่
+Setup สำรอง Tatree VST3 และ Standalone เดิมที่ติดตั้งในตำแหน่งระบบไว้ที่
 C:\ProgramData\Yuay Sound Records\Tatree\Backups
 หากติดตั้งไม่ผ่าน ให้หยุดและเก็บโฟลเดอร์สำรองไว้
 ถอนการติดตั้งได้จาก Settings > Apps โดยไฟล์สำรองยังอยู่
@@ -37,7 +37,7 @@ Windows 10/11 installation (64-bit)
 If you previously installed to %LOCALAPPDATA%\Programs\Common\VST3,
 move only Tatree Noise Remover 2.vst3 to a backup outside scan folders first.
 Do not remove unrelated plug-ins or DAW projects.
-Setup backs up an existing system Tatree VST3 bundle to
+Setup backs up an existing system Tatree VST3 bundle and Standalone executable to
 C:\ProgramData\Yuay Sound Records\Tatree\Backups.
 If installation fails, stop and keep the backup.
 Uninstall through Settings > Apps. Recovery backups are retained.

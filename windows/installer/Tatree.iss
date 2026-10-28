@@ -1,4 +1,4 @@
-﻿#ifndef BuildRoot
+#ifndef BuildRoot
   #error BuildRoot is required
 #endif
 #ifndef SourceRoot
@@ -43,7 +43,7 @@ Name: "{group}\Tatree installation guide"; Filename: "{app}\INSTALL-TH-EN.txt"
 [Code]
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 var
-  Target, BackupBase, Backup, UserCopy: String;
+  Target, BackupBase, Backup, UserCopy, OldApp: String;
   Counter: Integer;
 begin
   Result := '';
@@ -53,7 +53,8 @@ begin
     exit;
   end;
   Target := ExpandConstant('{commoncf64}\VST3\Tatree Noise Remover 2.vst3');
-  if DirExists(Target) then begin
+  OldApp := ExpandConstant('{app}\Tatree Noise Remover 2.exe');
+  if DirExists(Target) or FileExists(OldApp) then begin
     BackupBase := ExpandConstant('{commonappdata}\Yuay Sound Records\Tatree\Backups');
     Backup := BackupBase + '\' + GetDateTimeString('yyyymmdd-hhnnss', '-', ':');
     Counter := 0;
@@ -65,7 +66,11 @@ begin
       Result := 'สร้างโฟลเดอร์สำรองไม่ได้ / Cannot create the backup folder: ' + Backup;
       exit;
     end;
-    if not RenameFile(Target, Backup + '\Tatree Noise Remover 2.vst3') then
+    if FileExists(OldApp) and not FileCopy(OldApp, Backup + '\Tatree Noise Remover 2.exe', True) then begin
+      Result := 'Cannot back up the existing Standalone. Close Tatree and retry.';
+      exit;
+    end;
+    if DirExists(Target) and not RenameFile(Target, Backup + '\Tatree Noise Remover 2.vst3') then
       Result := 'สำรอง Tatree เดิมไม่ได้ กรุณาปิด DAW และลองใหม่ / Cannot back up Tatree. Close your DAW and retry. Existing files were not replaced.';
   end;
 end;

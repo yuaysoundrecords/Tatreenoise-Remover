@@ -69,7 +69,7 @@ jobs:
           path: build-windows-msvc/installer/*.zip
           if-no-files-found: error
   macos:
-    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.build_macos)
+    if: (github.event_name == 'push' && !contains(github.event.head_commit.message, '[windows only]')) || (github.event_name == 'workflow_dispatch' && inputs.build_macos)
     runs-on: ${{ inputs.macos_runner || 'macos-15' }}
     env:
       TATREE_TEST_SYSTEM_INSTALL: '1'
